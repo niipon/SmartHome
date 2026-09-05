@@ -1,0 +1,337 @@
+﻿
+@page "/users"
+@rendermode InteractiveServer
+@using SmartHome.Models
+@using SmartHome.Data
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Db
+
+<div class="page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">УПРАВЛЕНИЕ ДОМОМ</p>
+
+            <h1>Пользователи</h1>
+
+            <p class="subtitle">
+                Управление доступом к вашему дому
+            </p>
+        </div>
+
+        <div class="page-title-icon">
+            👥
+        </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+    <div class="page-actions">
+
+        <button class="primary-button"
+                @onclick="OpenAddUserModal">
+
+            + Добавить пользователя
+
+        </button>
+
+    </div>
+
+
+    <!-- USERS TABLE -->
+    <div class="users-table-container">
+
+        <table class="users-table">
+
+            <thead>
+
+                <tr>
+                    <th>Пользователь</th>
+                    <th>Роль</th>
+                    <th>Статус</th>
+                    <th>Последняя активность</th>
+                    <th></th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @foreach (var user in users)
+                {
+                    <tr>
+
+                        <!-- USER -->
+                        <td>
+
+                            <div class="table-user">
+
+                                <div class="avatar">
+                                    @(string.IsNullOrEmpty(user.Name)
+                                                                    ? "?"
+                                                                    : user.Name.Substring(0, 1).ToUpper())
+                            </div>
+
+                                <div>
+
+                                    <strong>
+                                        @user.Name
+                                    </strong>
+
+                                    <small>
+                                        @user.Email
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- ROLE -->
+                        <td>
+
+                            <span class="role">
+                                @user.Role
+                            </span>
+
+                        </td>
+
+
+                        <!-- STATUS -->
+                        <td>
+
+                        @if (user.IsActive)
+                            {
+                                <span class="status-badge success">
+                                    Активен
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-badge">
+                                    Неактивен
+                                </span>
+                            }
+
+                    </td>
+
+
+                    <!-- LAST ACTIVITY -->
+                    <td>
+
+                        @(user.LastActive.HasValue
+                                                ? user.LastActive.Value.ToString("dd.MM.yyyy HH:mm")
+                                                : "Нет данных")
+
+                    </td>
+
+
+                        
+
+                    </tr>
+                                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    @if (showAddUserModal)
+    {
+        <div class="user-modal-overlay">
+
+            <div class="user-modal">
+
+                <div class="user-modal-header">
+
+                    <div>
+                        <h2>Добавить пользователя</h2>
+
+                        <p>
+                            Создайте новый доступ к вашему дому
+                        </p>
+                    </div>
+
+                    <button class="user-modal-close"
+                            @onclick="CloseAddUserModal">
+                        ×
+                    </button>
+
+                </div>
+
+                <div class="user-modal-body">
+
+                    <div class="user-form-group">
+                        <label>Имя</label>
+
+                        <input type="text"
+                               placeholder="Введите имя"
+                               @bind="newUser.Name" />
+                    </div>
+
+                    <div class="user-form-group">
+                        <label>Email</label>
+
+                        <input type="email"
+                               placeholder="Введите email"
+                               @bind="newUser.Email" />
+                    </div>
+
+                    <div class="user-form-group">
+                        <label>Пароль</label>
+
+                        <input type="password"
+                               placeholder="Введите пароль"
+                               @bind="newUser.Password" />
+                    </div>
+
+                    <div class="user-form-group">
+                        <label>Роль</label>
+
+                        <select @bind="newUser.Role">
+                            <option value="Пользователь">Пользователь</option>
+                            <option value="Гость">Гость</option>
+                        </select>
+                    </div>
+
+                    <div class="user-checkbox">
+                        <input type="checkbox"
+                               @bind="newUser.CanControlHome" />
+
+                        <label>
+                            Может управлять домом
+                        </label>
+                    </div>
+
+                    <div class="user-checkbox">
+                        <input type="checkbox"
+                               @bind="newUser.CanControlSecurity" />
+
+                        <label>
+                            Может управлять безопасностью
+                        </label>
+                    </div>
+
+                    <div class="user-checkbox">
+                        <input type="checkbox"
+                               @bind="newUser.IsActive" />
+
+                        <label>
+                            Активный доступ
+                        </label>
+                    </div>
+
+                </div>
+
+                <div class="user-modal-footer">
+
+                    <button class="user-cancel-button"
+                            @onclick="CloseAddUserModal">
+                        Отмена
+                    </button>
+
+                    <button class="user-save-button"
+                            @onclick="AddUser">
+                        Добавить
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+    
+</div>
+
+
+@code {
+
+    private List<User> users = new();
+
+    private User newUser = new();
+
+    private User selectedUser = new();
+
+    private bool showAddUserModal;
+
+    private bool showEditUserModal;
+
+    private bool showDeleteModal;
+
+
+    // READ
+    protected override async Task OnInitializedAsync()
+    {
+        users = await Db.Users
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
+    }
+
+
+    // OPEN ADD
+    private void OpenAddUserModal()
+    {
+        
+        showAddUserModal = true;
+    }
+
+
+    // CLOSE ADD
+    private void CloseAddUserModal()
+    {
+        showAddUserModal = false;
+    }
+
+
+    // CREATE
+    private async Task AddUser()
+    {
+        newUser.CreatedAt = DateTime.UtcNow;
+
+        Db.Users.Add(newUser);
+
+        await Db.SaveChangesAsync();
+
+        users = await Db.Users
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
+
+        newUser = new User();
+
+        showAddUserModal = false;
+    }
+
+    
+   
+
+
+    // UPDATE
+    private async Task SaveUser()
+    {
+        Db.Users.Update(selectedUser);
+
+        await Db.SaveChangesAsync();
+
+        users = await Db.Users
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
+
+        showEditUserModal = false;
+    }
+
+
+
+
+
+    
+}
+

@@ -1,0 +1,144 @@
+﻿@page "/security"
+
+
+@rendermode InteractiveServer
+
+@using System.Net.Http.Json
+
+@inject IHttpClientFactory HttpClientFactory
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div>
+            <p class="eyebrow">БЕЗОПАСНОСТЬ</p>
+            <h1>Охрана</h1>
+            <p class="subtitle">
+                Управление системой безопасности
+
+            </p>
+        </div>
+
+        <div class="page-title-icon">
+            🛡️
+        </div>
+
+    </header>
+
+
+    <section class="security-status">
+
+        <div class="security-shield">
+            🛡️
+        </div>
+
+        <div class="security-info">
+
+            <p class="eyebrow">СОСТОЯНИЕ СИСТЕМЫ</p>
+
+            <h2>Охрана активна</h2>
+
+            <p>
+                Все основные датчики работают нормально.
+            </p>
+
+        </div>
+        
+
+        <button class="danger-button" @onclick="ToggleSecurity">
+            @(securityEnabled ? "Выключить охрану" : "Включить охрану")
+        </button>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+                <p class="eyebrow">СИСТЕМА БЕЗОПАСНОСТИ</p>
+                <h2>Датчики</h2>
+            </div>
+
+        </div>
+
+
+        <div class="device-grid">
+
+
+
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👀
+                </div>
+
+                <div>
+
+                    <p>Движение</p>
+
+                    @if (homeData!.MotionDetected)
+                    {
+                        <h2>
+                            Обнаружено
+                        </h2>
+                    }
+                    else
+                    {
+                        <h2>
+                            Нет
+                        </h2>
+                    }
+
+                </div>
+
+            </div>
+
+          
+
+
+        </div>
+
+    </section>
+
+
+
+</div>
+
+
+@code {
+    private HomeData homeData = new HomeData();
+    private bool securityEnabled;
+
+    public async Task ToggleSecurity()
+    {
+        securityEnabled = !securityEnabled;
+        
+        var client = HttpClientFactory.CreateClient("HomeApi");
+
+        await client.PostAsJsonAsync(
+            "api/home/security",
+            securityEnabled
+        );
+	}
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = HttpClientFactory.CreateClient("HomeApi");
+
+        homeData = await client.GetFromJsonAsync<HomeData>("api/home")
+                    ?? new HomeData();
+
+        securityEnabled = homeData.SecurityEnabled;
+    }
+
+    public class HomeData
+    {
+        public bool SecurityEnabled { get; set; }
+		public bool MotionDetected { get; set; }
+    }
+}

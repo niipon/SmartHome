@@ -1,0 +1,51 @@
+﻿@page "/login"
+
+<div class="login-page">
+
+    <div class="login-card">
+
+        <div class="login-logo">
+            🏠
+        </div>
+
+        <p class="eyebrow">MY HOME</p>
+
+        <h1>Добро пожаловать</h1>
+
+        <p class="login-subtitle">
+            Войдите в систему умного дома
+        </p>
+
+        <form method="post" action="/api/account/login">
+
+            <div class="login-form">
+
+                <div class="login-group">
+                    <label>Email</label>
+
+                    <input type="email"
+                           name="Email"
+                           placeholder="Введите email"
+                           required />
+                </div>
+
+                <div class="login-group">
+                    <label>Пароль</label>
+
+                    <input type="password"
+                           name="Password"
+                           placeholder="Введите пароль"
+                           required />
+                </div>
+
+                <button class="login-button" type="submit">
+                    Войти
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

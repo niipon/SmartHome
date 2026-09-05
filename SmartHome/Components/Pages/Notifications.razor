@@ -1,0 +1,146 @@
+﻿
+@page "/notifications"
+@rendermode InteractiveServer
+
+@using SmartHome.Models
+@inject NavigationManager Navigation
+
+@using System.Net.Http.Json
+
+@inject IHttpClientFactory HttpClientFactory
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div>
+            <p class="eyebrow">MY HOME</p>
+            <h1>Уведомления</h1>
+            <p class="subtitle">
+                События вашего умного дома
+            </p>
+        </div>
+
+        <div class="page-title-icon">
+            🔔
+        </div>
+
+    </header>
+
+
+    <div class="notifications-list">
+
+        @if (notification.Count == 0)
+        {
+            <div class="empty-notifications">
+
+                <div class="empty-icon">
+                    🔔
+                </div>
+
+                <h3>Уведомлений пока нет</h3>
+
+                <p>
+                    Здесь будут появляться события вашего дома
+                </p>
+
+            </div>
+        }
+        else
+        {
+            @foreach (var notification in notification)
+            {
+                <div class="notification-card">
+
+                    <div class="notification-icon">
+                        @notification.Icon
+                    </div>
+
+                    <div class="notification-content">
+
+                        <h3>
+                            @notification.Title
+                        </h3>
+
+                        <p>
+                            @notification.Description
+                        </p>
+
+                        <span class="notification-time">
+                            @notification.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                        </span>
+
+                    </div>
+
+                </div>
+            }
+        }
+
+    </div>
+
+</div>
+
+
+@code {
+    private HomeData? homeData;
+    private bool loading = true;
+    private bool error = false;
+    private List<Notification> notification = new();
+
+    private void Notification()
+    {
+        if (homeData != null)
+        {
+            if (homeData.GasDetected == true)
+            {
+                notification.Add(new Notification
+                {
+                    Title = "ОБНАРУЖЕН ГААААЗ!!!!",
+                    Description = "Датчик газа обнаружил опасный уровень газа",
+                    Icon = "🔥",
+                    CreatedAt = DateTime.UtcNow
+                });
+
+            }
+
+
+            if (homeData.SecurityEnabled == true && homeData.MotionDetected == true)
+            {
+                notification.Add(new Notification { Title = "ДВИЖЕИНИИЕЕЕЕ!!!!", Description = "ДАТЧИК ДВИДЕНИЕ УВИДЕЛ ДВИДЕНИЕ", Icon = "💃🏿", CreatedAt = DateTime.UtcNow });
+            }
+        }
+
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var client = HttpClientFactory.CreateClient("HomeApi");
+
+            homeData = await client.GetFromJsonAsync<HomeData>("api/home");
+
+            Notification();
+
+            error = homeData == null;
+        }
+        catch
+        {
+            error = true;
+
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+   
+    public class HomeData
+    {
+        public bool GasDetected { get; set; }
+        public bool SecurityEnabled { get; set; }
+        public bool MotionDetected { get; set; }
+    }
+}
+

@@ -1,0 +1,83 @@
+﻿@* @inherits LayoutComponentBase
+
+<div class="app">
+
+    <main class="main-content">
+        @Body
+    </main>
+
+
+
+
+    <nav class="bottom-nav">
+
+        <NavLink href="/" Match="NavLinkMatch.All" class="bottom-nav-item">
+            <span class="nav-icon">⌂</span>
+            <span>Дом</span>
+        </NavLink>
+
+        <NavLink href="/security" class="bottom-nav-item">
+            <span class="nav-icon">🛡️</span>
+            <span>Охрана</span>
+        </NavLink>
+
+        <NavLink href="/lights" class="bottom-nav-item">
+            <span class="nav-icon">💡</span>
+            <span>Свет</span>
+        </NavLink>
+
+        <NavLink href="/statistics" class="bottom-nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Статистика</span>
+        </NavLink>
+
+        <NavLink href="/settings" class="bottom-nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Ещё</span>
+        </NavLink>
+
+    </nav>
+
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+ *@
+
+@inherits LayoutComponentBase
+
+<div class="app">
+
+    <main class="main-content">
+          @Body
+    </main>
+
+    <nav class="bottom-nav">
+
+        <NavLink href="/" Match="NavLinkMatch.All" class="bottom-nav-item">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+        </NavLink>
+
+        <NavLink href="/security" class="bottom-nav-item">
+            <span class="nav-icon">◉</span>
+            <span>Security</span>
+        </NavLink>
+
+        <NavLink href="/lights" class="bottom-nav-item">
+            <span class="nav-icon">☼</span>
+            <span>Lights</span>
+        </NavLink>
+
+
+        <NavLink href="/settings" class="bottom-nav-item">
+            <span class="nav-icon">⚙</span>
+            <span>Settings</span>
+        </NavLink>
+
+    </nav>
+
+</div>
