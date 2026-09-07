@@ -306,7 +306,28 @@
     private bool loading = true;
     private bool error = false;
 
+    private System.Threading.Timer? timer;
+
     protected override async Task OnInitializedAsync()
+    {
+        await LoadHomeData();
+
+        timer = new System.Threading.Timer(
+            async _ =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    await LoadHomeData();
+                    StateHasChanged();
+                });
+            },
+            null,
+            TimeSpan.FromSeconds(5),
+            TimeSpan.FromSeconds(5)
+        );
+    }
+
+    private async Task LoadHomeData()
     {
         try
         {
@@ -319,12 +340,16 @@
         catch
         {
             error = true;
-
         }
         finally
         {
             loading = false;
         }
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
     }
 
     public class HomeData
