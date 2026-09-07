@@ -3,11 +3,13 @@
 @rendermode InteractiveServer
 
 @using SmartHome.Models
+@using Microsoft.JSInterop
 @inject NavigationManager Navigation
 
 @using System.Net.Http.Json
 
 @inject IHttpClientFactory HttpClientFactory
+@inject IJSRuntime JS
 
 <div class="page">
 
@@ -27,6 +29,11 @@
 
     </header>
 
+    <div class="push-notification-settings">
+        <button class="push-button" @onclick="EnableNotifications">
+            🔔 Включить уведомления
+        </button>
+    </div>
 
     <div class="notifications-list">
 
@@ -134,6 +141,42 @@
         {
             loading = false;
         }
+    }
+
+    private async Task EnableNotifications()
+    {
+        try
+        {
+            var publicKey = "BFX-X1h-RYlIYA4Kn2cKggnVpMfEfjJdDH1GqLfpPNGgcC1w5yOuReZXgn0Ziot9a9ZT1m_frxQ6QBfEnHgMb-I";
+
+            var subscription = await JS.InvokeAsync<PushSubscriptionData>(
+                "pushNotifications.subscribe",
+                publicKey
+            );
+
+            var client = HttpClientFactory.CreateClient("HomeApi");
+
+            var response = await client.PostAsJsonAsync(
+                "api/home/push-subscription",
+                subscription
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Push-подписка сохранена!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка push-уведомлений: {ex.Message}");
+        }
+    }
+
+    public class PushSubscriptionData
+    {
+        public string Endpoint { get; set; } = "";
+        public string P256dh { get; set; } = "";
+        public string Auth { get; set; } = "";
     }
    
     public class HomeData

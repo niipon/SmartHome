@@ -1,12 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SmartHome.Models;
+using SmartHome.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmartHome.Controllers;
 
 [ApiController]
 [Route("api/home")]
-public class HomeController : ControllerBase
+public class HomeController : ControllerBase 
 {
+    private readonly AppDbContext _db;
+
+    public HomeController(AppDbContext db)
+    {
+        _db = db;
+    }
+
     private static HomeState currentState = new HomeState
     {
         IndoorTemperature = 0,
@@ -19,8 +28,24 @@ public class HomeController : ControllerBase
         UpdatedAt = DateTime.Now
     };
 
-// ESP32 отправляет сюда данные
-[HttpPost]
+    [HttpPost("push-subscription")]
+    public async Task<IActionResult> SavePushSubscription(
+    [FromBody] PushSubscription subscription)
+    {
+        var existing = await _db.PushSubscriptions
+            .FirstOrDefaultAsync(x => x.Endpoint == subscription.Endpoint);
+
+        if (existing == null)
+        {
+            _db.PushSubscriptions.Add(subscription);
+            await _db.SaveChangesAsync();
+        }
+
+        return Ok();
+    }
+
+    // ESP32 отправляет сюда данные
+    [HttpPost]
     public IActionResult UpdateHomeState([FromBody] HomeState state)
     {
         state.UpdatedAt = DateTime.Now;

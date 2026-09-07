@@ -45,6 +45,7 @@ using SmartHome.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<CurrentUserService>();
+builder.Services.AddSingleton<PushNotificationService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
