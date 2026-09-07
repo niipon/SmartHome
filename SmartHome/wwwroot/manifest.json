@@ -8,8 +8,8 @@
     "description": "Управление умным домом",
     "icons": [
         {
-            "src": "/golub",
-            "sizes": "192x192",
+            "src": "/smart-house",
+            "sizes": "512x512",
             "type": "image/png"
         }
     ]
