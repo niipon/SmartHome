@@ -8,8 +8,8 @@
     "description": "Управление умным домом",
     "icons": [
         {
-            "src": "/smart-house",
-            "sizes": "512x512",
+            "src": "/smart",
+            "sizes": "128x128",
             "type": "image/png"
         }
     ]
