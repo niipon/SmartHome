@@ -114,26 +114,63 @@
     private HomeData homeData = new HomeData();
     private bool securityEnabled;
 
-    public async Task ToggleSecurity()
+    private System.Threading.Timer? timer;
+
+    private async Task ToggleSecurity()
     {
         securityEnabled = !securityEnabled;
-        
+
         var client = HttpClientFactory.CreateClient("HomeApi");
 
         await client.PostAsJsonAsync(
             "api/home/security",
             securityEnabled
         );
-	}
+
+        await LoadHomeData();
+
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        var client = HttpClientFactory.CreateClient("HomeApi");
+        await LoadHomeData();
 
-        homeData = await client.GetFromJsonAsync<HomeData>("api/home")
-                    ?? new HomeData();
+        timer = new System.Threading.Timer(
+            async _ =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    await LoadHomeData();
+                    StateHasChanged();
+                });
+            },
+            null,
+            TimeSpan.FromSeconds(5),
+            TimeSpan.FromSeconds(5)
+        );
+    }
 
-        securityEnabled = homeData.SecurityEnabled;
+    private async Task LoadHomeData()
+    {
+        try
+        {
+            var client = HttpClientFactory.CreateClient("HomeApi");
+
+            homeData = await client.GetFromJsonAsync<HomeData>("api/home")
+                        ?? new HomeData();
+
+            securityEnabled = homeData.SecurityEnabled;
+        }
+        catch
+        {
+            // Если API временно недоступен — оставляем последние данные
+        }
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
     }
 
     public class HomeData
