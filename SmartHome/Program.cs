@@ -69,7 +69,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddHttpClient("HomeApi", client =>
 {
-    client.BaseAddress = new Uri("http://192.168.8.12:5284/");
+    client.BaseAddress = new Uri("https://smarthome-r4vs.onrender.com/");
 });
 
 var app = builder.Build();
