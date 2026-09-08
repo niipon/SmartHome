@@ -86,10 +86,7 @@ public class HomeController : ControllerBase
             gasNotificationSent = false;
         }
 
-        return Ok(new
-        {
-            message = "Данные получены"
-        });
+        
 
         // 👀 Движение при включённой охране
         if (state.SecurityEnabled && state.MotionDetected && !motionNotificationSent)
@@ -115,6 +112,11 @@ public class HomeController : ControllerBase
         {
             motionNotificationSent = false;
         }
+
+        return Ok(new
+        {
+            message = "Данные получены"
+        });
     }
 
     [HttpPost("security")]
