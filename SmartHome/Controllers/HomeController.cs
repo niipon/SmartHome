@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SmartHome.Models;
 using SmartHome.Data;
+using SmartHome.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmartHome.Controllers;
@@ -9,11 +10,37 @@ namespace SmartHome.Controllers;
 [Route("api/home")]
 public class HomeController : ControllerBase 
 {
-    private readonly AppDbContext _db;
 
-    public HomeController(AppDbContext db)
+    private readonly AppDbContext _db;
+    private readonly PushNotificationService _pushService;
+
+    public HomeController(
+    AppDbContext db,
+    PushNotificationService pushService)
     {
         _db = db;
+        _pushService = pushService;
+    }
+
+    [HttpPost("test-push")]
+    public async Task<IActionResult> TestPush()
+    {
+        var subscription = await _db.PushSubscriptions.FirstOrDefaultAsync();
+
+        if (subscription == null)
+        {
+            return NotFound("Push-подписка не найдена.");
+        }
+
+        await _pushService.SendAsync(
+            subscription.Endpoint,
+            subscription.P256dh,
+            subscription.Auth,
+            "🔔 SmartHome",
+            "Тестовое push-уведомление работает!"
+        );
+
+        return Ok("Тестовое уведомление отправлено!");
     }
 
     private static HomeState currentState = new HomeState

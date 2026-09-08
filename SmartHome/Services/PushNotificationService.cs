@@ -1,11 +1,15 @@
 ﻿using System.Text.Json;
 using Lib.Net.Http.WebPush;
 using Lib.Net.Http.WebPush.Authentication;
+using Microsoft.AspNetCore.Identity;
+using SmartHome.Data;
 
 namespace SmartHome.Services;
 
 public class PushNotificationService
 {
+    
+
     private readonly PushServiceClient _pushClient;
     private readonly VapidAuthentication _vapid;
 

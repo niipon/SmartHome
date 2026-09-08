@@ -35,6 +35,14 @@
         </button>
     </div>
 
+    <button class="push-button" @onclick="TestPush">
+        🧪 Тестовое уведомление
+    </button>
+
+    <p>@pushResult</p>
+
+
+
     <div class="notifications-list">
 
         @if (notification.Count == 0)
@@ -169,6 +177,47 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Ошибка push-уведомлений: {ex.Message}");
+        }
+    }
+
+    // private async Task TestPush()
+    // {
+    //     try
+    //     {
+    //         var client = HttpClientFactory.CreateClient("HomeApi");
+
+    //         var response = await client.PostAsync(
+    //             "api/home/test-push",
+    //             null
+    //         );
+
+    //         Console.WriteLine(await response.Content.ReadAsStringAsync());
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine($"Ошибка тестового push: {ex.Message}");
+    //     }
+    // }
+    private string pushResult = "";
+
+    private async Task TestPush()
+    {
+        try
+        {
+            var client = HttpClientFactory.CreateClient("HomeApi");
+
+            var response = await client.PostAsync(
+                "api/home/test-push",
+                null
+            );
+
+            var text = await response.Content.ReadAsStringAsync();
+
+            pushResult = $"HTTP {(int)response.StatusCode}: {text}";
+        }
+        catch (Exception ex)
+        {
+            pushResult = $"ОШИБКА: {ex.Message}";
         }
     }
 
