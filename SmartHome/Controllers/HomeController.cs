@@ -61,10 +61,22 @@ public class HomeController : ControllerBase
 
         currentState = state;
 
+
+
         // 🔥 Газ обнаружен
         if (state.GasDetected && !gasNotificationSent)
         {
             gasNotificationSent = true;
+
+            _db.HomeNotifications.Add(new HomeNotification
+            {
+                Title = "ОБНАРУЖЕН ГАЗ!",
+                Description = "Датчик газа обнаружил опасный уровень газа",
+                Icon = "🔥",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _db.SaveChangesAsync();
 
             var subscription = await _db.PushSubscriptions.FirstOrDefaultAsync();
 
@@ -93,6 +105,16 @@ public class HomeController : ControllerBase
         {
             motionNotificationSent = true;
 
+            _db.HomeNotifications.Add(new HomeNotification
+            {
+                Title = "ДВИЖЕНИЕ ОБНАРУЖЕНО!",
+                Description = "Датчик движения обнаружил активность при включённой охране",
+                Icon = "👀",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _db.SaveChangesAsync();
+
             var subscription = await _db.PushSubscriptions.FirstOrDefaultAsync();
 
             if (subscription != null)
@@ -105,6 +127,11 @@ public class HomeController : ControllerBase
                     "Датчик движения обнаружил активность при включённой охране!"
                 );
             }
+        }
+
+        if (!state.SecurityEnabled || !state.MotionDetected)
+        {
+            motionNotificationSent = false;
         }
 
         // Охрана выключена или движения больше нет — разрешаем следующее уведомление
@@ -133,6 +160,16 @@ public class HomeController : ControllerBase
     public IActionResult GetHomeState()
     {
         return Ok(currentState);
+    }
+
+    [HttpGet("notifications")]
+    public async Task<IActionResult> GetNotifications()
+    {
+        var notifications = await _db.HomeNotifications
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
+
+        return Ok(notifications);
     }
 
 }
