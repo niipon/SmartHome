@@ -22,26 +22,8 @@ public class HomeController : ControllerBase
         _pushService = pushService;
     }
 
-    [HttpPost("test-push")]
-    public async Task<IActionResult> TestPush()
-    {
-        var subscription = await _db.PushSubscriptions.FirstOrDefaultAsync();
-
-        if (subscription == null)
-        {
-            return NotFound("Push-подписка не найдена.");
-        }
-
-        await _pushService.SendAsync(
-            subscription.Endpoint,
-            subscription.P256dh,
-            subscription.Auth,
-            "🔔 SmartHome",
-            "Тестовое push-уведомление работает!"
-        );
-
-        return Ok("Тестовое уведомление отправлено!");
-    }
+    private static bool gasNotificationSent = false;
+    private static bool motionNotificationSent = false;
 
     private static HomeState currentState = new HomeState
     {
@@ -73,16 +55,66 @@ public class HomeController : ControllerBase
 
     // ESP32 отправляет сюда данные
     [HttpPost]
-    public IActionResult UpdateHomeState([FromBody] HomeState state)
+    public async Task<IActionResult> UpdateHomeState([FromBody] HomeState state)
     {
         state.UpdatedAt = DateTime.Now;
 
         currentState = state;
 
+        // 🔥 Газ обнаружен
+        if (state.GasDetected && !gasNotificationSent)
+        {
+            gasNotificationSent = true;
+
+            var subscription = await _db.PushSubscriptions.FirstOrDefaultAsync();
+
+            if (subscription != null)
+            {
+                await _pushService.SendAsync(
+                    subscription.Endpoint,
+                    subscription.P256dh,
+                    subscription.Auth,
+                    "🔥 ОПАСНОСТЬ!",
+                    "Датчик обнаружил газ в доме!"
+                );
+            }
+        }
+
+        // Газ больше не обнаружен — разрешаем следующее уведомление
+        if (!state.GasDetected)
+        {
+            gasNotificationSent = false;
+        }
+
         return Ok(new
         {
             message = "Данные получены"
         });
+
+        // 👀 Движение при включённой охране
+        if (state.SecurityEnabled && state.MotionDetected && !motionNotificationSent)
+        {
+            motionNotificationSent = true;
+
+            var subscription = await _db.PushSubscriptions.FirstOrDefaultAsync();
+
+            if (subscription != null)
+            {
+                await _pushService.SendAsync(
+                    subscription.Endpoint,
+                    subscription.P256dh,
+                    subscription.Auth,
+                    "👀 ДВИЖЕНИЕ!",
+                    "Датчик движения обнаружил активность при включённой охране!"
+                );
+            }
+        }
+
+        // Охрана выключена или движения больше нет — разрешаем следующее уведомление
+        if (!state.SecurityEnabled || !state.MotionDetected)
+        {
+            motionNotificationSent = false;
+        }
     }
 
     [HttpPost("security")]
