@@ -1,936 +1,428 @@
 ﻿@page "/home-plan"
-@rendermode InteractiveServer
 
 <div class="home-plan-page">
 
-    <div class="plan-wrapper">
+    <div class="plan-card">
+
+        <svg viewBox="430 40 500 450"
+             xmlns="http://www.w3.org/2000/svg"
+             class="house-plan">
+
+            <!-- Фон -->
+            <rect x="430" y="40" width="500" height="450" fill="#ffffff" />
+
+            <!-- =========================
+                 ПОЛ
+            ========================== -->
+
+            <!-- Прихожая -->
+            <rect x="478" y="70"
+                  width="84.5"
+                  height="207.5"
+                  class="floor hallway-floor" />
+
+            <!-- Комната 1 -->
+            <rect x="582" y="70"
+                  width="126.5"
+                  height="177.5"
+                  class="floor room-floor" />
+
+            <!-- Комната 2 -->
+            <rect x="720" y="70"
+                  width="165"
+                  height="174.5"
+                  class="floor room-floor" />
+
+            <!-- Комната 3 / коридор -->
+            <rect x="708" y="267"
+                  width="177"
+                  height="70"
+                  class="floor room-floor" />
+
+            <!-- Балкон -->
+            <rect x="563" y="267"
+                  width="122"
+                  height="169"
+                  class="floor balcony-floor" />
+
+            <!-- Ванная -->
+            <rect x="736" y="360"
+                  width="73"
+                  height="120"
+                  class="floor bathroom-floor" />
+
+
+            <!-- =========================
+                 СТЕНЫ
+            ========================== -->
+
+            <rect x="478" y="70"
+                  width="84.5"
+                  height="207.5"
+                  class="wall" />
+
+            <rect x="582" y="70"
+                  width="126.5"
+                  height="177.5"
+                  class="wall" />
+
+            <rect x="720" y="70"
+                  width="165"
+                  height="174.5"
+                  class="wall" />
+
+            <rect x="708" y="267"
+                  width="177"
+                  height="70"
+                  class="wall" />
+
+            <rect x="563" y="267"
+                  width="122"
+                  height="169"
+                  class="wall" />
 
-        <div class="plan-header">
-            <div>
-                <div class="plan-title">MY HOME</div>
-                <div class="plan-subtitle">План квартиры</div>
-            </div>
-
-            <div class="plan-status">
-                <span class="status-dot"></span>
-                Система активна
-            </div>
-        </div>
+            <rect x="736" y="360"
+                  width="73"
+                  height="120"
+                  class="wall" />
 
 
-        <div class="plan-content">
+            <!-- =========================
+                 ОКНА
+            ========================== -->
 
-            <!-- ========================= -->
-            <!-- ПЛАН -->
-            <!-- ========================= -->
-
-            <div class="floor-plan">
-
-                <svg viewBox="0 0 1050 760"
-                     xmlns="http://www.w3.org/2000/svg">
-
-                    <defs>
-
-                        <!-- Тень стен -->
-                        <filter id="wallShadow"
-                                x="-20%"
-                                y="-20%"
-                                width="140%"
-                                height="140%">
-
-                            <feDropShadow dx="0"
-                                          dy="4"
-                                          stdDeviation="5"
-                                          flood-opacity="0.18" />
-
-                        </filter>
-
-                        <!-- Тень мебели -->
-                        <filter id="objectShadow"
-                                x="-20%"
-                                y="-20%"
-                                width="140%"
-                                height="140%">
-
-                            <feDropShadow dx="0"
-                                          dy="2"
-                                          stdDeviation="3"
-                                          flood-opacity="0.15" />
-
-                        </filter>
-
-                        <!-- Текстура пола -->
-                        <pattern id="woodFloor"
-                                 width="35"
-                                 height="35"
-                                 patternUnits="userSpaceOnUse">
-
-                            <rect width="35"
-                                  height="35"
-                                  fill="#eadfca" />
-
-                            <line x1="0"
-                                  y1="17"
-                                  x2="35"
-                                  y2="17"
-                                  stroke="#dfd1b8"
-                                  stroke-width="1" />
-
-                        </pattern>
-
-                    </defs>
-
-
-                    <!-- Фон -->
-
-                    <rect x="0"
-                          y="0"
-                          width="1050"
-                          height="760"
-                          fill="#fafafa" />
-
-
-                    <!-- ================================= -->
-                    <!-- КВАРТИРА -->
-                    <!-- ================================= -->
-
-                    <g filter="url(#wallShadow)">
-
-                        <!-- Общий силуэт -->
-                        <path d="
-                            M 150 80
-                            L 820 80
-                            L 820 325
-                            L 875 325
-                            L 875 540
-                            L 820 540
-                            L 820 680
-                            L 150 680
-                            L 150 455
-                            L 105 455
-                            L 105 80
-                            Z"
-                              fill="#202832" />
-
-                    </g>
-
-
-                    <!-- ================================= -->
-                    <!-- ВНУТРЕННИЕ ПОЛЫ -->
-                    <!-- ================================= -->
-                    <!-- Прихожая -->
-                    <rect x="125"
-                          y="105"
-                          width="175"
-                          height="330"
-                          rx="2"
-                          fill="#ddd7ca" />
-
-                    <!-- Комната 1 -->
-                    <rect x="315"
-                          y="105"
-                          width="220"
-                          height="275"
-                          rx="2"
-                          fill="url(#woodFloor)" />
-
-                    <!-- Комната 2 -->
-                    <rect x="550"
-                          y="105"
-                          width="245"
-                          height="275"
-                          rx="2"
-                          fill="url(#woodFloor)" />
-
-                    <!-- Коридор -->
-                    <rect x="315"
-                          y="405"
-                          width="480"
-                          height="120"
-                          rx="2"
-                          fill="url(#woodFloor)" />
-
-                    <!-- Кухня -->
-                    <rect x="175"
-                          y="545"
-                          width="350"
-                          height="110"
-                          rx="2"
-                          fill="url(#woodFloor)" />
-
-                    <!-- Балкон -->
-                    <rect x="125"
-                          y="460"
-                          width="175"
-                          height="195"
-                          rx="2"
-                          fill="#d8dce0" />
-
-                    <!-- Ванная -->
-                    <rect x="820"
-                          y="350"
-                          width="30"
-                          height="165"
-                          fill="#d7dce0" />
-
-
-                    <!-- ================================= -->
-                    <!-- ОКНА -->
-                    <!-- ================================= -->
-                    <!-- Верхние окна -->
-
-                    <g fill="#d8f0f7"
-                       stroke="#7aa8ba"
-                       stroke-width="2">
-
-                        <rect x="335"
-                              y="83"
-                              width="175"
-                              height="12"
-                              rx="3" />
-
-                        <rect x="570"
-                              y="83"
-                              width="200"
-                              height="12"
-                              rx="3" />
-
-                    </g>
-
-                    <!-- Балконное остекление -->
-
-                    <g stroke="#75a9bc"
-                       stroke-width="3">
-
-                        <line x1="112"
-                              y1="475"
-                              x2="112"
-                              y2="635" />
-
-                        <line x1="118"
-                              y1="475"
-                              x2="118"
-                              y2="635" />
-
-                        <line x1="125"
-                              y1="475"
-                              x2="125"
-                              y2="635" />
-
-                    </g>
-
-
-                    <!-- ================================= -->
-                    <!-- ДВЕРИ -->
-                    <!-- ================================= -->
-                    <!-- Дверь в комнату 1 -->
-
-                    <g stroke="#303943"
-                       stroke-width="2"
-                       fill="none">
-
-                        <line x1="315"
-                              y1="385"
-                              x2="365"
-                              y2="385" />
-
-                        <path d="
-                            M 365 385
-                            A 50 50 0 0 0 315 335" />
-
-                    </g>
-
-
-                    <!-- Дверь в комнату 2 -->
-
-                    <g stroke="#303943"
-                       stroke-width="2"
-                       fill="none">
-
-                        <line x1="550"
-                              y1="385"
-                              x2="600"
-                              y2="385" />
-
-                        <path d="
-                            M 600 385
-                            A 50 50 0 0 0 550 335" />
-
-                    </g>
-
-
-                    <!-- Дверь в ванную -->
-
-                    <g stroke="#303943"
-                       stroke-width="2"
-                       fill="none">
-
-                        <line x1="795"
-                              y1="410"
-                              x2="795"
-                              y2="455" />
-
-                        <path d="
-                            M 795 455
-                            A 45 45 0 0 0 750 410" />
-
-                    </g>
-
-
-                    <!-- Входная дверь -->
-
-                    <g stroke="#303943"
-                       stroke-width="3"
-                       fill="none">
-
-                        <line x1="490"
-                              y1="680"
-                              x2="540"
-                              y2="680" />
-
-                        <path d="
-                            M 540 680
-                            A 50 50 0 0 1 490 630" />
-
-                    </g>
-
-
-                    <!-- ================================= -->
-                    <!-- КОМНАТА 1 — КРОВАТЬ -->
-                    <!-- ================================= -->
-
-                    <g filter="url(#objectShadow)">
-
-                        <!-- кровать -->
-                        <rect x="365"
-                              y="145"
-                              width="120"
-                              height="185"
-                              rx="12"
-                              fill="#f7f5f0" />
-
-                        <!-- матрас -->
-                        <rect x="375"
-                              y="160"
-                              width="100"
-                              height="155"
-                              rx="10"
-                              fill="#d9e0d4" />
-
-                        <!-- подушки -->
-                        <rect x="385"
-                              y="170"
-                              width="80"
-                              height="35"
-                              rx="8"
-                              fill="white" />
-
-                        <rect x="385"
-                              y="212"
-                              width="80"
-                              height="35"
-                              rx="8"
-                              fill="white" />
-
-                    </g>
-
-
-                    <!-- Тумба -->
-
-                    <rect x="335"
-                          y="155"
-                          width="25"
-                          height="60"
-                          rx="4"
-                          fill="#a98761" />
-
-
-                    <!-- Растение -->
-
-                    <circle cx="500"
-                            cy="140"
-                            r="14"
-                            fill="#78936f" />
+            <!-- Верхнее окно комнаты 1 -->
+            <rect x="600"
+                  y="65"
+                  width="90"
+                  height="6"
+                  class="window" />
 
-                    <circle cx="492"
-                            cy="133"
-                            r="10"
-                            fill="#91aa82" />
-
-                    <circle cx="507"
-                            cy="130"
-                            r="9"
-                            fill="#6f8967" />
-
-
-                    <!-- ================================= -->
-                    <!-- КОМНАТА 2 -->
-                    <!-- ================================= -->
-                    <!-- Кровать -->
+            <line x1="645" y1="65"
+                  x2="645" y2="71"
+                  class="window-line" />
 
-                    <g filter="url(#objectShadow)">
-
-                        <rect x="600"
-                              y="145"
-                              width="145"
-                              height="185"
-                              rx="12"
-                              fill="#f7f5f0" />
-
-                        <rect x="610"
-                              y="160"
-                              width="125"
-                              height="155"
-                              rx="10"
-                              fill="#eeeeeb" />
-
-                        <!-- подушки -->
-
-                        <rect x="620"
-                              y="170"
-                              width="105"
-                              height="38"
-                              rx="8"
-                              fill="white" />
-
-                        <rect x="620"
-                              y="215"
-                              width="105"
-                              height="38"
-                              rx="8"
-                              fill="white" />
-
-                    </g>
-
-
-                    <!-- Шкаф -->
-
-                    <rect x="760"
-                          y="135"
-                          width="25"
-                          height="180"
-                          rx="4"
-                          fill="#a98a65" />
-
-
-                    <!-- Растение -->
-
-                    <circle cx="570"
-                            cy="135"
-                            r="13"
-                            fill="#6e8c67" />
-
-                    <circle cx="578"
-                            cy="127"
-                            r="9"
-                            fill="#87a47b" />
-
-
-                    <!-- ================================= -->
-                    <!-- ПРИХОЖАЯ -->
-                    <!-- ================================= -->
-
-                    <text x="212"
-                          y="235"
-                          text-anchor="middle"
-                          class="room-title">
-
-                        ПРИХОЖАЯ
-
-                    </text>
-
-                    <text x="212"
-                          y="260"
-                          text-anchor="middle"
-                          class="room-size">
-
-                        16.5 м²
-
-                    </text>
 
-
-                    <!-- Шкаф в прихожей -->
-
-                    <rect x="145"
-                          y="120"
-                          width="45"
-                          height="210"
-                          rx="5"
-                          fill="#a88a67" />
-
-                    <line x1="167"
-                          y1="120"
-                          x2="167"
-                          y2="330"
-                          stroke="#8c704f"
-                          stroke-width="2" />
-
-
-                    <!-- ================================= -->
-                    <!-- КУХНЯ -->
-                    <!-- ================================= -->
-                    <!-- кухонный гарнитур -->
-
-                    <rect x="190"
-                          y="555"
-                          width="310"
-                          height="35"
-                          rx="5"
-                          fill="#d7d1c5" />
-
-                    <!-- плита -->
+            <!-- Верхнее окно комнаты 2 -->
+            <rect x="750"
+                  y="65"
+                  width="105"
+                  height="6"
+                  class="window" />
 
-                    <rect x="275"
-                          y="557"
-                          width="45"
-                          height="30"
-                          rx="4"
-                          fill="#41484f" />
+            <line x1="802" y1="65"
+                  x2="802" y2="71"
+                  class="window-line" />
 
-                    <circle cx="288"
-                            cy="567"
-                            r="5"
-                            fill="#bfc2c3" />
 
-                    <circle cx="307"
-                            cy="567"
-                            r="5"
-                            fill="#bfc2c3" />
+            <!-- Окно балкона -->
+            <rect x="568"
+                  y="425"
+                  width="110"
+                  height="6"
+                  class="window" />
 
-                    <circle cx="288"
-                            cy="579"
-                            r="5"
-                            fill="#bfc2c3" />
+            <line x1="605" y1="425"
+                  x2="605" y2="431"
+                  class="window-line" />
 
-                    <circle cx="307"
-                            cy="579"
-                            r="5"
-                            fill="#bfc2c3" />
+            <line x1="642" y1="425"
+                  x2="642" y2="431"
+                  class="window-line" />
 
 
-                    <!-- мойка -->
+            <!-- =========================
+                 ДВЕРИ
+            ========================== -->
 
-                    <rect x="335"
-                          y="557"
-                          width="50"
-                          height="28"
-                          rx="5"
-                          fill="#aeb7bb" />
+            <!-- Дверь из прихожей в комнату 1 -->
 
+            <rect x="570"
+                  y="155"
+                  width="18"
+                  height="3"
+                  class="door-opening" />
 
-                    <!-- холодильник -->
+            <line x1="582"
+                  y1="155"
+                  x2="620"
+                  y2="155"
+                  class="door" />
 
-                    <rect x="445"
-                          y="550"
-                          width="45"
-                          height="65"
-                          rx="5"
-                          fill="#e9ecec" />
+            <path d="M582 155 A38 38 0 0 1 620 193"
+                  class="door-arc" />
 
-                    <line x1="445"
-                          y1="580"
-                          x2="490"
-                          y2="580"
-                          stroke="#c5c9ca"
-                          stroke-width="2" />
 
+            <!-- Дверь из прихожей в комнату 2 -->
 
-                    <!-- стол -->
-
-                    <rect x="275"
-                          y="615"
-                          width="130"
-                          height="25"
-                          rx="5"
-                          fill="#9b7650" />
-
-
-                    <!-- стулья -->
-
-                    <circle cx="255"
-                            cy="627"
-                            r="12"
-                            fill="#535c62" />
-
-                    <circle cx="425"
-                            cy="627"
-                            r="12"
-                            fill="#535c62" />
-
-                    <circle cx="320"
-                            cy="650"
-                            r="12"
-                            fill="#535c62" />
-
-                    <circle cx="365"
-                            cy="650"
-                            r="12"
-                            fill="#535c62" />
-
-
-                    <!-- ================================= -->
-                    <!-- БАЛКОН -->
-                    <!-- ================================= -->
-
-                    <text x="212"
-                          y="500"
-                          text-anchor="middle"
-                          class="room-title">
-
-                        БАЛКОН
-
-                    </text>
-
-                    <text x="212"
-                          y="525"
-                          text-anchor="middle"
-                          class="room-size">
-
-                        8.8 м²
-
-                    </text>
-
-
-                    <!-- кресла -->
-
-                    <ellipse cx="165"
-                             cy="570"
-                             rx="25"
-                             ry="20"
-                             fill="#c5b7a2" />
-
-                    <ellipse cx="240"
-                             cy="570"
-                             rx="25"
-                             ry="20"
-                             fill="#d0c2ae" />
-
-
-                    <!-- растение -->
-
-                    <circle cx="215"
-                            cy="615"
-                            r="15"
-                            fill="#72906a" />
-
-                    <circle cx="205"
-                            cy="608"
-                            r="10"
-                            fill="#8ba681" />
-
-                    <circle cx="225"
-                            cy="605"
-                            r="10"
-                            fill="#64845d" />
-
-
-                    <!-- ================================= -->
-                    <!-- КОРИДОР -->
-                    <!-- ================================= -->
-
-                    <text x="555"
-                          y="455"
-                          text-anchor="middle"
-                          class="room-title">
-
-                        ПРИХОЖАЯ / КОРИДОР
-
-                    </text>
-
-                    <text x="555"
-                          y="480"
-                          text-anchor="middle"
-                          class="room-size">
-
-                        12.5 м²
-
-                    </text>
-
-
-                    <!-- консоль -->
-
-                    <rect x="650"
-                          y="490"
-                          width="90"
-                          height="18"
-                          rx="3"
-                          fill="#9b7650" />
-
-
-                    <!-- растение -->
-
-                    <circle cx="665"
-                            cy="480"
-                            r="10"
-                            fill="#72916b" />
-
-
-                    <!-- ================================= -->
-                    <!-- ВАННАЯ -->
-                    <!-- ================================= -->
-                    <!-- ванна -->
-
-                    <rect x="805"
-                          y="370"
-                          width="75"
-                          height="125"
-                          rx="15"
-                          fill="#f4f5f4"
-                          stroke="#c5cccf"
-                          stroke-width="3" />
-
-
-                    <!-- раковина -->
-
-                    <ellipse cx="820"
-                             cy="365"
-                             rx="28"
-                             ry="15"
-                             fill="#f7f7f7"
-                             stroke="#bfc7ca"
-                             stroke-width="2" />
-
-
-                    <!-- туалет -->
-
-                    <rect x="770"
-                          y="450"
-                          width="35"
-                          height="50"
-                          rx="12"
-                          fill="#f3f4f4"
-                          stroke="#c5cbcd"
-                          stroke-width="2" />
-
-
-                    <!-- ================================= -->
-                    <!-- ПОДПИСИ -->
-                    <!-- ================================= -->
-
-                    <text x="425"
-                          y="355"
-                          text-anchor="middle"
-                          class="room-title">
-
-                        КОМНАТА 1
-
-                    </text>
-
-                    <text x="425"
-                          y="375"
-                          text-anchor="middle"
-                          class="room-size">
-
-                        12.7 м²
-
-                    </text>
-
-
-                    <text x="675"
-                          y="355"
-                          text-anchor="middle"
-                          class="room-title">
-
-                        КОМНАТА 2
-
-                    </text>
-
-                    <text x="675"
-                          y="375"
-                          text-anchor="middle"
-                          class="room-size">
-
-                        16.5 м²
-
-                    </text>
-
-
-                    <text x="835"
-                          y="525"
-                          text-anchor="middle"
-                          class="room-title">
-
-                        ВАННАЯ
-
-                    </text>
-
-                    <text x="835"
-                          y="545"
-                          text-anchor="middle"
-                          class="room-size">
-
-                        7.3 м²
-
-                    </text>
-
-
-                    <text x="350"
-                          y="535"
-                          text-anchor="middle"
-                          class="room-title">
-
-                        КУХНЯ
-
-                    </text>
-
-                    <text x="350"
-                          y="550"
-                          text-anchor="middle"
-                          class="room-size">
-
-                        12.3 м²
-
-                    </text>
-
-
-                    <!-- ================================= -->
-                    <!-- СЕВЕР -->
-                    <!-- ================================= -->
-
-                    <g transform="translate(930 110)">
-
-                        <circle cx="0"
-                                cy="0"
-                                r="28"
-                                fill="white"
-                                stroke="#b9c0c5"
-                                stroke-width="2" />
-
-                        <path d="M 0 -22 L 8 10 L 0 5 L -8 10 Z"
-                              fill="#33404c" />
-
-                        <text x="0"
-                              y="-38"
-                              text-anchor="middle"
-                              class="compass">
-
-                            С
-
-                        </text>
-
-                    </g>
-
-                </svg>
-
-            </div>
-
-
-            <!-- ================================= -->
-            <!-- ПРАВАЯ ПАНЕЛЬ -->
-            <!-- ================================= -->
-
-            <div class="info-panel">
-
-                <div class="info-card">
-
-                    <h3>Экспликация</h3>
-
-                    <div class="room-row">
-                        <span>Комната 1</span>
-                        <strong>12.7 м²</strong>
-                    </div>
-
-                    <div class="room-row">
-                        <span>Комната 2</span>
-                        <strong>16.5 м²</strong>
-                    </div>
-
-                    <div class="room-row">
-                        <span>Прихожая</span>
-                        <strong>16.5 м²</strong>
-                    </div>
-
-                    <div class="room-row">
-                        <span>Кухня</span>
-                        <strong>12.3 м²</strong>
-                    </div>
-
-                    <div class="room-row">
-                        <span>Ванная</span>
-                        <strong>7.3 м²</strong>
-                    </div>
-
-                    <div class="room-row">
-                        <span>Балкон</span>
-                        <strong>8.8 м²</strong>
-                    </div>
-
-                    <div class="room-row">
-                        <span>Коридор</span>
-                        <strong>12.5 м²</strong>
-                    </div>
-
-                </div>
-
-
-                <div class="info-card">
-
-                    <h3>Размеры</h3>
-
-                    <div class="dimension">
-                        <span>Комната 1</span>
-                        <b>253 × 355 см</b>
-                    </div>
-
-                    <div class="dimension">
-                        <span>Комната 2</span>
-                        <b>330 × 349 см</b>
-                    </div>
-
-                    <div class="dimension">
-                        <span>Прихожая</span>
-                        <b>354 × 140 см</b>
-                    </div>
-
-                    <div class="dimension">
-                        <span>Кухня</span>
-                        <b>338 × 243 см</b>
-                    </div>
-
-                    <div class="dimension">
-                        <span>Ванная</span>
-                        <b>240 × 145 см</b>
-                    </div>
-
-                    <div class="dimension">
-                        <span>Балкон</span>
-                        <b>415 × 169 см</b>
-                    </div>
-
-                    <div class="dimension">
-                        <span>Стена 1–2</span>
-                        <b>11.5 см</b>
-                    </div>
-
-                </div>
-
-
-                <div class="info-card smart-card">
-
-                    <div class="smart-title">
-                        SMART HOME
-                    </div>
-
-                    <div class="smart-item">
-                        <span>●</span>
-                        Датчики активны
-                    </div>
-
-                    <div class="smart-item">
-                        <span>●</span>
-                        Освещение подключено
-                    </div>
-
-                    <div class="smart-item">
-                        <span>●</span>
-                        Охрана готова
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
+            <line x1="708"
+                  y1="155"
+                  x2="748"
+                  y2="155"
+                  class="door" />
+
+            <path d="M708 155 A40 40 0 0 0 748 195"
+                  class="door-arc" />
+
+
+            <!-- Дверь в коридор -->
+
+            <line x1="708"
+                  y1="280"
+                  x2="708"
+                  y2="315"
+                  class="door" />
+
+            <path d="M708 315 A35 35 0 0 1 743 280"
+                  class="door-arc" />
+
+
+            <!-- Дверь в ванную -->
+
+            <line x1="736"
+                  y1="385"
+                  x2="770"
+                  y2="385"
+                  class="door" />
+
+            <path d="M770 385 A34 34 0 0 0 736 419"
+                  class="door-arc" />
+
+
+            <!-- Дверь на балкон -->
+
+            <line x1="685"
+                  y1="300"
+                  x2="650"
+                  y2="300"
+                  class="door" />
+
+            <path d="M650 300 A35 35 0 0 0 685 335"
+                  class="door-arc" />
+
+
+            <!-- =========================
+                 КОМНАТА 1
+            ========================== -->
+
+            <!-- Кровать -->
+            <rect x="600"
+                  y="90"
+                  width="65"
+                  height="105"
+                  rx="7"
+                  class="bed" />
+
+            <rect x="605"
+                  y="95"
+                  width="55"
+                  height="25"
+                  rx="5"
+                  class="pillow" />
+
+            <!-- Тумба -->
+            <rect x="675"
+                  y="100"
+                  width="18"
+                  height="35"
+                  rx="3"
+                  class="wood-furniture" />
+
+            <!-- Ковер -->
+            <ellipse cx="650"
+                     cy="220"
+                     rx="38"
+                     ry="16"
+                     class="carpet" />
+
+
+            <!-- =========================
+                 КОМНАТА 2
+            ========================== -->
+
+            <!-- Кровать -->
+            <rect x="745"
+                  y="95"
+                  width="110"
+                  height="65"
+                  rx="7"
+                  class="bed" />
+
+            <rect x="750"
+                  y="100"
+                  width="45"
+                  height="23"
+                  rx="5"
+                  class="pillow" />
+
+            <rect x="805"
+                  y="100"
+                  width="45"
+                  height="23"
+                  rx="5"
+                  class="pillow" />
+
+            <!-- Шкаф -->
+            <rect x="830"
+                  y="180"
+                  width="28"
+                  height="48"
+                  rx="3"
+                  class="wood-furniture" />
+
+            <!-- Ковер -->
+            <rect x="745"
+                  y="170"
+                  width="70"
+                  height="55"
+                  rx="8"
+                  class="carpet" />
+
+
+            <!-- =========================
+                 ПРИХОЖАЯ
+            ========================== -->
+
+            <!-- Шкаф -->
+            <rect x="490"
+                  y="90"
+                  width="25"
+                  height="95"
+                  rx="3"
+                  class="wood-furniture" />
+
+            <!-- Зеркало -->
+            <rect x="530"
+                  y="95"
+                  width="18"
+                  height="55"
+                  rx="5"
+                  class="mirror" />
+
+            <!-- Пуфик -->
+            <ellipse cx="520"
+                     cy="225"
+                     rx="17"
+                     ry="10"
+                     class="pouf" />
+
+
+            <!-- =========================
+                 КОРИДОР
+            ========================== -->
+
+            <!-- Консоль -->
+            <rect x="765"
+                  y="280"
+                  width="75"
+                  height="18"
+                  rx="3"
+                  class="wood-furniture" />
+
+            <!-- Ковер -->
+            <rect x="735"
+                  y="305"
+                  width="125"
+                  height="22"
+                  rx="5"
+                  class="carpet" />
+
+
+            <!-- =========================
+                 БАЛКОН
+            ========================== -->
+
+            <!-- Кресло -->
+            <rect x="580"
+                  y="290"
+                  width="35"
+                  height="45"
+                  rx="12"
+                  class="chair" />
+
+            <!-- Стол -->
+            <circle cx="650"
+                    cy="370"
+                    r="20"
+                    class="balcony-table" />
+
+            <!-- Второе кресло -->
+            <rect x="620"
+                  y="390"
+                  width="35"
+                  height="25"
+                  rx="10"
+                  class="chair" />
+
+
+            <!-- =========================
+                 ВАННАЯ
+            ========================== -->
+
+            <!-- Ванна -->
+            <rect x="748"
+                  y="365"
+                  width="45"
+                  height="85"
+                  rx="18"
+                  class="bath" />
+
+            <!-- Раковина -->
+            <ellipse cx="818"
+                     cy="380"
+                     rx="13"
+                     ry="9"
+                     class="sink" />
+
+            <!-- Унитаз -->
+            <ellipse cx="818"
+                     cy="430"
+                     rx="11"
+                     ry="15"
+                     class="toilet" />
+
+
+            <!-- =========================
+                 НАЗВАНИЯ
+            ========================== -->
+
+            <text x="645"
+                  y="215"
+                  class="room-name">
+                Комната 1
+            </text>
+
+            <text x="802"
+                  y="235"
+                  class="room-name">
+                Комната 2
+            </text>
+
+            <text x="520"
+                  y="200"
+                  class="room-name">
+                Прихожая
+            </text>
+
+            <text x="795"
+                  y="320"
+                  class="room-name">
+                Коридор
+            </text>
+
+            <text x="620"
+                  y="355"
+                  class="room-name">
+                Балкон
+            </text>
+
+            <text x="772"
+                  y="465"
+                  class="room-name">
+                Ванная
+            </text>
+
+        </svg>
 
     </div>
 
@@ -939,253 +431,251 @@
 
 <style>
 
-    * {
+    /* =========================
+       ОСНОВА
+    ========================= */
+
+    .home-plan-page {
+        width: 100%;
+        min-height: 100vh;
+
+        background: #eef0f2;
+
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+
+        padding: 35px;
+
+        box-sizing: border-box;
+
+        overflow: auto;
+    }
+
+
+    .plan-card {
+        width: 1000px;
+
+        background: #ffffff;
+
+        border-radius: 24px;
+
+        padding: 25px;
+
+        box-shadow:
+            0 20px 60px rgba(20, 30, 40, 0.15);
+
         box-sizing: border-box;
     }
 
-    .home-plan-page {
-        min-height: 100vh;
+
+    .house-plan {
+        display: block;
+
         width: 100%;
-        padding: 35px;
-        background: radial-gradient(circle at top left, #ffffff 0%, #f1f3f4 45%, #e9ecef 100%);
-        font-family: Inter, Arial, sans-serif;
+
+        height: auto;
     }
 
 
-    .plan-wrapper {
-        max-width: 1450px;
-        margin: 0 auto;
-        background: rgba(255,255,255,.88);
-        border-radius: 28px;
-        box-shadow: 0 25px 70px rgba(25,35,45,.14);
-        overflow: hidden;
-        border: 1px solid rgba(255,255,255,.8);
+    /* =========================
+       ПОЛ
+    ========================= */
+
+    .floor {
+        stroke: none;
+    }
+
+    .room-floor {
+        fill: #f5f1e8;
+    }
+
+    .hallway-floor {
+        fill: #eee9df;
+    }
+
+    .balcony-floor {
+        fill: #dfe5e8;
+    }
+
+    .bathroom-floor {
+        fill: #e8eef1;
     }
 
 
-    /* HEADER */
+    /* =========================
+       СТЕНЫ
+    ========================= */
 
-    .plan-header {
-        height: 90px;
-        padding: 0 35px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid #e5e8ea;
-        background: rgba(255,255,255,.92);
+    .wall {
+        fill: none;
+
+        stroke: #202832;
+
+        stroke-width: 9;
+
+        stroke-linejoin: miter;
     }
 
 
-    .plan-title {
-        font-size: 27px;
-        font-weight: 800;
-        letter-spacing: 3px;
-        color: #202832;
+    /* =========================
+       ОКНА
+    ========================= */
+
+    .window {
+        fill: #d9edf7;
+
+        stroke: #79aabd;
+
+        stroke-width: 2;
+    }
+
+    .window-line {
+        stroke: #79aabd;
+
+        stroke-width: 1.5;
     }
 
 
-    .plan-subtitle {
-        margin-top: 4px;
-        color: #899198;
-        font-size: 14px;
+    /* =========================
+       ДВЕРИ
+    ========================= */
+
+    .door {
+        stroke: #303943;
+
+        stroke-width: 3;
+
+        fill: none;
+    }
+
+    .door-arc {
+        stroke: #8b949e;
+
+        stroke-width: 1.5;
+
+        fill: none;
+
+        stroke-dasharray: 4 3;
+    }
+
+    .door-opening {
+        fill: #ffffff;
+
+        stroke: none;
     }
 
 
-    .plan-status {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        padding: 10px 16px;
-        border-radius: 30px;
-        background: #f1f5f1;
-        color: #526456;
+    /* =========================
+       МЕБЕЛЬ
+    ========================= */
+
+    .bed {
+        fill: #c9bda9;
+
+        stroke: #a99b86;
+
+        stroke-width: 1.5;
+    }
+
+    .pillow {
+        fill: #f8f6f1;
+
+        stroke: #ddd8cf;
+
+        stroke-width: 1;
+    }
+
+    .wood-furniture {
+        fill: #aa8c68;
+
+        stroke: #8c7254;
+
+        stroke-width: 1;
+    }
+
+    .carpet {
+        fill: #ded8cc;
+
+        stroke: #c8c0b2;
+
+        stroke-width: 1;
+    }
+
+    .mirror {
+        fill: #d9e8ed;
+
+        stroke: #91aab3;
+
+        stroke-width: 2;
+    }
+
+    .pouf {
+        fill: #9d9385;
+    }
+
+    .chair {
+        fill: #9b9285;
+
+        stroke: #81786d;
+
+        stroke-width: 1;
+    }
+
+    .balcony-table {
+        fill: #a88b6b;
+
+        stroke: #856d53;
+
+        stroke-width: 1;
+    }
+
+
+    /* =========================
+       ВАННАЯ
+    ========================== */
+
+    .bath {
+        fill: #ffffff;
+
+        stroke: #9baab2;
+
+        stroke-width: 2;
+    }
+
+    .sink {
+        fill: #ffffff;
+
+        stroke: #9baab2;
+
+        stroke-width: 2;
+    }
+
+    .toilet {
+        fill: #ffffff;
+
+        stroke: #9baab2;
+
+        stroke-width: 2;
+    }
+
+
+    /* =========================
+       НАЗВАНИЯ
+    ========================== */
+
+    .room-name {
+        fill: #27313b;
+
+        font-family: Arial, sans-serif;
+
         font-size: 13px;
+
         font-weight: 600;
+
+        text-anchor: middle;
+
+        letter-spacing: 0.3px;
     }
 
-
-    .status-dot {
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        background: #6d9568;
-        box-shadow: 0 0 0 5px rgba(109,149,104,.12);
-    }
-
-
-    /* CONTENT */
-
-    .plan-content {
-        display: grid;
-        grid-template-columns: minmax(700px, 1fr) 330px;
-        gap: 25px;
-        padding: 30px;
-    }
-
-
-    .floor-plan {
-        min-width: 0;
-        background: #ffffff;
-        border-radius: 22px;
-        padding: 15px;
-        box-shadow: inset 0 0 0 1px #edf0f1;
-    }
-
-
-        .floor-plan svg {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
-
-
-    /* TEXT */
-
-    .room-title {
-        font-size: 16px;
-        font-weight: 700;
-        fill: #252d35;
-        letter-spacing: .3px;
-    }
-
-
-    .room-size {
-        font-size: 13px;
-        font-weight: 500;
-        fill: #626c73;
-    }
-
-
-    .compass {
-        font-size: 13px;
-        font-weight: 700;
-        fill: #34414b;
-    }
-
-
-    /* RIGHT PANEL */
-
-    .info-panel {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-    }
-
-
-    .info-card {
-        padding: 22px;
-        border-radius: 20px;
-        background: #ffffff;
-        border: 1px solid #e7eaec;
-        box-shadow: 0 8px 25px rgba(30,40,50,.06);
-    }
-
-
-        .info-card h3 {
-            margin: 0 0 18px;
-            font-size: 18px;
-            color: #27323b;
-        }
-
-
-    .room-row,
-    .dimension {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        padding: 10px 0;
-        border-bottom: 1px solid #eef0f1;
-        font-size: 13px;
-        color: #667079;
-    }
-
-
-        .room-row:last-child,
-        .dimension:last-child {
-            border-bottom: none;
-        }
-
-
-        .room-row strong {
-            color: #34424c;
-            font-weight: 700;
-        }
-
-
-        .dimension b {
-            color: #34424c;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-
-    .smart-card {
-        background: linear-gradient( 145deg, #f7faf7, #eef4ee );
-    }
-
-
-    .smart-title {
-        font-size: 16px;
-        font-weight: 800;
-        letter-spacing: 1.5px;
-        color: #344c38;
-        margin-bottom: 15px;
-    }
-
-
-    .smart-item {
-        font-size: 13px;
-        color: #59675c;
-        margin-top: 10px;
-    }
-
-
-        .smart-item span {
-            color: #6f956b;
-            margin-right: 7px;
-        }
-
-
-    /* АДАПТАЦИЯ */
-
-    @@media (max-width: 1050px) {
-        .plan-content
-
-    {
-        grid-template-columns: 1fr;
-    }
-
-    .info-panel {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    }
-
-
-    @@media (max-width: 700px) {
-        .home-plan-page
-
-    {
-        padding: 10px;
-    }
-
-    .plan-header {
-        padding: 0 20px;
-    }
-
-    .plan-content {
-        padding: 12px;
-    }
-
-    .info-panel {
-        grid-template-columns: 1fr;
-    }
-
-    .plan-status {
-        display: none;
-    }
-
-    }
 </style>
