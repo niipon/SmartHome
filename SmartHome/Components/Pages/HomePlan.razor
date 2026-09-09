@@ -1,0 +1,81 @@
+﻿@page "/home-plan"
+<div class="home-plan-page">
+    <div class="home-plan">
+        <svg width="1440"
+             height="900"
+             viewBox="0 0 1440 900"
+             xmlns="http://www.w3.org/2000/svg">
+            <!-- Фон -->
+            <rect width="1440"
+                  height="900"
+                  fill="white" />
+            <!-- Комнаты -->
+            <!-- Комната 1 -->
+            <rect x="582"
+                  y="70"
+                  width="126.5"
+                  height="177.5"
+                  fill="#D9D9D9" />
+            <!-- Комната 2 -->
+            <rect x="720"
+                  y="70"
+                  width="165"
+                  height="174.5"
+                  fill="#D9D9D9" />
+            <!-- Комната 3 -->
+            <rect x="708"
+                  y="267"
+                  width="177"
+                  height="70"
+                  fill="#D9D9D9" />
+            <!-- Балкон -->
+            <rect x="563"
+                  y="267"
+                  width="122"
+                  height="169"
+                  fill="#D9D9D9" />
+            <!-- Ванная -->
+            <rect x="736"
+                  y="360"
+                  width="73"
+                  height="120"
+                  fill="#D9D9D9" />
+            <!-- Коридор / входная зона -->
+            <rect x="478"
+                  y="70"
+                  width="84.5"
+                  height="207.5"
+                  fill="#D9D9D9" />
+            <!-- Дверной проём -->
+            <line x1="888.5"
+                  y1="290"
+                  x2="888.5"
+                  y2="322"
+                  stroke="white" />
+        </svg>
+    </div>
+</div>
+<style>
+    .home-plan-page {
+        width: 100%;
+        min-height: 100vh;
+        background: #f5f5f5;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 30px;
+        overflow: auto;
+    }
+    .home-plan {
+        width: 1440px;
+        height: 900px;
+        background: white;
+        flex-shrink: 0;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+    }
+    .home-plan svg {
+        display: block;
+        width: 1440px;
+        height: 900px;
+    }
+</style>
