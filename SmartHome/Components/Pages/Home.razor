@@ -1,8 +1,13 @@
 ﻿@page "/"
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
+@using SmartHome.Components.Launch
 
 @rendermode InteractiveServer
+@if (showLaunch)
+{
+    <LaunchMode OnFinished="FinishLaunch" />
+}
 @inject NavigationManager Navigation
 @using System.Net.Http.Json
 
@@ -305,6 +310,13 @@
     private HomeData? homeData;
     private bool loading = true;
     private bool error = false;
+
+    private bool showLaunch = true;
+
+    private void FinishLaunch()
+    {
+        showLaunch = false;
+    }
 
     private System.Threading.Timer? timer;
 
