@@ -5,14 +5,10 @@
 
 @rendermode InteractiveServer
 
+@inject NavigationManager Navigation
+@using System.Net.Http.Json
 
-
-@if (showLaunch)
-{
-    <LaunchMode OnFinished="FinishLaunch" />
-}
-else
-{
+@inject IHttpClientFactory HttpClientFactory
 
 
 <div class="page">
@@ -307,23 +303,15 @@ else
     }
 
 </div>
-}
-    @inject NavigationManager Navigation
-    @using System.Net.Http.Json
 
-@inject IHttpClientFactory HttpClientFactory
+
 
 @code {
     private HomeData? homeData;
     private bool loading = true;
     private bool error = false;
 
-    private bool showLaunch = true;
 
-    private void FinishLaunch()
-    {
-        showLaunch = false;
-    }
 
     private System.Threading.Timer? timer;
 
