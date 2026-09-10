@@ -1,0 +1,20 @@
+﻿@rendermode InteractiveServer
+
+@if (showLaunch)
+{
+    <LaunchMode OnFinished="FinishLaunch" />
+}
+else
+{
+    <Routes />
+}
+
+@code
+{
+    private bool showLaunch = true;
+
+    private void FinishLaunch()
+    {
+        showLaunch = false;
+    }
+}

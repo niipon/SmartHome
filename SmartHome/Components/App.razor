@@ -22,14 +22,7 @@
 
 <body>
 
-    @if (showLaunch)
-    {
-        <LaunchMode OnFinished="FinishLaunch" />
-    }
-    else
-    {
-        <Routes />
-    }
+    <LaunchHost />
 
     <script src="_framework/blazor.web.js"></script>
     <script src="push-notifications.js"></script>
@@ -47,12 +40,3 @@
 </body>
 
 </html>
-
-@code {
-    private bool showLaunch = true;
-
-    private void FinishLaunch()
-    {
-        showLaunch = false;
-    }
-}
