@@ -4,14 +4,16 @@
 @using SmartHome.Components.Launch
 
 @rendermode InteractiveServer
+
+
+
 @if (showLaunch)
 {
     <LaunchMode OnFinished="FinishLaunch" />
 }
-@inject NavigationManager Navigation
-@using System.Net.Http.Json
+else
+{
 
-@inject IHttpClientFactory HttpClientFactory
 
 <div class="page">
 
@@ -305,6 +307,11 @@
     }
 
 </div>
+}
+    @inject NavigationManager Navigation
+    @using System.Net.Http.Json
+
+@inject IHttpClientFactory HttpClientFactory
 
 @code {
     private HomeData? homeData;
