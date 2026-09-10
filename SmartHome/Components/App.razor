@@ -507,6 +507,10 @@
             }
         }
 
+        body.launch-complete .launch-screen {
+            display: none !important;
+        }
+
     </style>
 
 </head>
@@ -629,54 +633,133 @@
 
         (() => {
 
-            const launch =
-                document.getElementById("launch-screen");
+            const STORAGE_KEY = "myhome-launch-shown";
+
+            let launchWasShown =
+                sessionStorage.getItem(STORAGE_KEY) === "true";
 
 
             /*
-             * Если заставка уже была показана
-             * в этой вкладке — сразу отключаем её.
+             * Если заставка уже была показана,
+             * сразу помечаем приложение как запущенное.
              */
 
-            if (
-                sessionStorage.getItem(
-                    "myhome-launch-shown"
-                ) === "true"
-            ) {
+            if (launchWasShown) {
+
+                document.body.classList.add("launch-complete");
+
+            }
+
+
+            /*
+             * Удаляет любую заставку,
+             * которая появилась после навигации.
+             */
+
+            function removeLaunchIfNeeded() {
+
+                if (!launchWasShown)
+                    return;
+
 
                 document.body.classList.add(
                     "launch-complete"
                 );
 
-                launch?.remove();
 
-                return;
+                const launch =
+                    document.getElementById("launch-screen");
+
+
+                if (launch) {
+
+                    launch.remove();
+
+                }
+
             }
 
 
             /*
-             * Первый запуск.
+             * Следим за изменениями DOM.
+             *
+             * Blazor может заново создать
+             * launch-screen при переходе:
+             *
+             * Home → Security
+             * Security → Lights
+             * Lights → Settings
+             *
+             * MutationObserver сразу его удалит.
              */
+
+            const observer =
+                new MutationObserver(() => {
+
+                    removeLaunchIfNeeded();
+
+                });
+
+
+            observer.observe(
+                document.body,
+                {
+                    childList: true,
+                    subtree: true
+                }
+            );
+
+
+            /*
+             * Если заставка уже была показана —
+             * больше ничего не запускаем.
+             */
+
+            if (launchWasShown) {
+
+                removeLaunchIfNeeded();
+
+                return;
+
+            }
+
+
+            /*
+             * Первый запуск приложения.
+             */
+
+            const launch =
+                document.getElementById(
+                    "launch-screen"
+                );
+
 
             if (!launch)
                 return;
 
 
             /*
-             * Запоминаем запуск.
+             * Запоминаем первый запуск.
              */
 
             sessionStorage.setItem(
-                "myhome-launch-shown",
+                STORAGE_KEY,
                 "true"
             );
 
+            launchWasShown = true;
+
 
             /*
-             * Ждём 5.5 секунд.
+             * Через 5.5 секунд начинаем
+             * красивое исчезновение.
              */
 
             setTimeout(() => {
+
+                if (!launch)
+                    return;
+
 
                 launch.classList.add(
                     "launch-finished"
@@ -684,8 +767,7 @@
 
 
                 /*
-                 * Ждём завершения
-                 * анимации исчезновения.
+                 * После анимации полностью удаляем.
                  */
 
                 setTimeout(() => {
@@ -694,42 +776,16 @@
                         "launch-complete"
                     );
 
+
                     launch.remove();
 
                 }, 700);
 
+
             }, 5500);
 
+
         })();
-
-
-        /* =========================
-           SERVICE WORKER
-           ========================= */
-
-        if ("serviceWorker" in navigator) {
-
-            window.addEventListener("load", () => {
-
-                navigator.serviceWorker
-                    .register("/service-worker.js")
-
-                    .then(() =>
-                        console.log(
-                            "Service Worker зарегистрирован"
-                        )
-                    )
-
-                    .catch(error =>
-                        console.error(
-                            "Ошибка Service Worker:",
-                            error
-                        )
-                    );
-
-            });
-
-        }
 
     </script>
 
