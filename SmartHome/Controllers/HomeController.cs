@@ -3,6 +3,7 @@ using SmartHome.Models;
 using SmartHome.Data;
 using SmartHome.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace SmartHome.Controllers;
 
@@ -78,18 +79,26 @@ public class HomeController : ControllerBase
 
             await _db.SaveChangesAsync();
 
-            var subscription = await _db.PushSubscriptions.FirstOrDefaultAsync();
+            var subscriptions = await _db.PushSubscriptions.ToListAsync();
 
-            if (subscription != null)
-            {
-                await _pushService.SendAsync(
-                    subscription.Endpoint,
-                    subscription.P256dh,
-                    subscription.Auth,
-                    "🔥 ОПАСНОСТЬ!",
-                    "Датчик обнаружил газ в доме!"
-                );
+            foreach (var subscription in subscriptions)
+
+                try {
+                    
+                        await _pushService.SendAsync(
+                            subscription.Endpoint,
+                            subscription.P256dh,
+                            subscription.Auth,
+                            "🔥 ОПАСНОСТЬ!",
+                            "Датчик обнаружил газ в доме!"
+                        );
+                    
+                }
+                catch 
+                {
+                    
             }
+        
         }
 
         // Газ больше не обнаружен — разрешаем следующее уведомление
@@ -115,18 +124,27 @@ public class HomeController : ControllerBase
 
             await _db.SaveChangesAsync();
 
-            var subscription = await _db.PushSubscriptions.FirstOrDefaultAsync();
 
-            if (subscription != null)
-            {
-                await _pushService.SendAsync(
+            var subscriptions = await _db.PushSubscriptions.ToListAsync();
+
+            foreach (var subscription in subscriptions)
+
+                try
+                {
+                    await _pushService.SendAsync(
                     subscription.Endpoint,
                     subscription.P256dh,
                     subscription.Auth,
                     "👀 ДВИЖЕНИЕ!",
                     "Датчик движения обнаружил активность при включённой охране!"
                 );
-            }
+                }
+                catch
+                {
+
+                }
+                
+            
         }
 
         if (!state.SecurityEnabled || !state.MotionDetected)
