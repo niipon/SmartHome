@@ -1,7 +1,7 @@
 ﻿@page "/"
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
-@using SmartHome.Components.Launch
+
 
 @rendermode InteractiveServer
 
@@ -10,12 +10,7 @@
 
 @inject IHttpClientFactory HttpClientFactory
 
-@if (showLaunch)
-{
-    <LaunchMode OnFinished="FinishLaunch" />
-}
-else
-{
+
 
 <div class="page">
 
@@ -309,7 +304,7 @@ else
     }
 
 </div>
-}
+
 
 
 @code {
@@ -317,12 +312,7 @@ else
     private bool loading = true;
     private bool error = false;
 
-    private bool showLaunch = true;
 
-    private void FinishLaunch()
-    {
-        showLaunch = false;
-    }
 
     private System.Threading.Timer? timer;
 
