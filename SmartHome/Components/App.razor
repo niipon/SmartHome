@@ -520,33 +520,37 @@
 
     <script>
 
-        window.addEventListener("load", () => {
+                window.addEventListener("load", () => {
+
+            const launch =
+                document.getElementById("launch-screen");
+
+            if (!launch)
+                return;
+
+            // Если заставка уже показывалась в этой вкладке —
+            // сразу убираем её
+            if (sessionStorage.getItem("myhome-launch-shown") === "true") {
+
+                launch.remove();
+
+                return;
+            }
+
+            // Запоминаем, что заставка уже была показана
+            sessionStorage.setItem("myhome-launch-shown", "true");
+
+
+            // Точно как в старом LaunchMode:
+            // 5500 мс до начала исчезновения
 
             setTimeout(() => {
-
-                const launch =
-                    document.getElementById("launch-screen");
-
-                if (!launch)
-                    return;
-
-                /*
-                 * Это аналог:
-                 *
-                 * finished = true;
-                 *
-                 * из LaunchMode
-                 */
 
                 launch.classList.add("launch-finished");
 
 
-                /*
-                 * Это аналог:
-                 *
-                 * await Task.Delay(700);
-                 * OnFinished.InvokeAsync();
-                 */
+                // Точно как:
+                // await Task.Delay(700)
 
                 setTimeout(() => {
 
