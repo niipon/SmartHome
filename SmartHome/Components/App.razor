@@ -33,8 +33,6 @@
 
 </html> *@
 
-@using SmartHome.Components.Launch
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -52,26 +50,105 @@
     <link rel="icon" type="image/png" href="smart-house.png" />
     <link rel="apple-touch-icon" href="/smart.png" />
 
+    <style>
+        #startup-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+
+            background: #0b0d10;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            transition: opacity .5s ease;
+        }
+
+        #startup-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .startup-content {
+            text-align: center;
+        }
+
+        .startup-logo {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: white;
+        }
+
+        .startup-status {
+            margin-top: 12px;
+
+            font-size: 11px;
+            letter-spacing: 3px;
+
+            color: rgba(255,255,255,.55);
+        }
+
+        .startup-dot {
+            display: inline-block;
+
+            width: 7px;
+            height: 7px;
+
+            margin-right: 7px;
+
+            border-radius: 50%;
+
+            background: #6cff9b;
+            box-shadow: 0 0 12px #6cff9b;
+        }
+    </style>
+
     <HeadOutlet />
 </head>
 
 <body>
 
-    @if (showLaunch)
-    {
-        <div id="launch-container">
-            <LaunchMode OnFinished="FinishLaunch" />
-        </div>
-    }
+    <!-- Показывается сразу, ещё до запуска Blazor -->
+    <div id="startup-screen">
+        <div class="startup-content">
 
-    <div id="app-container">
-        <Routes />
+            <div class="startup-logo">
+                MY HOME
+            </div>
+
+            <div class="startup-status">
+                <span class="startup-dot"></span>
+                SYSTEM ONLINE
+            </div>
+
+        </div>
     </div>
+
+    <Routes />
 
     <script src="_framework/blazor.web.js"></script>
     <script src="push-notifications.js"></script>
 
     <script>
+        window.addEventListener("load", () => {
+
+            setTimeout(() => {
+
+                const screen = document.getElementById("startup-screen");
+
+                if (screen) {
+                    screen.classList.add("hide");
+
+                    setTimeout(() => {
+                        screen.remove();
+                    }, 500);
+                }
+
+            }, 100);
+        });
+
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
                 navigator.serviceWorker.register("/service-worker.js")
@@ -84,13 +161,3 @@
 </body>
 
 </html>
-
-@code {
-
-    private bool showLaunch = true;
-
-    private void FinishLaunch()
-    {
-        showLaunch = false;
-    }
-}

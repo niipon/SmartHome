@@ -10,6 +10,12 @@
 
 @inject IHttpClientFactory HttpClientFactory
 
+@if (showLaunch)
+{
+    <LaunchMode OnFinished="FinishLaunch" />
+}
+else
+{
 
 <div class="page">
 
@@ -303,7 +309,7 @@
     }
 
 </div>
-
+}
 
 
 @code {
@@ -311,7 +317,12 @@
     private bool loading = true;
     private bool error = false;
 
+    private bool showLaunch = true;
 
+    private void FinishLaunch()
+    {
+        showLaunch = false;
+    }
 
     private System.Threading.Timer? timer;
 
