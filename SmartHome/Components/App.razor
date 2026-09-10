@@ -2,10 +2,13 @@
 <html lang="en">
 
 <head>
+
     <link rel="manifest" href="/manifest.json">
+
     <meta name="theme-color" content="#111827">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <base href="/" />
 
     <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
@@ -18,11 +21,16 @@
     <HeadOutlet />
 
     <style>
+
+        /* =========================
+                   LAUNCH SCREEN
+                   ========================= */
+
         .launch-screen {
             position: fixed;
             inset: 0;
             z-index: 99999;
-            background: radial-gradient(circle at 50% 45%, #111820 0%, #07090c 45%, #030405 100%);
+            background: radial-gradient( circle at 50% 45%, #111820 0%, #07090c 45%, #030405 100% );
             display: flex;
             align-items: center;
             justify-content: center;
@@ -30,11 +38,19 @@
             animation: launchAppear 0.8s ease-out forwards;
         }
 
+        /* Если заставка уже была показана,
+                   полностью скрываем её */
+        body.launch-complete .launch-screen {
+            display: none !important;
+        }
+
+
         .launch-background {
             position: absolute;
             inset: 0;
             overflow: hidden;
         }
+
 
         .grid-floor {
             position: absolute;
@@ -42,13 +58,14 @@
             height: 55%;
             left: -40%;
             bottom: -25%;
-            background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+            background-image: linear-gradient( rgba(255,255,255,.035) 1px, transparent 1px ), linear-gradient( 90deg, rgba(255,255,255,.035) 1px, transparent 1px );
             background-size: 55px 55px;
             transform: perspective(500px) rotateX(60deg);
             transform-origin: center bottom;
             opacity: 0;
             animation: gridAppear 2s ease-out 0.7s forwards, gridMove 8s linear infinite;
         }
+
 
         .launch-content {
             position: relative;
@@ -61,6 +78,11 @@
             perspective: 1200px;
         }
 
+
+        /* =========================
+                   HOUSE
+                   ========================= */
+
         .house-scene {
             width: 340px;
             height: 300px;
@@ -71,6 +93,7 @@
             perspective: 1000px;
         }
 
+
         .house {
             position: relative;
             width: 260px;
@@ -80,6 +103,7 @@
             opacity: 0;
             animation: houseAppear 1.5s cubic-bezier(.2,.8,.2,1) 0.5s forwards, houseFloat 5s ease-in-out 2s infinite;
         }
+
 
         .house-base {
             position: absolute;
@@ -93,17 +117,19 @@
             box-shadow: 0 0 30px rgba(120,180,255,.12);
         }
 
+
         .house-front {
             position: absolute;
             left: 20px;
             bottom: 12px;
             width: 200px;
             height: 130px;
-            background: linear-gradient(135deg, #1c242d, #0e1318);
+            background: linear-gradient( 135deg, #1c242d, #0e1318 );
             border: 1px solid rgba(255,255,255,.14);
             transform: translateZ(35px);
             box-shadow: inset 0 0 30px rgba(255,255,255,.025);
         }
+
 
         .house-side {
             position: absolute;
@@ -111,19 +137,25 @@
             bottom: 12px;
             width: 55px;
             height: 130px;
-            background: linear-gradient(135deg, #11171d, #080b0f);
+            background: linear-gradient( 135deg, #11171d, #080b0f );
             border: 1px solid rgba(255,255,255,.1);
             transform: skewY(-28deg) translateZ(0);
         }
+
+
+        /* =========================
+                   ROOF
+                   ========================= */
 
         .roof {
             position: absolute;
             width: 145px;
             height: 85px;
-            background: linear-gradient(135deg, #202a35, #0b1015);
+            background: linear-gradient( 135deg, #202a35, #0b1015 );
             border: 1px solid rgba(255,255,255,.18);
             top: 5px;
         }
+
 
         .roof-left {
             left: 17px;
@@ -131,11 +163,17 @@
             transform-origin: right bottom;
         }
 
+
         .roof-right {
             left: 130px;
             transform: rotate(-27deg) skewX(25deg) translateZ(45px);
             transform-origin: left bottom;
         }
+
+
+        /* =========================
+                   DOOR
+                   ========================= */
 
         .house-door {
             position: absolute;
@@ -143,11 +181,12 @@
             bottom: 12px;
             width: 42px;
             height: 82px;
-            background: linear-gradient(180deg, #151d25, #080c10);
+            background: linear-gradient( 180deg, #151d25, #080c10 );
             border: 1px solid rgba(255,255,255,.2);
             transform: translateZ(38px);
             overflow: hidden;
         }
+
 
         .door-light {
             position: absolute;
@@ -155,10 +194,15 @@
             right: 5px;
             top: 5px;
             height: 35px;
-            background: radial-gradient(circle, rgba(180,220,255,.5), rgba(100,160,255,.08), transparent);
+            background: radial-gradient( circle, rgba(180,220,255,.5), rgba(100,160,255,.08), transparent );
             opacity: 0;
             animation: lightOn .8s ease-out 3.1s forwards;
         }
+
+
+        /* =========================
+                   WINDOWS
+                   ========================= */
 
         .house-window {
             position: absolute;
@@ -170,21 +214,25 @@
             overflow: hidden;
         }
 
+
         .window-left {
             left: 38px;
             bottom: 73px;
         }
+
 
         .window-right {
             right: 30px;
             bottom: 73px;
         }
 
+
         .window-side {
             left: 229px;
             bottom: 72px;
             transform: skewY(-28deg) translateZ(3px);
         }
+
 
         .house-window::before,
         .house-window::after {
@@ -195,9 +243,11 @@
             animation: windowLight .8s ease-out 3.2s forwards;
         }
 
+
         .house-window::before {
             inset: 4px;
         }
+
 
         .house-window::after {
             left: 50%;
@@ -206,6 +256,7 @@
             width: 1px;
             background: rgba(255,255,255,.25);
         }
+
 
         .house-window span:first-child {
             position: absolute;
@@ -217,17 +268,27 @@
             z-index: 2;
         }
 
+
+        /* =========================
+                   HOUSE GLOW
+                   ========================= */
+
         .house-glow {
             position: absolute;
             width: 230px;
             height: 80px;
             left: 20px;
             bottom: -10px;
-            background: radial-gradient(ellipse, rgba(120,180,255,.22), transparent 70%);
+            background: radial-gradient( ellipse, rgba(120,180,255,.22), transparent 70% );
             filter: blur(20px);
             opacity: 0;
             animation: glowAppear 1.5s ease-out 2.8s forwards;
         }
+
+
+        /* =========================
+                   TITLE
+                   ========================= */
 
         .launch-title {
             margin-top: 5px;
@@ -237,6 +298,7 @@
             animation: titleAppear 1s ease-out 3.7s forwards;
         }
 
+
         .launch-logo {
             font-size: 32px;
             font-weight: 700;
@@ -245,12 +307,14 @@
             text-shadow: 0 0 15px rgba(150,200,255,.25);
         }
 
+
         .launch-status {
             margin-top: 12px;
             font-size: 11px;
             letter-spacing: 4px;
             color: rgba(255,255,255,.45);
         }
+
 
         .status-dot {
             display: inline-block;
@@ -263,196 +327,205 @@
             animation: statusPulse 1.4s ease-in-out infinite;
         }
 
+
+        /* =========================
+                   ANIMATIONS
+                   ========================= */
+
         @@keyframes launchAppear {
-            from
 
-        {
-            opacity: 0;
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
-        to {
-            opacity: 1;
-        }
-
-        }
 
         @@keyframes gridAppear {
-            from
 
-        {
-            opacity: 0;
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
-        to {
-            opacity: 1;
-        }
-
-        }
 
         @@keyframes gridMove {
-            from
 
-        {
-            background-position: 0 0, 0 0;
+            from {
+                background-position: 0 0, 0 0;
+            }
+
+            to {
+                background-position: 0 55px, 55px 0;
+            }
         }
 
-        to {
-            background-position: 0 55px, 55px 0;
-        }
-
-        }
 
         @@keyframes houseAppear {
-            0%
 
-        {
-            opacity: 0;
-            transform: rotateX(20deg) rotateY(-45deg) translateY(100px) scale(.45);
+            0% {
+                opacity: 0;
+                transform: rotateX(20deg) rotateY(-45deg) translateY(100px) scale(.45);
+            }
+
+            60% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 1;
+                transform: rotateX(4deg) rotateY(-20deg) translateY(30px) scale(.75);
+            }
         }
 
-        60% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 1;
-            transform: rotateX(4deg) rotateY(-20deg) translateY(30px) scale(.75);
-        }
-
-        }
 
         @@keyframes houseFloat {
-            0%, 100%
 
-        {
-            transform: rotateX(4deg) rotateY(-20deg) translateY(30px) scale(.75);
+            0%, 100% {
+                transform: rotateX(4deg) rotateY(-20deg) translateY(30px) scale(.75);
+            }
+
+            50% {
+                transform: rotateX(5deg) rotateY(-16deg) translateY(20px) scale(.75);
+            }
         }
 
-        50% {
-            transform: rotateX(5deg) rotateY(-16deg) translateY(20px) scale(.75);
-        }
-
-        }
 
         @@keyframes windowLight {
-            from
 
-        {
-            opacity: 0;
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
-        to {
-            opacity: 1;
-        }
-
-        }
 
         @@keyframes lightOn {
-            from
 
-        {
-            opacity: 0;
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
-        to {
-            opacity: 1;
-        }
-
-        }
 
         @@keyframes glowAppear {
-            from
 
-        {
-            opacity: 0;
-            transform: scale(.5);
+            from {
+                opacity: 0;
+                transform: scale(.5);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        }
 
         @@keyframes titleAppear {
-            from
 
-        {
-            opacity: 0;
-            transform: translateY(20px);
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        }
 
         @@keyframes statusPulse {
-            0%, 100%
 
-        {
-            opacity: .5;
-            transform: scale(.8);
+            0%, 100% {
+                opacity: .5;
+                transform: scale(.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
         }
 
-        50% {
-            opacity: 1;
-            transform: scale(1.2);
-        }
 
-        }
+        /* =========================
+                   EXIT
+                   ========================= */
 
         .launch-finished {
             animation: launchExit .7s ease-in forwards;
         }
 
+
         @@keyframes launchExit {
-            from
 
-        {
-            opacity: 1;
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(1.04);
+            }
         }
 
-        to {
-            opacity: 0;
-            transform: scale(1.04);
-        }
 
-        }
+        /* =========================
+                   MOBILE
+                   ========================= */
 
         @@media (max-width: 600px) {
-            .house-scene
 
-        {
-            transform: scale(.8);
+            .house-scene {
+                transform: scale(.8);
+            }
+
+            .launch-logo {
+                font-size: 26px;
+                letter-spacing: 6px;
+            }
+
+            .launch-status {
+                font-size: 9px;
+                letter-spacing: 3px;
+            }
         }
 
-        .launch-logo {
-            font-size: 26px;
-            letter-spacing: 6px;
-        }
-
-        .launch-status {
-            font-size: 9px;
-            letter-spacing: 3px;
-        }
-
-        }
     </style>
+
 </head>
+
 
 <body>
 
-    <!-- Точная заставка из LaunchMode -->
+    <!-- =========================
+         LAUNCH SCREEN
+         ========================= -->
 
     <div class="launch-screen" id="launch-screen">
 
         <div class="launch-background">
+
             <div class="grid-floor"></div>
+
         </div>
+
 
         <div class="launch-content">
 
@@ -463,29 +536,45 @@
                     <div class="house-base"></div>
 
                     <div class="house-front"></div>
+
                     <div class="house-side"></div>
 
+
                     <div class="roof roof-left"></div>
+
                     <div class="roof roof-right"></div>
 
+
                     <div class="house-door">
+
                         <div class="door-light"></div>
+
                     </div>
+
 
                     <div class="house-window window-left">
+
                         <span></span>
                         <span></span>
+
                     </div>
+
 
                     <div class="house-window window-right">
+
                         <span></span>
                         <span></span>
+
                     </div>
 
+
                     <div class="house-window window-side">
+
                         <span></span>
                         <span></span>
+
                     </div>
+
 
                     <div class="house-glow"></div>
 
@@ -493,15 +582,20 @@
 
             </div>
 
+
             <div class="launch-title">
 
                 <div class="launch-logo">
                     MY HOME
                 </div>
 
+
                 <div class="launch-status">
+
                     <span class="status-dot"></span>
+
                     SYSTEM ONLINE
+
                 </div>
 
             </div>
@@ -511,48 +605,94 @@
     </div>
 
 
-    <!-- Основное приложение -->
+    <!-- =========================
+         MAIN APPLICATION
+         ========================= -->
 
     <Routes />
 
+
+    <!-- Blazor -->
+
     <script src="_framework/blazor.web.js"></script>
+
+    <!-- Push notifications -->
+
     <script src="push-notifications.js"></script>
+
+
+    <!-- =========================
+         LAUNCH SCRIPT
+         ========================= -->
 
     <script>
 
-                window.addEventListener("load", () => {
+        (() => {
 
             const launch =
                 document.getElementById("launch-screen");
 
-            if (!launch)
-                return;
 
-            // Если заставка уже показывалась в этой вкладке —
-            // сразу убираем её
-            if (sessionStorage.getItem("myhome-launch-shown") === "true") {
+            /*
+             * Если заставка уже была показана
+             * в этой вкладке — сразу отключаем её.
+             */
 
-                launch.remove();
+            if (
+                sessionStorage.getItem(
+                    "myhome-launch-shown"
+                ) === "true"
+            ) {
+
+                document.body.classList.add(
+                    "launch-complete"
+                );
+
+                launch?.remove();
 
                 return;
             }
 
-            // Запоминаем, что заставка уже была показана
-            sessionStorage.setItem("myhome-launch-shown", "true");
+
+            /*
+             * Первый запуск.
+             */
+
+            if (!launch)
+                return;
 
 
-            // Точно как в старом LaunchMode:
-            // 5500 мс до начала исчезновения
+            /*
+             * Запоминаем запуск.
+             */
+
+            sessionStorage.setItem(
+                "myhome-launch-shown",
+                "true"
+            );
+
+
+            /*
+             * Ждём 5.5 секунд.
+             */
 
             setTimeout(() => {
 
-                launch.classList.add("launch-finished");
+                launch.classList.add(
+                    "launch-finished"
+                );
 
 
-                // Точно как:
-                // await Task.Delay(700)
+                /*
+                 * Ждём завершения
+                 * анимации исчезновения.
+                 */
 
                 setTimeout(() => {
+
+                    document.body.classList.add(
+                        "launch-complete"
+                    );
 
                     launch.remove();
 
@@ -560,8 +700,12 @@
 
             }, 5500);
 
-        });
+        })();
 
+
+        /* =========================
+           SERVICE WORKER
+           ========================= */
 
         if ("serviceWorker" in navigator) {
 
