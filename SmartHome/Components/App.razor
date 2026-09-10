@@ -1,11 +1,4 @@
-﻿@code {
-    private bool showLaunch = true;
-
-    private void FinishLaunch()
-    {
-        showLaunch = false;
-    }
-}
+﻿@using SmartHome.Components.Launch
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,16 +9,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+
     <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="SmartHome.styles.css" />
+
     <link rel="icon" type="image/png" href="smart-house.png" />
     <link rel="apple-touch-icon" href="/smart.png" />
-    @using SmartHome.Components.Launch
+
     <HeadOutlet />
 </head>
 
 <body>
+
     @if (showLaunch)
     {
         <LaunchMode OnFinished="FinishLaunch" />
@@ -34,6 +30,7 @@
     {
         <Routes />
     }
+
     <script src="_framework/blazor.web.js"></script>
     <script src="push-notifications.js"></script>
 
@@ -46,7 +43,16 @@
             });
         }
     </script>
+
 </body>
 
 </html>
 
+@code {
+    private bool showLaunch = true;
+
+    private void FinishLaunch()
+    {
+        showLaunch = false;
+    }
+}
