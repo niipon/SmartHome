@@ -2594,7 +2594,7 @@ textarea {
     --shadow-soft: 0 15px 35px rgba(0, 0, 0, 0.32);
     --radius: 24px;
     --radius-small: 16px;
-    --nav-height: 76px;
+    
 }
 
 /* =========================================================
@@ -2663,7 +2663,7 @@ a {
 
 .main-content {
     min-height: 100vh;
-    padding-bottom: calc(var(--nav-height) + 55px);
+    
     transform-style: preserve-3d;
 }
 
@@ -3984,9 +3984,9 @@ select {
 }
 
 
- ========================================
+/* ========================================
    MENU ITEM
-======================================== 
+======================================== */
 
 .bottom-nav-item {
     position: relative;
@@ -4005,9 +4005,9 @@ select {
 }
 
 
- ========================================
+/* ========================================
    MENU ICON
-======================================== 
+======================================== */
 
 .nav-icon {
     display: flex;
@@ -4021,10 +4021,10 @@ select {
 }
 
 
- ========================================
+/* ========================================
    ACTIVE ITEM
 ======================================== 
-
+*/
 .bottom-nav-item.active {
     background: #252c34;
     color: #ffffff;
@@ -4036,10 +4036,10 @@ select {
         color: #ffffff;
     }
 
-
+/*
  ========================================
    ACTIVE DOT
-======================================== 
+======================================== */
 
 .bottom-nav-item.active::after {
         content: "";
@@ -4054,10 +4054,10 @@ select {
     }
 
 
- ========================================
+/* ========================================
    HOVER
 ======================================== 
-
+*/
 .bottom-nav-item:hover {
     background: #1d232a;
     color: #ffffff;
@@ -4308,9 +4308,7 @@ select {
 
 @media (max-width: 760px) {
 
-    :root {
-        --nav-height: 70px;
-    }
+
 
     .main-content {
         padding-bottom: 95px;
@@ -4503,26 +4501,7 @@ select {
         grid-template-columns: 1fr;
     }
 
-    .bottom-nav {
-        bottom: 12px;
-        width: calc(100% - 20px);
-        min-height: 65px;
-        border-radius: 21px;
-        padding: 6px;
-    }
 
-    .bottom-nav-item {
-        min-width: 55px;
-        height: 53px;
-    }
-
-    .nav-icon {
-        font-size: 18px;
-    }
-
-    .bottom-nav-item span:not(.nav-icon) {
-        font-size: 9px;
-    }
 
     .user-modal-overlay,
     .modal-overlay {
@@ -4590,13 +4569,7 @@ select {
         margin-bottom: 18px;
     }
 
-    .bottom-nav-item {
-        min-width: 48px;
-    }
 
-        .bottom-nav-item span:not(.nav-icon) {
-            font-size: 8px;
-        }
 }
 
 /* =========================================================
