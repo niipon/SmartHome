@@ -2562,3 +2562,127 @@ textarea {
         letter-spacing: 3px;
     }
 }
+
+/* =========================
+   MY HOME 3D
+   ========================= */
+
+.three-scene {
+    position: relative;
+    width: 100%;
+    height: 520px;
+    margin-bottom: 22px;
+    overflow: hidden;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: radial-gradient( circle at center, #111923, #05070a 75% );
+    box-shadow: 0 30px 80px rgba(0,0,0,.45);
+}
+
+.three-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+    .three-canvas canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+        touch-action: none;
+    }
+
+.three-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: rgba(0,0,0,.4);
+    border: 1px solid rgba(255,255,255,.08);
+    color: rgba(255,255,255,.4);
+    font-size: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.three-label {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 14px;
+    background: rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.08);
+    color: rgba(255,255,255,.55);
+    font-size: 9px;
+    letter-spacing: 2px;
+    pointer-events: none;
+}
+
+    .three-label span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #7ee787;
+        box-shadow: 0 0 10px rgba(126,231,135,.8);
+    }
+
+
+/* SKINS */
+
+.theme-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px 20px 20px;
+}
+
+    .theme-buttons button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 105px;
+        padding: 11px 15px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.035);
+        color: white;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+        .theme-buttons button:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,.08);
+        }
+
+        .theme-buttons button span {
+            font-size: 11px;
+        }
+
+
+@media (max-width: 600px) {
+
+    .three-scene {
+        height: 400px;
+        border-radius: 22px;
+    }
+
+    .three-hint {
+        font-size: 8px;
+    }
+
+    .theme-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+        .theme-buttons button {
+            min-width: 0;
+            justify-content: center;
+        }
+}

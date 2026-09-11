@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@* @page "/"
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 
@@ -374,4 +374,469 @@
     {
         Navigation.NavigateTo("/notifications");
     }
+} *@
+
+@page "/"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@rendermode InteractiveServer
+
+@inject NavigationManager Navigation
+@inject IHttpClientFactory HttpClientFactory
+@inject IJSRuntime JS
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div>
+            <p class="eyebrow">MY HOME</p>
+
+            <h1>Добро пожаловать 👋</h1>
+
+            <p class="subtitle">
+                Вот состояние вашего дома сейчас
+            </p>
+        </div>
+
+        <button class="notification-button" @onclick="OpenNotifications">
+            🔔
+            <span></span>
+        </button>
+
+    </header>
+
+
+    <!-- 3D ДОМ -->
+
+    <section class="three-scene home-three-scene">
+
+        <div id="home3d" class="three-canvas"></div>
+
+        <div class="three-hint">
+            ↔ Потяните для вращения&nbsp;&nbsp; • &nbsp;&nbsp;Колесо для масштаба
+        </div>
+
+        <div class="three-label">
+            <span></span>
+            3D HOME
+        </div>
+
+    </section>
+
+
+    <!-- СТАТУС -->
+
+    <section class="welcome-card">
+
+        <div class="welcome-content">
+
+            <p class="eyebrow">СТАТУС ДОМА</p>
+
+            @if (loading)
+            {
+                <h2>Загрузка...</h2>
+
+                <p>
+                    Получаем данные от станции.
+                </p>
+            }
+            else if (error)
+            {
+                <h2>Станция недоступна</h2>
+
+                <p>
+                    Не удалось получить данные от API.
+                </p>
+            }
+            else
+            {
+                <h2>
+
+                    @if (homeData!.GasDetected)
+                    {
+                        <span>Обнаружен газ ⚠️</span>
+                    }
+                    else if (homeData!.MotionDetected)
+                    {
+                        <span>Обнаружено движение 👀</span>
+                    }
+                    else
+                    {
+                        <span>Всё работает нормально</span>
+                    }
+
+                </h2>
+
+                <p>
+                    Станция подключена и все системы работают.
+                </p>
+            }
+
+        </div>
+
+        <div class="welcome-icon">
+            🏠
+        </div>
+
+    </section>
+
+
+    <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
+
+    <section class="stats-grid">
+
+        <!-- ТЕМПЕРАТУРА -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🌡️
+            </div>
+
+            <div>
+
+                <p>Температура</p>
+
+                @if (loading)
+                {
+                    <h2>...</h2>
+                }
+                else if (error)
+                {
+                    <h2>—</h2>
+                }
+                else
+                {
+                    <h2>
+                        @homeData!.IndoorTemperature.ToString("0.0")°C
+                    </h2>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- ВЛАЖНОСТЬ -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                💧
+            </div>
+
+            <div>
+
+                <p>Влажность</p>
+
+                @if (loading)
+                {
+                    <h2>...</h2>
+                }
+                else if (error)
+                {
+                    <h2>—</h2>
+                }
+                else
+                {
+                    <h2>
+                        @homeData!.Humidity.ToString("0")%
+                    </h2>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- СТАНЦИЯ -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📡
+            </div>
+
+            <div>
+
+                <p>Станция</p>
+
+                @if (loading)
+                {
+                    <h2>Проверка...</h2>
+                }
+                else if (error)
+                {
+                    <h2 class="offline-text">
+                        Офлайн
+                    </h2>
+                }
+                else
+                {
+                    <h2 class="online-text">
+                        Онлайн
+                    </h2>
+                }
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    @if (!loading && !error)
+    {
+
+        <!-- ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ -->
+
+        <section class="stats-grid">
+
+            <!-- УЛИЦА -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🌤️
+                </div>
+
+                <div>
+
+                    <p>На улице</p>
+
+                    <h2>
+                        @homeData!.OutdoorTemperature.ToString("0.0")°C
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <!-- ГАЗ -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🔥
+                </div>
+
+                <div>
+
+                    <p>Газ</p>
+
+                    <h2>
+                        @homeData!.GasValue
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <!-- ДВИЖЕНИЕ -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👀
+                </div>
+
+                <div>
+
+                    <p>Движение</p>
+
+                    @if (homeData!.MotionDetected)
+                    {
+                        <h2>
+                            Обнаружено
+                        </h2>
+                    }
+                    else
+                    {
+                        <h2>
+                            Нет
+                        </h2>
+                    }
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ОХРАНА -->
+
+        <section class="welcome-card">
+
+            <div class="welcome-content">
+
+                <p class="eyebrow">
+                    БЕЗОПАСНОСТЬ
+                </p>
+
+                <h2>
+
+                    @if (homeData!.SecurityEnabled)
+                    {
+                        <span>Охрана включена 🔒</span>
+                    }
+                    else
+                    {
+                        <span>Охрана выключена 🔓</span>
+                    }
+
+                </h2>
+
+                <p>
+                    Состояние системы безопасности дома.
+                </p>
+
+            </div>
+
+            <div class="welcome-icon">
+                @(homeData!.SecurityEnabled ? "🔒" : "🔓")
+            </div>
+
+        </section>
+
+    }
+
+</div>
+
+
+@code {
+
+    private HomeData? homeData;
+
+    private bool loading = true;
+    private bool error = false;
+
+    private System.Threading.Timer? timer;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadHomeData();
+
+        timer = new System.Threading.Timer(
+            async _ =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    await LoadHomeData();
+
+                    StateHasChanged();
+                });
+            },
+            null,
+            TimeSpan.FromSeconds(5),
+            TimeSpan.FromSeconds(5)
+        );
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await JS.InvokeVoidAsync(
+            "MyHome3D.create",
+            "home3d",
+            new
+            {
+                cameraX = 0,
+                cameraY = 1,
+                cameraZ = 8,
+                background = 0x07090d
+            }
+        );
+
+        await JS.InvokeVoidAsync(
+            "MyHome3D.addHome",
+            "home3d"
+        );
+
+        await JS.InvokeVoidAsync(
+            "MyHome3D.addSensor",
+            "home3d",
+            -2,
+            1,
+            1.7,
+            0x4d8dff
+        );
+
+        await JS.InvokeVoidAsync(
+            "MyHome3D.addSensor",
+            "home3d",
+            2,
+            1,
+            1.7,
+            0x7ee787
+        );
+
+        await JS.InvokeVoidAsync(
+            "MyHomeTheme.load"
+        );
+    }
+
+
+    private async Task LoadHomeData()
+    {
+        try
+        {
+            var client =
+                HttpClientFactory.CreateClient("HomeApi");
+
+            homeData =
+                await client.GetFromJsonAsync<HomeData>(
+                    "api/home"
+                );
+
+            error = homeData == null;
+        }
+        catch
+        {
+            error = true;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+
+
+    private void OpenNotifications()
+    {
+        Navigation.NavigateTo("/notifications");
+    }
+
+
+    public class HomeData
+    {
+        public double IndoorTemperature { get; set; }
+
+        public double OutdoorTemperature { get; set; }
+
+        public int Humidity { get; set; }
+
+        public bool GasDetected { get; set; }
+
+        public int GasValue { get; set; }
+
+        public bool MotionDetected { get; set; }
+
+        public bool SecurityEnabled { get; set; }
+    }
+
 }
