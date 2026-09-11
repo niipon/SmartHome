@@ -336,17 +336,7 @@
         );
     }
 
-    protected override async Task OnAfterRenderAsync(
-    bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JS.InvokeVoidAsync(
-                "threeHome.init",
-                "three-home-world"
-            );
-        }
-    }
+
 
     private async Task LoadHomeData()
     {
@@ -356,17 +346,6 @@
 
             homeData = await client.GetFromJsonAsync<HomeData>("api/home");
 
-            if (homeData != null)
-            {
-                await JS.InvokeVoidAsync(
-                    "threeHome.update",
-                    homeData.IndoorTemperature,
-                    homeData.Humidity,
-                    homeData.GasValue,
-                    homeData.MotionDetected,
-                    homeData.SecurityEnabled
-                );
-            }
 
             error = homeData == null;
         }
