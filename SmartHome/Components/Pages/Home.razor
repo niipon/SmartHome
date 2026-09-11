@@ -5,12 +5,13 @@
 
 @rendermode InteractiveServer
 
+@inject IJSRuntime JS
 @inject NavigationManager Navigation
 @using System.Net.Http.Json
 
 @inject IHttpClientFactory HttpClientFactory
 
-
+<div id="three-home-world" class="three-world"></div>
 
 <div class="page">
 
@@ -335,6 +336,18 @@
         );
     }
 
+    protected override async Task OnAfterRenderAsync(
+    bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync(
+                "threeHome.init",
+                "three-home-world"
+            );
+        }
+    }
+
     private async Task LoadHomeData()
     {
         try
@@ -342,6 +355,18 @@
             var client = HttpClientFactory.CreateClient("HomeApi");
 
             homeData = await client.GetFromJsonAsync<HomeData>("api/home");
+
+            if (homeData != null)
+            {
+                await JS.InvokeVoidAsync(
+                    "threeHome.update",
+                    homeData.IndoorTemperature,
+                    homeData.Humidity,
+                    homeData.GasValue,
+                    homeData.MotionDetected,
+                    homeData.SecurityEnabled
+                );
+            }
 
             error = homeData == null;
         }
