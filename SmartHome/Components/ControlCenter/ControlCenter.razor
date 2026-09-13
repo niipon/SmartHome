@@ -12,7 +12,7 @@
 
 <div class="control-center-page">
 
-    <canvas id="controlCenter3dCanvas"></canvas>
+    <canvas id="controlCenterCanvas"></canvas>
 
     <div class="control-center-overlay">
 
@@ -63,19 +63,19 @@
 
     private bool initialized;
 
-    @inject IJSRuntime JS
-
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
     {
         if (!firstRender)
             return;
 
+        initialized = true;
+
         await JS.InvokeVoidAsync(
-            "controlCenter3D.init"
+            "myHomeControlCenter.init",
+            "controlCenterCanvas"
         );
     }
-
 
 
     public async ValueTask DisposeAsync()
