@@ -2746,27 +2746,15 @@ let scene = null;
 let camera = null;
 let renderer = null;
 let controls = null;
+let animationFrame = null;
+let canvas = null;
 let clock = null;
 
-let canvas = null;
-
-let animationFrame = null;
-let resizeObserver = null;
-
-let raycaster = null;
-let mouse = null;
-
-let cards = [];
-
 let core = null;
-let coreRing = null;
-let coreGlow = null;
+let cards = [];
+let notification = null;
 
-let notificationButton = null;
-
-let lastFrameTime = 0;
-
-let state = {
+let currentState = {
     IndoorTemperature: 0,
     OutdoorTemperature: 0,
     Humidity: 0,
@@ -2777,1047 +2765,333 @@ let state = {
     StationOnline: false
 };
 
+const objects = {};
 
-// ============================================================
-// INIT
-// ============================================================
+function isMobile() {
+    return window.innerWidth <= 700;
+}
 
-function init(canvasId) {
+function isTablet() {
+    return window.innerWidth > 700 && window.innerWidth <= 1100;
+}
 
-    dispose();
+function createText(text, size, scaleX, scaleY) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
 
-    canvas = document.getElementById(canvasId);
+    canvas.width = 1024;
+    canvas.height = 256;
 
-    if (!canvas) {
-        console.error("MY HOME 3D: canvas not found");
-        return;
-    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    scene = new THREE.Scene();
+    ctx.font = `700 ${size}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
 
-    scene.background = new THREE.Color(0x050912);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
-    scene.fog = new THREE.FogExp2(
-        0x050912,
-        0.018
-    );
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
 
-    clock = new THREE.Clock();
-
-    raycaster = new THREE.Raycaster();
-
-    mouse = new THREE.Vector2();
-
-
-    // ========================================================
-    // CAMERA
-    // ========================================================
-
-    camera = new THREE.OrthographicCamera(
-        -5,
-        5,
-        5,
-        -5,
-        0.1,
-        100
-    );
-
-    camera.position.set(
-        0,
-        0,
-        15
-    );
-
-    camera.lookAt(
-        0,
-        0,
-        0
-    );
-
-
-    // ========================================================
-    // RENDERER
-    // ========================================================
-
-    renderer = new THREE.WebGLRenderer({
-
-        canvas: canvas,
-
-        antialias: true,
-
-        alpha: false,
-
-        powerPreference: "high-performance"
+    const material = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        depthWrite: false
     });
 
-    renderer.setPixelRatio(
-        Math.min(
-            window.devicePixelRatio || 1,
-            1.5
-        )
-    );
+    const sprite = new THREE.Sprite(material);
 
-    renderer.outputColorSpace =
-        THREE.SRGBColorSpace;
+    sprite.scale.set(scaleX, scaleY, 1);
 
-
-    // ========================================================
-    // LIGHTS
-    // ========================================================
-
-    createLights();
-
-
-    // ========================================================
-    // BACKGROUND
-    // ========================================================
-
-    createBackground();
-
-
-    // ========================================================
-    // CORE
-    // ========================================================
-
-    createCore();
-
-
-    // ========================================================
-    // CARDS
-    // ========================================================
-
-    createCards();
-
-
-    // ========================================================
-    // NOTIFICATIONS
-    // ========================================================
-
-    createNotificationButton();
-
-
-    // ========================================================
-    // CONTROLS
-    // ========================================================
-
-    controls = new OrbitControls(
-        camera,
-        renderer.domElement
-    );
-
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-
-    controls.enablePan = false;
-    controls.enableZoom = false;
-
-    controls.rotateSpeed = 0.25;
-
-    controls.minPolarAngle =
-        Math.PI * 0.40;
-
-    controls.maxPolarAngle =
-        Math.PI * 0.60;
-
-    controls.target.set(
-        0,
-        0,
-        0
-    );
-
-
-    // ========================================================
-    // EVENTS
-    // ========================================================
-
-    canvas.addEventListener(
-        "pointermove",
-        onPointerMove
-    );
-
-    canvas.addEventListener(
-        "pointerdown",
-        onPointerDown
-    );
-
-
-    // ========================================================
-    // RESIZE
-    // ========================================================
-
-    resizeObserver =
-        new ResizeObserver(
-            updateResponsiveLayout
-        );
-
-    resizeObserver.observe(canvas);
-
-    updateResponsiveLayout();
-
-    animate();
+    return sprite;
 }
 
+function createCard(width, height) {
+    const group = new THREE.Group();
 
-// ============================================================
-// LIGHTS
-// ============================================================
-
-function createLights() {
-
-    const hemisphere =
-        new THREE.HemisphereLight(
-            0x5c9fff,
-            0x04070c,
-            2.4
-        );
-
-    scene.add(hemisphere);
-
-
-    const key =
-        new THREE.DirectionalLight(
-            0xc9e5ff,
-            2.4
-        );
-
-    key.position.set(
-        -4,
-        7,
-        10
+    const geometry = new THREE.BoxGeometry(
+        width,
+        height,
+        0.10
     );
 
-    scene.add(key);
+    const material = new THREE.MeshBasicMaterial({
+        color: 0x10151d,
+        transparent: true,
+        opacity: 0.94
+    });
 
-
-    const blue =
-        new THREE.PointLight(
-            0x168cff,
-            25,
-            20
-        );
-
-    blue.position.set(
-        -5,
-        2,
-        5
+    const mesh = new THREE.Mesh(
+        geometry,
+        material
     );
 
-    scene.add(blue);
+    group.add(mesh);
 
+    // border
+    const borderGeometry =
+        new THREE.EdgesGeometry(geometry);
 
-    const blue2 =
-        new THREE.PointLight(
-            0x246bff,
-            18,
-            18
+    const borderMaterial =
+        new THREE.LineBasicMaterial({
+            color: 0x4f8cff,
+            transparent: true,
+            opacity: 0.75
+        });
+
+    const border =
+        new THREE.LineSegments(
+            borderGeometry,
+            borderMaterial
         );
 
-    blue2.position.set(
-        5,
-        -2,
-        4
-    );
+    group.add(border);
 
-    scene.add(blue2);
+    return group;
 }
 
+function createDataCard(
+    title,
+    value,
+    subtitle,
+    position
+) {
+    const group = createCard(3.15, 1.65);
 
-// ============================================================
-// BACKGROUND
-// ============================================================
+    const titleText =
+        createText(
+            title,
+            42,
+            1.75,
+            0.28
+        );
 
-function createBackground() {
+    titleText.position.set(
+        0,
+        0.48,
+        0.12
+    );
 
-    const glowGeometry =
-        new THREE.CircleGeometry(
-            5,
+    group.add(titleText);
+
+    const valueText =
+        createText(
+            value,
+            88,
+            2.15,
+            0.50
+        );
+
+    valueText.position.set(
+        0,
+        -0.03,
+        0.12
+    );
+
+    group.add(valueText);
+
+    const subtitleText =
+        createText(
+            subtitle,
+            30,
+            1.45,
+            0.20
+        );
+
+    subtitleText.position.set(
+        0,
+        -0.55,
+        0.12
+    );
+
+    group.add(subtitleText);
+
+    group.userData = {
+        titleText,
+        valueText,
+        subtitleText
+    };
+
+    group.position.set(
+        position.x,
+        position.y,
+        position.z
+    );
+
+    scene.add(group);
+    cards.push(group);
+
+    return group;
+}
+
+function createStatusCard(
+    title,
+    value,
+    position
+) {
+    const group = createCard(3.0, 1.05);
+
+    const titleText =
+        createText(
+            title,
+            38,
+            1.45,
+            0.25
+        );
+
+    titleText.position.set(
+        0,
+        0.22,
+        0.12
+    );
+
+    group.add(titleText);
+
+    const valueText =
+        createText(
+            value,
+            48,
+            1.55,
+            0.28
+        );
+
+    valueText.position.set(
+        0,
+        -0.22,
+        0.12
+    );
+
+    group.add(valueText);
+
+    group.userData = {
+        titleText,
+        valueText
+    };
+
+    group.position.set(
+        position.x,
+        position.y,
+        position.z
+    );
+
+    scene.add(group);
+    cards.push(group);
+
+    return group;
+}
+
+function createCore() {
+    const group = new THREE.Group();
+
+    const geometry =
+        new THREE.SphereGeometry(
+            0.85,
+            48,
             48
         );
 
-    const glowMaterial =
-        new THREE.MeshBasicMaterial({
-
-            color: 0x0c3c72,
-
-            transparent: true,
-
-            opacity: 0.12,
-
-            side: THREE.DoubleSide
-        });
-
-    const glow =
-        new THREE.Mesh(
-            glowGeometry,
-            glowMaterial
-        );
-
-    glow.position.z = -3;
-
-    glow.scale.set(
-        1.3,
-        1.3,
-        1
-    );
-
-    scene.add(glow);
-
-
-    const grid =
-        new THREE.GridHelper(
-            30,
-            30,
-            0x12365c,
-            0x071523
-        );
-
-    grid.position.y = -5;
-
-    grid.material.transparent = true;
-
-    grid.material.opacity = 0.35;
-
-    scene.add(grid);
-
-
-    // Немного меньше частиц для телефона
-    const geometry =
-        new THREE.BufferGeometry();
-
-    const count = 150;
-
-    const positions =
-        new Float32Array(
-            count * 3
-        );
-
-    for (
-        let i = 0;
-        i < count;
-        i++
-    ) {
-
-        positions[i * 3] =
-            (Math.random() - 0.5) * 24;
-
-        positions[i * 3 + 1] =
-            (Math.random() - 0.5) * 16;
-
-        positions[i * 3 + 2] =
-            -2 -
-            Math.random() * 6;
-    }
-
-    geometry.setAttribute(
-        "position",
-
-        new THREE.BufferAttribute(
-            positions,
-            3
-        )
-    );
-
     const material =
-        new THREE.PointsMaterial({
-
-            color: 0x378fff,
-
-            size: 0.025,
-
+        new THREE.MeshBasicMaterial({
+            color: 0x287cff,
             transparent: true,
-
-            opacity: 0.45
+            opacity: 0.9
         });
 
-    const particles =
-        new THREE.Points(
+    const sphere =
+        new THREE.Mesh(
             geometry,
             material
         );
 
-    scene.add(particles);
-}
-
-
-// ============================================================
-// CORE
-// ============================================================
-
-function createCore() {
-
-    core =
-        new THREE.Group();
-
-    core.userData.baseY = 0.05;
-
+    group.add(sphere);
 
     const ringGeometry =
         new THREE.TorusGeometry(
-            1.25,
+            1.12,
             0.025,
-            10,
-            64
+            16,
+            80
         );
 
     const ringMaterial =
         new THREE.MeshBasicMaterial({
-            color: 0x2b9cff
+            color: 0x65a5ff
         });
 
-    coreRing =
+    const ring =
         new THREE.Mesh(
             ringGeometry,
             ringMaterial
         );
 
-    coreRing.rotation.x =
-        Math.PI / 2;
+    ring.rotation.x = Math.PI / 2;
 
-    core.add(coreRing);
+    group.add(ring);
 
-
-    const ring2 =
-        new THREE.Mesh(
-
-            new THREE.TorusGeometry(
-                1.55,
-                0.012,
-                8,
-                64
-            ),
-
-            new THREE.MeshBasicMaterial({
-
-                color: 0x176fff,
-
-                transparent: true,
-
-                opacity: 0.6
-            })
-        );
-
-    ring2.rotation.x =
-        Math.PI / 2;
-
-    core.add(ring2);
-
-
-    const sphere =
-        new THREE.Mesh(
-
-            new THREE.SphereGeometry(
-                0.72,
-                24,
-                24
-            ),
-
-            new THREE.MeshPhysicalMaterial({
-
-                color: 0x0a2c50,
-
-                metalness: 0.65,
-
-                roughness: 0.2,
-
-                emissive: 0x0a62bd,
-
-                emissiveIntensity: 0.65
-            })
-        );
-
-    core.add(sphere);
-
-
-    const innerRing =
-        new THREE.Mesh(
-
-            new THREE.TorusGeometry(
-                0.85,
-                0.018,
-                8,
-                48
-            ),
-
-            new THREE.MeshBasicMaterial({
-                color: 0x66c4ff
-            })
-        );
-
-    innerRing.rotation.y =
-        Math.PI / 2;
-
-    core.add(innerRing);
-
-
-    const glowGeometry =
-        new THREE.SphereGeometry(
-            1.35,
-            24,
-            24
-        );
-
-    const glowMaterial =
-        new THREE.MeshBasicMaterial({
-
-            color: 0x167cff,
-
-            transparent: true,
-
-            opacity: 0.035,
-
-            side: THREE.BackSide
-        });
-
-    coreGlow =
-        new THREE.Mesh(
-            glowGeometry,
-            glowMaterial
-        );
-
-    core.add(coreGlow);
-
-
-    const title =
-        createTextSprite(
-            "MY HOME",
-            52,
-            "#dff3ff"
-        );
-
-    title.scale.set(
-        1.55,
-        0.3,
-        1
-    );
-
-    title.position.y = 0.12;
-    title.position.z = 1.65;
-
-    core.add(title);
-
-
-    const system =
-        createTextSprite(
-            "SMART HOME SYSTEM",
-            25,
-            "#5181a9"
-        );
-
-    system.scale.set(
-        1.45,
-        0.16,
-        1
-    );
-
-    system.position.y = -0.35;
-    system.position.z = 1.65;
-
-    core.add(system);
-
-    scene.add(core);
-}
-
-
-// ============================================================
-// CARDS
-// ============================================================
-
-function createCards() {
-
-    createDataCard(
-        "temperature",
-        "ТЕМПЕРАТУРА",
-        "--°C",
-        "INDOOR"
-    );
-
-    createDataCard(
-        "humidity",
-        "ВЛАЖНОСТЬ",
-        "--%",
-        "AIR"
-    );
-
-    createDataCard(
-        "outdoor",
-        "НА УЛИЦЕ",
-        "--°C",
-        "OUTDOOR"
-    );
-
-    createDataCard(
-        "gas",
-        "ГАЗ",
-        "--",
-        "MQ SENSOR"
-    );
-
-    createStatusCard(
-        "motion",
-        "ДВИЖЕНИЕ",
-        "НЕТ"
-    );
-
-    createStatusCard(
-        "security",
-        "ОХРАНА",
-        "ВЫКЛ"
-    );
-
-    createStatusCard(
-        "station",
-        "СТАНЦИЯ",
-        "ОФЛАЙН"
-    );
-}
-
-
-// ============================================================
-// DATA CARD
-// ============================================================
-
-function createDataCard(
-    id,
-    title,
-    value,
-    subtitle
-) {
-
-    const group =
-        new THREE.Group();
-
-    group.userData.id = id;
-
-
-    // Увеличиваем карточку
-    const width = 2.7;
-    const height = 1.45;
-
-
-    const glass =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                width,
-                height,
-                0.12
-            ),
-
-            new THREE.MeshPhysicalMaterial({
-
-                color: 0x0a1728,
-
-                metalness: 0.5,
-
-                roughness: 0.28,
-
-                transparent: true,
-
-                opacity: 0.94
-            })
-        );
-
-    glass.userData.card = group;
-
-    group.add(glass);
-
-
-    const border =
-        createBorder(
-            width,
-            height
-        );
-
-    group.add(border);
-
-
-    // Заголовок увеличен
-    const titleSprite =
-        createTextSprite(
-            title,
-            40,
-            "#69a9d9"
-        );
-
-    titleSprite.scale.set(
-        1.28,
-        0.20,
-        1
-    );
-
-    titleSprite.position.set(
+    group.position.set(
         0,
-        0.42,
-        0.12
-    );
-
-    group.add(titleSprite);
-
-
-    // Основное значение увеличено
-    const valueSprite =
-        createTextSprite(
-            value,
-            82,
-            "#e8f6ff"
-        );
-
-    valueSprite.scale.set(
-        1.68,
-        0.39,
-        1
-    );
-
-    valueSprite.position.set(
         0,
-        -0.02,
-        0.13
+        0
     );
 
-    group.add(valueSprite);
-
-
-    // Нижний текст тоже увеличен
-    const subtitleSprite =
-        createTextSprite(
-            subtitle,
-            29,
-            "#466984"
-        );
-
-    subtitleSprite.scale.set(
-        1.12,
-        0.15,
-        1
-    );
-
-    subtitleSprite.position.set(
-        0,
-        -0.47,
-        0.12
-    );
-
-    group.add(subtitleSprite);
-
-
-    group.userData.valueSprite =
-        valueSprite;
-
-    group.userData.border =
-        border;
-
-    group.userData.glass =
-        glass;
-
-    cards.push(group);
+    group.userData.baseY = 0;
 
     scene.add(group);
+
+    core = group;
 }
 
-
-// ============================================================
-// STATUS CARD
-// ============================================================
-
-function createStatusCard(
-    id,
-    title,
-    value
-) {
-
-    const group =
-        new THREE.Group();
-
-    group.userData.id = id;
-
-
-    const width = 2.7;
-    const height = 0.88;
-
-
-    const glass =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                width,
-                height,
-                0.12
-            ),
-
-            new THREE.MeshPhysicalMaterial({
-
-                color: 0x0a1728,
-
-                metalness: 0.5,
-
-                roughness: 0.28,
-
-                transparent: true,
-
-                opacity: 0.94
-            })
+function createNotification() {
+    notification =
+        createText(
+            "● Система работает нормально",
+            42,
+            2.4,
+            0.30
         );
 
-    glass.userData.card = group;
-
-    group.add(glass);
-
-
-    const border =
-        createBorder(
-            width,
-            height
-        );
-
-    group.add(border);
-
-
-    const titleSprite =
-        createTextSprite(
-            title,
-            36,
-            "#69a9d9"
-        );
-
-    titleSprite.scale.set(
-        1.12,
-        0.18,
-        1
-    );
-
-    titleSprite.position.set(
-        -0.68,
+    notification.position.set(
         0,
-        0.13
+        -3.2,
+        4
     );
 
-    group.add(titleSprite);
-
-
-    const valueSprite =
-        createTextSprite(
-            value,
-            39,
-            "#9acfff"
-        );
-
-    valueSprite.scale.set(
-        1.12,
-        0.19,
-        1
-    );
-
-    valueSprite.position.set(
-        0.82,
-        0,
-        0.13
-    );
-
-    group.add(valueSprite);
-
-
-    group.userData.valueSprite =
-        valueSprite;
-
-    group.userData.border =
-        border;
-
-    group.userData.glass =
-        glass;
-
-    cards.push(group);
-
-    scene.add(group);
+    scene.add(notification);
 }
 
+function updateCard(card, value) {
+    if (!card)
+        return;
 
-// ============================================================
-// NOTIFICATION
-// ============================================================
-
-function createNotificationButton() {
-
-    notificationButton =
-        new THREE.Group();
-
-    notificationButton.userData.baseY = -4.85;
-
-
-    const glass =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                2.8,
-                0.68,
-                0.1
-            ),
-
-            new THREE.MeshPhysicalMaterial({
-
-                color: 0x0b182a,
-
-                metalness: 0.5,
-
-                roughness: 0.25,
-
-                transparent: true,
-
-                opacity: 0.94
-            })
-        );
-
-    glass.userData.notification = true;
-
-    notificationButton.add(glass);
-
-
-    const border =
-        createBorder(
-            2.8,
-            0.68
-        );
-
-    notificationButton.add(border);
-
-
-    const text =
-        createTextSprite(
-            "🔔  УВЕДОМЛЕНИЯ",
-            38,
-            "#75baff"
-        );
-
-    text.scale.set(
-        1.45,
-        0.21,
-        1
-    );
-
-    text.position.z = 0.13;
-
-    notificationButton.add(text);
-
-    scene.add(notificationButton);
-}
-
-
-// ============================================================
-// BORDER
-// ============================================================
-
-function createBorder(
-    width,
-    height
-) {
-
-    const points = [
-
-        new THREE.Vector3(
-            -width / 2,
-            -height / 2,
-            0
-        ),
-
-        new THREE.Vector3(
-            width / 2,
-            -height / 2,
-            0
-        ),
-
-        new THREE.Vector3(
-            width / 2,
-            height / 2,
-            0
-        ),
-
-        new THREE.Vector3(
-            -width / 2,
-            height / 2,
-            0
-        ),
-
-        new THREE.Vector3(
-            -width / 2,
-            -height / 2,
-            0
-        )
-    ];
-
-
-    const geometry =
-        new THREE.BufferGeometry()
-            .setFromPoints(points);
-
-
-    const material =
-        new THREE.LineBasicMaterial({
-
-            color: 0x258dff,
-
-            transparent: true,
-
-            opacity: 0.8
-        });
-
-
-    const line =
-        new THREE.Line(
-            geometry,
-            material
-        );
-
-    line.position.z = 0.08;
-
-    return line;
-}
-
-
-// ============================================================
-// TEXT
-// ============================================================
-
-function createTextSprite(
-    text,
-    fontSize,
-    color
-) {
-
-    const width = 900;
-    const height = 200;
+    card.userData.valueText.material.map.dispose();
 
     const textCanvas =
         document.createElement("canvas");
 
-    textCanvas.width = width;
-    textCanvas.height = height;
-
     const ctx =
         textCanvas.getContext("2d");
+
+    textCanvas.width = 1024;
+    textCanvas.height = 256;
 
     ctx.clearRect(
         0,
         0,
-        width,
-        height
+        textCanvas.width,
+        textCanvas.height
     );
 
-    ctx.font =
-        `700 ${fontSize}px Arial`;
-
+    ctx.font = "700 88px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-
-    ctx.fillStyle = color;
-
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 15;
+    ctx.fillStyle = "#ffffff";
 
     ctx.fillText(
-        text,
-        width / 2,
-        height / 2
+        value,
+        512,
+        128
     );
-
 
     const texture =
         new THREE.CanvasTexture(
@@ -3827,521 +3101,236 @@ function createTextSprite(
     texture.colorSpace =
         THREE.SRGBColorSpace;
 
-    texture.minFilter =
-        THREE.LinearFilter;
-
-    texture.magFilter =
-        THREE.LinearFilter;
-
-
-    const material =
-        new THREE.SpriteMaterial({
-
-            map: texture,
-
-            transparent: true,
-
-            depthWrite: false
-        });
-
-
-    const sprite =
-        new THREE.Sprite(
-            material
-        );
-
-    sprite.userData.canvas =
-        textCanvas;
-
-    sprite.userData.context =
-        ctx;
-
-    sprite.userData.texture =
+    card.userData.valueText.material.map =
         texture;
 
-    sprite.userData.fontSize =
-        fontSize;
-
-    sprite.userData.color =
-        color;
-
-    sprite.userData.lastText =
-        text;
-
-    sprite.userData.lastColor =
-        color;
-
-    return sprite;
+    card.userData.valueText.material.needsUpdate =
+        true;
 }
 
-
-// ============================================================
-// UPDATE TEXT
-// ============================================================
-
-function updateText(
-    sprite,
-    text,
-    color = null
-) {
-
-    if (!sprite)
+function updateStatus(card, value) {
+    if (!card)
         return;
 
-    const finalColor =
-        color ||
-        sprite.userData.color;
-
-    // Не перерисовываем Canvas,
-    // если значение реально не изменилось.
-    if (
-        sprite.userData.lastText === text &&
-        sprite.userData.lastColor === finalColor
-    ) {
-        return;
-    }
-
-
-    const canvas =
-        sprite.userData.canvas;
+    const textCanvas =
+        document.createElement("canvas");
 
     const ctx =
-        sprite.userData.context;
+        textCanvas.getContext("2d");
 
-    const texture =
-        sprite.userData.texture;
-
-    if (
-        !canvas ||
-        !ctx ||
-        !texture
-    ) {
-        return;
-    }
-
+    textCanvas.width = 1024;
+    textCanvas.height = 256;
 
     ctx.clearRect(
         0,
         0,
-        canvas.width,
-        canvas.height
+        textCanvas.width,
+        textCanvas.height
     );
 
-    ctx.font =
-        `700 ${sprite.userData.fontSize}px Arial`;
-
+    ctx.font = "700 48px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
     ctx.fillStyle =
-        finalColor;
-
-    ctx.shadowColor =
-        finalColor;
-
-    ctx.shadowBlur = 15;
+        value === "ON"
+            ? "#55ff99"
+            : "#ffffff";
 
     ctx.fillText(
-        text,
-        canvas.width / 2,
-        canvas.height / 2
+        value,
+        512,
+        128
     );
 
+    const texture =
+        new THREE.CanvasTexture(
+            textCanvas
+        );
 
-    texture.needsUpdate = true;
+    texture.colorSpace =
+        THREE.SRGBColorSpace;
 
-    sprite.userData.lastText =
-        text;
+    card.userData.valueText.material.map =
+        texture;
 
-    sprite.userData.lastColor =
-        finalColor;
+    card.userData.valueText.material.needsUpdate =
+        true;
 }
 
+function setupLayout() {
+    const mobile = isMobile();
+    const tablet = isTablet();
 
-// ============================================================
-// STATE
-// ============================================================
+    if (mobile) {
 
-function updateState(newState) {
+        camera.position.set(
+            0,
+            0,
+            15
+        );
 
-    if (!newState)
+        cards[0].position.set(
+            -1.75,
+            3.0,
+            4
+        );
+
+        cards[1].position.set(
+            1.75,
+            3.0,
+            4
+        );
+
+        cards[2].position.set(
+            -1.75,
+            0.9,
+            4
+        );
+
+        cards[3].position.set(
+            1.75,
+            0.9,
+            4
+        );
+
+        cards[4].position.set(
+            -1.6,
+            -3.0,
+            4
+        );
+
+        cards[5].position.set(
+            1.6,
+            -3.0,
+            4
+        );
+
+        notification.position.set(
+            0,
+            -4.4,
+            4
+        );
+
+        core.scale.setScalar(0.72);
+
+        camera.position.z = 17;
+
+    } else if (tablet) {
+
+        camera.position.set(
+            0,
+            0,
+            12
+        );
+
+        cards[0].position.set(
+            -2.0,
+            3.1,
+            4
+        );
+
+        cards[1].position.set(
+            2.0,
+            3.1,
+            4
+        );
+
+        cards[2].position.set(
+            -2.0,
+            0.9,
+            4
+        );
+
+        cards[3].position.set(
+            2.0,
+            0.9,
+            4
+        );
+
+        cards[4].position.set(
+            -1.6,
+            -2.8,
+            4
+        );
+
+        cards[5].position.set(
+            1.6,
+            -2.8,
+            4
+        );
+
+        notification.position.set(
+            0,
+            -4.1,
+            4
+        );
+
+        core.scale.setScalar(0.85);
+
+    } else {
+
+        camera.position.set(
+            0,
+            0,
+            10
+        );
+
+        cards[0].position.set(
+            -2.7,
+            2.9,
+            4
+        );
+
+        cards[1].position.set(
+            2.7,
+            2.9,
+            4
+        );
+
+        cards[2].position.set(
+            -2.7,
+            0.7,
+            4
+        );
+
+        cards[3].position.set(
+            2.7,
+            0.7,
+            4
+        );
+
+        cards[4].position.set(
+            -2.1,
+            -2.1,
+            4
+        );
+
+        cards[5].position.set(
+            2.1,
+            -2.1,
+            4
+        );
+
+        notification.position.set(
+            0,
+            -3.8,
+            4
+        );
+
+        core.scale.setScalar(1);
+    }
+
+    camera.aspect =
+        canvas.clientWidth /
+        canvas.clientHeight;
+
+    camera.updateProjectionMatrix();
+}
+
+function resize() {
+    if (!renderer || !camera || !canvas)
         return;
-
-
-    const newIndoor =
-        Number(
-            newState.IndoorTemperature ??
-            newState.indoorTemperature ??
-            0
-        );
-
-    const newOutdoor =
-        Number(
-            newState.OutdoorTemperature ??
-            newState.outdoorTemperature ??
-            0
-        );
-
-    const newHumidity =
-        Number(
-            newState.Humidity ??
-            newState.humidity ??
-            0
-        );
-
-    const newGasDetected =
-        Boolean(
-            newState.GasDetected ??
-            newState.gasDetected ??
-            false
-        );
-
-    const newGasValue =
-        Number(
-            newState.GasValue ??
-            newState.gasValue ??
-            0
-        );
-
-    const newMotion =
-        Boolean(
-            newState.MotionDetected ??
-            newState.motionDetected ??
-            false
-        );
-
-    const newSecurity =
-        Boolean(
-            newState.SecurityEnabled ??
-            newState.securityEnabled ??
-            false
-        );
-
-    const newStation =
-        Boolean(
-            newState.StationOnline ??
-            newState.stationOnline ??
-            false
-        );
-
-
-    state.IndoorTemperature =
-        newIndoor;
-
-    state.OutdoorTemperature =
-        newOutdoor;
-
-    state.Humidity =
-        newHumidity;
-
-    state.GasDetected =
-        newGasDetected;
-
-    state.GasValue =
-        newGasValue;
-
-    state.MotionDetected =
-        newMotion;
-
-    state.SecurityEnabled =
-        newSecurity;
-
-    state.StationOnline =
-        newStation;
-
-
-    // ========================================================
-    // TEMPERATURE
-    // ========================================================
-
-    const temperature =
-        getCard("temperature");
-
-    if (temperature) {
-
-        updateText(
-            temperature.userData.valueSprite,
-
-            `${state.IndoorTemperature.toFixed(1)}°C`
-        );
-    }
-
-
-    // ========================================================
-    // HUMIDITY
-    // ========================================================
-
-    const humidity =
-        getCard("humidity");
-
-    if (humidity) {
-
-        updateText(
-            humidity.userData.valueSprite,
-
-            `${Math.round(state.Humidity)}%`
-        );
-    }
-
-
-    // ========================================================
-    // OUTDOOR
-    // ========================================================
-
-    const outdoor =
-        getCard("outdoor");
-
-    if (outdoor) {
-
-        updateText(
-            outdoor.userData.valueSprite,
-
-            `${state.OutdoorTemperature.toFixed(1)}°C`
-        );
-    }
-
-
-    // ========================================================
-    // GAS
-    // ========================================================
-
-    const gas =
-        getCard("gas");
-
-    if (gas) {
-
-        updateText(
-            gas.userData.valueSprite,
-
-            state.GasDetected
-                ? "ОПАСНО"
-                : `${state.GasValue}`,
-
-            state.GasDetected
-                ? "#ff5c5c"
-                : "#e8f6ff"
-        );
-
-        setCardColor(
-            gas,
-            state.GasDetected
-                ? 0xff4444
-                : 0x258dff
-        );
-    }
-
-
-    // ========================================================
-    // MOTION
-    // ========================================================
-
-    const motion =
-        getCard("motion");
-
-    if (motion) {
-
-        const dangerousMotion =
-            state.MotionDetected &&
-            state.SecurityEnabled;
-
-        updateText(
-            motion.userData.valueSprite,
-
-            state.MotionDetected
-                ? "ОБНАРУЖЕНО"
-                : "НЕТ",
-
-            dangerousMotion
-                ? "#ff6262"
-                : "#9acfff"
-        );
-
-        setCardColor(
-            motion,
-
-            dangerousMotion
-                ? 0xff4444
-                : 0x258dff
-        );
-    }
-
-
-    // ========================================================
-    // SECURITY
-    // ========================================================
-
-    const security =
-        getCard("security");
-
-    if (security) {
-
-        updateText(
-            security.userData.valueSprite,
-
-            state.SecurityEnabled
-                ? "ВКЛ"
-                : "ВЫКЛ",
-
-            state.SecurityEnabled
-                ? "#55e0a0"
-                : "#9acfff"
-        );
-
-        setCardColor(
-            security,
-
-            state.SecurityEnabled
-                ? 0x43d99b
-                : 0x258dff
-        );
-    }
-
-
-    // ========================================================
-    // STATION
-    // ========================================================
-
-    const station =
-        getCard("station");
-
-    if (station) {
-
-        updateText(
-            station.userData.valueSprite,
-
-            state.StationOnline
-                ? "ОНЛАЙН"
-                : "ОФЛАЙН",
-
-            state.StationOnline
-                ? "#55e0a0"
-                : "#ff6464"
-        );
-
-        setCardColor(
-            station,
-
-            state.StationOnline
-                ? 0x43d99b
-                : 0xff4444
-        );
-    }
-
-
-    updateCoreState();
-}
-
-
-// ============================================================
-// CORE STATE
-// ============================================================
-
-function updateCoreState() {
-
-    if (!coreGlow)
-        return;
-
-
-    let color = 0x167cff;
-
-
-    if (state.GasDetected) {
-
-        color = 0xff3030;
-
-    }
-    else if (
-        state.MotionDetected &&
-        state.SecurityEnabled
-    ) {
-
-        color = 0xff5555;
-
-    }
-    else if (
-        state.SecurityEnabled
-    ) {
-
-        color = 0x43d99b;
-    }
-
-
-    coreGlow.material.color.setHex(color);
-
-    coreRing.material.color.setHex(color);
-}
-
-
-// ============================================================
-// CARD COLOR
-// ============================================================
-
-function setCardColor(
-    card,
-    color
-) {
-
-    if (!card)
-        return;
-
-
-    if (
-        card.userData.border &&
-        card.userData.border.material
-    ) {
-
-        card.userData.border.material.color.setHex(
-            color
-        );
-    }
-
-
-    if (
-        card.userData.glass &&
-        card.userData.glass.material
-    ) {
-
-        if (
-            card.userData.glass.material.emissive
-        ) {
-
-            card.userData.glass.material.emissive.setHex(
-                color
-            );
-
-            card.userData.glass.material.emissiveIntensity =
-                0.04;
-        }
-    }
-}
-
-
-// ============================================================
-// GET CARD
-// ============================================================
-
-function getCard(id) {
-
-    return cards.find(
-        card =>
-            card.userData.id === id
-    );
-}
-
-
-// ============================================================
-// RESPONSIVE
-// ============================================================
-
-function updateResponsiveLayout() {
-
-    if (
-        !camera ||
-        !renderer ||
-        !canvas
-    )
-        return;
-
 
     const width =
         canvas.clientWidth;
@@ -4349,697 +3338,54 @@ function updateResponsiveLayout() {
     const height =
         canvas.clientHeight;
 
-
-    if (!width || !height)
+    if (width === 0 || height === 0)
         return;
-
-
-    const aspect =
-        width / height;
-
-
-    let viewHeight;
-
-
-    // PHONE
-    if (aspect < 0.62) {
-
-        viewHeight = 12.5;
-
-        layoutPhone();
-    }
-
-    // TABLET
-    else if (aspect < 1.0) {
-
-        viewHeight = 10;
-
-        layoutTablet();
-    }
-
-    // DESKTOP
-    else {
-
-        viewHeight = 8.2;
-
-        layoutDesktop();
-    }
-
-
-    const viewWidth =
-        viewHeight * aspect;
-
-
-    camera.left =
-        -viewWidth / 2;
-
-    camera.right =
-        viewWidth / 2;
-
-    camera.top =
-        viewHeight / 2;
-
-    camera.bottom =
-        -viewHeight / 2;
-
-
-    camera.updateProjectionMatrix();
-
 
     renderer.setSize(
         width,
         height,
         false
     );
+
+    camera.aspect =
+        width / height;
+
+    camera.updateProjectionMatrix();
+
+    setupLayout();
 }
 
-
-// ============================================================
-// DESKTOP
-// ============================================================
-
-function layoutDesktop() {
-
-    const temperature = getCard("temperature");
-    const humidity = getCard("humidity");
-    const outdoor = getCard("outdoor");
-    const gas = getCard("gas");
-    const motion = getCard("motion");
-    const security = getCard("security");
-    const station = getCard("station");
-
-
-    if (temperature)
-        setCardPosition(
-            temperature,
-            -4.0,
-            1.65,
-            2.0,
-            1
-        );
-
-
-    if (humidity)
-        setCardPosition(
-            humidity,
-            4.0,
-            1.65,
-            2.0,
-            1
-        );
-
-
-    if (outdoor)
-        setCardPosition(
-            outdoor,
-            -4.0,
-            -0.45,
-            2.0,
-            1
-        );
-
-
-    if (gas)
-        setCardPosition(
-            gas,
-            4.0,
-            -0.45,
-            2.0,
-            1
-        );
-
-
-    if (security)
-        setCardPosition(
-            security,
-            -1.5,
-            -2.45,
-            2.0,
-            1
-        );
-
-
-    if (motion)
-        setCardPosition(
-            motion,
-            1.5,
-            -2.45,
-            2.0,
-            1
-        );
-
-
-    if (station)
-        setCardPosition(
-            station,
-            0,
-            3.0,
-            2.0,
-            1
-        );
-
-
-    if (notificationButton) {
-
-        notificationButton.position.set(
-            0,
-            -3.55,
-            2
-        );
-
-        notificationButton.scale.setScalar(
-            0.95
-        );
-
-        notificationButton.userData.baseY =
-            -3.55;
-    }
-
-
-    if (core) {
-
-        core.position.set(
-            0,
-            0.05,
-            0
-        );
-
-        core.scale.setScalar(1);
-    }
-}
-
-
-// ============================================================
-// TABLET
-// ============================================================
-
-function layoutTablet() {
-
-    const temperature = getCard("temperature");
-    const humidity = getCard("humidity");
-    const outdoor = getCard("outdoor");
-    const gas = getCard("gas");
-    const motion = getCard("motion");
-    const security = getCard("security");
-    const station = getCard("station");
-
-
-    if (temperature)
-        setCardPosition(
-            temperature,
-            -3.15,
-            2.15,
-            2.5,
-            0.82
-        );
-
-
-    if (humidity)
-        setCardPosition(
-            humidity,
-            3.15,
-            2.15,
-            2.5,
-            0.82
-        );
-
-
-    if (outdoor)
-        setCardPosition(
-            outdoor,
-            -3.15,
-            -0.45,
-            2.5,
-            0.82
-        );
-
-
-    if (gas)
-        setCardPosition(
-            gas,
-            3.15,
-            -0.45,
-            2.5,
-            0.82
-        );
-
-
-    if (security)
-        setCardPosition(
-            security,
-            -1.4,
-            -2.7,
-            2.7,
-            0.82
-        );
-
-
-    if (motion)
-        setCardPosition(
-            motion,
-            1.4,
-            -2.7,
-            2.7,
-            0.82
-        );
-
-
-    if (station)
-        setCardPosition(
-            station,
-            0,
-            3.55,
-            2.7,
-            0.82
-        );
-
-
-    if (notificationButton) {
-
-        notificationButton.position.set(
-            0,
-            -3.55,
-            2.7
-        );
-
-        notificationButton.scale.setScalar(
-            0.8
-        );
-
-        notificationButton.userData.baseY =
-            -3.55;
-    }
-
-
-    if (core) {
-
-        core.position.set(
-            0,
-            0.05,
-            0
-        );
-
-        core.scale.setScalar(0.82);
-    }
-}
-
-
-// ============================================================
-// PHONE
-// ============================================================
-
-function layoutPhone() {
-
-    const temperature = getCard("temperature");
-    const humidity = getCard("humidity");
-    const outdoor = getCard("outdoor");
-    const gas = getCard("gas");
-    const motion = getCard("motion");
-    const security = getCard("security");
-    const station = getCard("station");
-
-
-    // Карточки немного крупнее,
-    // но помещаются на экран телефона.
-
-    if (temperature)
-        setCardPosition(
-            temperature,
-            -1.55,
-            3.55,
-            4,
-            0.60
-        );
-
-
-    if (humidity)
-        setCardPosition(
-            humidity,
-            1.55,
-            3.55,
-            4,
-            0.60
-        );
-
-
-    if (outdoor)
-        setCardPosition(
-            outdoor,
-            -1.55,
-            -2.85,
-            4,
-            0.60
-        );
-
-
-    if (gas)
-        setCardPosition(
-            gas,
-            1.55,
-            -2.85,
-            4,
-            0.60
-        );
-
-
-    if (security)
-        setCardPosition(
-            security,
-            -1.45,
-            -3.95,
-            4.2,
-            0.70
-        );
-
-
-    if (motion)
-        setCardPosition(
-            motion,
-            1.45,
-            -3.95,
-            4.2,
-            0.70
-        );
-
-
-    if (station)
-        setCardPosition(
-            station,
-            0,
-            4.55,
-            4.2,
-            0.70
-        );
-
-
-    if (notificationButton) {
-
-        notificationButton.position.set(
-            0,
-            -4.85,
-            4.2
-        );
-
-        notificationButton.scale.setScalar(
-            0.70
-        );
-
-        notificationButton.userData.baseY =
-            -4.85;
-    }
-
-
-    if (core) {
-
-        core.position.set(
-            0,
-            0.15,
-            0
-        );
-
-        core.scale.setScalar(0.67);
-    }
-}
-
-
-// ============================================================
-// POSITION
-// ============================================================
-
-function setCardPosition(
-    card,
-    x,
-    y,
-    z,
-    scale
-) {
-
-    card.position.set(
-        x,
-        y,
-        z
-    );
-
-    card.scale.setScalar(scale);
-
-    card.userData.baseX = x;
-    card.userData.baseY = y;
-    card.userData.baseZ = z;
-}
-
-
-// ============================================================
-// POINTER
-// ============================================================
-
-function onPointerMove(event) {
-
-    if (!canvas || !camera)
-        return;
-
-
-    const rect =
-        canvas.getBoundingClientRect();
-
-
-    mouse.x =
-        (
-            (event.clientX - rect.left) /
-            rect.width
-        ) * 2 - 1;
-
-
-    mouse.y =
-        -(
-            (event.clientY - rect.top) /
-            rect.height
-        ) * 2 + 1;
-
-
-    raycaster.setFromCamera(
-        mouse,
-        camera
-    );
-
-
-    const objects = [];
-
-
-    for (const card of cards) {
-
-        if (card.children.length) {
-
-            objects.push(
-                card.children[0]
-            );
-        }
-    }
-
-
-    if (notificationButton) {
-
-        objects.push(
-            notificationButton.children[0]
-        );
-    }
-
-
-    const hits =
-        raycaster.intersectObjects(
-            objects,
-            false
-        );
-
-
-    canvas.style.cursor =
-        hits.length
-            ? "pointer"
-            : "default";
-}
-
-
-// ============================================================
-// CLICK
-// ============================================================
-
-function onPointerDown(event) {
-
-    if (!canvas || !camera)
-        return;
-
-
-    const rect =
-        canvas.getBoundingClientRect();
-
-
-    mouse.x =
-        (
-            (event.clientX - rect.left) /
-            rect.width
-        ) * 2 - 1;
-
-
-    mouse.y =
-        -(
-            (event.clientY - rect.top) /
-            rect.height
-        ) * 2 + 1;
-
-
-    raycaster.setFromCamera(
-        mouse,
-        camera
-    );
-
-
-    const objects = [];
-
-
-    for (const card of cards) {
-
-        objects.push(
-            card.children[0]
-        );
-    }
-
-
-    if (notificationButton) {
-
-        objects.push(
-            notificationButton.children[0]
-        );
-    }
-
-
-    const hits =
-        raycaster.intersectObjects(
-            objects,
-            false
-        );
-
-
-    if (!hits.length)
-        return;
-
-
-    const hit =
-        hits[0].object;
-
-
-    if (hit.userData.notification) {
-
-        window.location.assign(
-            "/notifications"
-        );
-    }
-}
-
-
-// ============================================================
-// ANIMATION
-// ============================================================
-
-function animate(time = 0) {
-
+function animate() {
     animationFrame =
         requestAnimationFrame(
             animate
         );
 
-
-    // Около 30 FPS вместо постоянных 60+
-    if (
-        time - lastFrameTime <
-        33
-    ) {
-        return;
-    }
-
-
-    lastFrameTime = time;
-
-
-    if (
-        !scene ||
-        !renderer ||
-        !camera ||
-        !clock
-    ) {
-        return;
-    }
-
-
-    const elapsed =
+    const time =
         clock.getElapsedTime();
-
 
     if (core) {
 
-        core.rotation.y =
-            Math.sin(
-                elapsed * 0.25
-            ) * 0.08;
-
-
         core.position.y =
             core.userData.baseY +
-            Math.sin(
-                elapsed * 0.8
-            ) * 0.035;
+            Math.sin(time * 0.8) * 0.08;
+
+        core.rotation.y =
+            time * 0.25;
     }
 
+    cards.forEach(
+        (card, index) => {
 
-    if (coreRing) {
+            card.rotation.y =
+                Math.sin(
+                    time * 0.45 +
+                    index
+                ) * 0.015;
+        }
+    );
 
-        coreRing.rotation.z +=
-            0.0025;
-    }
-
-
-    if (coreGlow) {
-
-        coreGlow.material.opacity =
-            0.025 +
-            Math.sin(
-                elapsed * 1.5
-            ) * 0.008;
-    }
-
-
-    for (const card of cards) {
-
-        const baseY =
-            card.userData.baseY ??
-            card.position.y;
-
-
-        card.position.y =
-            baseY +
-            Math.sin(
-                elapsed * 0.8 +
-                card.userData.baseX
-            ) * 0.025;
-    }
-
-
-    if (notificationButton) {
-
-        const baseY =
-            notificationButton.userData.baseY ??
-            notificationButton.position.y;
-
-
-        notificationButton.position.y =
-            baseY +
-            Math.sin(
-                elapsed * 1.1
-            ) * 0.012;
-    }
-
-
-    if (controls)
-        controls.update();
-
+    controls.update();
 
     renderer.render(
         scene,
@@ -5047,91 +3393,236 @@ function animate(time = 0) {
     );
 }
 
+function createScene() {
 
-// ============================================================
-// DISPOSE
-// ============================================================
+    scene =
+        new THREE.Scene();
 
-function dispose() {
-
-    if (animationFrame) {
-
-        cancelAnimationFrame(
-            animationFrame
+    scene.background =
+        new THREE.Color(
+            0x080b10
         );
 
-        animationFrame = null;
-    }
-
-
-    if (resizeObserver) {
-
-        resizeObserver.disconnect();
-
-        resizeObserver = null;
-    }
-
-
-    if (canvas) {
-
-        canvas.removeEventListener(
-            "pointermove",
-            onPointerMove
+    camera =
+        new THREE.PerspectiveCamera(
+            42,
+            1,
+            0.1,
+            100
         );
 
-        canvas.removeEventListener(
-            "pointerdown",
-            onPointerDown
+    renderer =
+        new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true
+        });
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio,
+            2
+        )
+    );
+
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
+    controls =
+        new OrbitControls(
+            camera,
+            renderer.domElement
         );
-    }
 
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.enableZoom = false;
 
-    if (controls) {
+    controls.minPolarAngle =
+        Math.PI / 2;
 
-        controls.dispose();
+    controls.maxPolarAngle =
+        Math.PI / 2;
 
-        controls = null;
-    }
+    createDataCard(
+        "Температура",
+        "0°",
+        "В доме",
+        { x: 0, y: 0, z: 0 }
+    );
 
+    createDataCard(
+        "Влажность",
+        "0%",
+        "В доме",
+        { x: 0, y: 0, z: 0 }
+    );
 
-    if (renderer) {
+    createDataCard(
+        "На улице",
+        "0°",
+        "Температура",
+        { x: 0, y: 0, z: 0 }
+    );
 
-        renderer.dispose();
+    createDataCard(
+        "Газ",
+        "0",
+        "MQ-135",
+        { x: 0, y: 0, z: 0 }
+    );
 
-        renderer = null;
-    }
+    createStatusCard(
+        "Охрана",
+        "OFF",
+        { x: 0, y: 0, z: 0 }
+    );
 
+    createStatusCard(
+        "Движение",
+        "Нет",
+        { x: 0, y: 0, z: 0 }
+    );
 
-    scene = null;
-    camera = null;
-    canvas = null;
+    createCore();
 
-    cards = [];
+    createNotification();
 
-    core = null;
-    coreRing = null;
-    coreGlow = null;
+    setupLayout();
 
-    notificationButton = null;
+    clock =
+        new THREE.Clock();
 
-    raycaster = null;
-    mouse = null;
+    window.addEventListener(
+        "resize",
+        resize
+    );
 
-    clock = null;
+    resize();
 
-    lastFrameTime = 0;
+    animate();
 }
-
-
-// ============================================================
-// PUBLIC
-// ============================================================
 
 window.myHome3D = {
 
-    init,
+    init: function (canvasId) {
 
-    updateState,
+        if (scene)
+            return;
 
-    dispose
+        canvas =
+            document.getElementById(
+                canvasId
+            );
+
+        if (!canvas)
+            return;
+
+        createScene();
+    },
+
+    updateState: function (data) {
+
+        currentState = data;
+
+        if (cards.length < 6)
+            return;
+
+        updateCard(
+            cards[0],
+            `${Number(
+                data.IndoorTemperature
+            ).toFixed(1)}°`
+        );
+
+        updateCard(
+            cards[1],
+            `${data.Humidity}%`
+        );
+
+        updateCard(
+            cards[2],
+            `${Number(
+                data.OutdoorTemperature
+            ).toFixed(1)}°`
+        );
+
+        updateCard(
+            cards[3],
+            `${data.GasValue}`
+        );
+
+        updateStatus(
+            cards[4],
+            data.SecurityEnabled
+                ? "ON"
+                : "OFF"
+        );
+
+        updateStatus(
+            cards[5],
+            data.MotionDetected
+                ? "Да"
+                : "Нет"
+        );
+
+        if (notification) {
+
+            notification.material.map =
+                notification.material.map;
+
+            const text =
+                data.GasDetected
+                    ? "● ВНИМАНИЕ: обнаружен газ"
+                    : data.MotionDetected &&
+                        data.SecurityEnabled
+                        ? "● Обнаружено движение"
+                        : "● Система работает нормально";
+
+            const canvas =
+                document.createElement(
+                    "canvas"
+                );
+
+            const ctx =
+                canvas.getContext("2d");
+
+            canvas.width = 1200;
+            canvas.height = 256;
+
+            ctx.font =
+                "700 42px Arial";
+
+            ctx.textAlign =
+                "center";
+
+            ctx.textBaseline =
+                "middle";
+
+            ctx.fillStyle =
+                data.GasDetected
+                    ? "#ff5555"
+                    : "#ffffff";
+
+            ctx.fillText(
+                text,
+                600,
+                128
+            );
+
+            const texture =
+                new THREE.CanvasTexture(
+                    canvas
+                );
+
+            texture.colorSpace =
+                THREE.SRGBColorSpace;
+
+            notification.material.map =
+                texture;
+
+            notification.material.needsUpdate =
+                true;
+        }
+    }
 };
