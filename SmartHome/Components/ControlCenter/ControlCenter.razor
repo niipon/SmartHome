@@ -1,4 +1,131 @@
 ﻿@page "/control-center"
+
+@rendermode InteractiveServer
+
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+
+@implements IAsyncDisposable
+
+@inject IJSRuntime JS
+
+<div class="control-center-page">
+
+    <canvas id="controlCenterCanvas"></canvas>
+
+    <div class="control-center-overlay">
+
+        <div class="control-center-brand">
+
+            <div class="control-center-eyebrow">
+                MY HOME
+            </div>
+
+            <div class="control-center-title">
+                CONTROL CENTER
+            </div>
+
+            <div class="control-center-subtitle">
+                Центр управления домом
+            </div>
+
+        </div>
+
+        <div class="control-center-status">
+
+            <span class="status-dot"></span>
+
+            SYSTEM ONLINE
+
+        </div>
+
+        <div class="control-center-help">
+
+            <span class="desktop-help">
+                Наведите курсор на систему
+            </span>
+
+            <span class="mobile-help">
+                Проведите пальцем для вращения
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    private IJSObjectReference? module;
+    private bool initialized;
+
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        try
+        {
+            Console.WriteLine(
+                "CONTROL CENTER: loading module..."
+            );
+
+            module = await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/js/myhome3d/control-center.js?v=12"
+            );
+
+            Console.WriteLine(
+                "CONTROL CENTER: module loaded"
+            );
+
+            await module.InvokeVoidAsync(
+                "init",
+                "controlCenterCanvas"
+            );
+
+            initialized = true;
+
+            Console.WriteLine(
+                "CONTROL CENTER: initialized"
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"CONTROL CENTER INIT ERROR: {ex}"
+            );
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module == null)
+            return;
+
+        try
+        {
+            if (initialized)
+            {
+                await module.InvokeVoidAsync(
+                    "dispose"
+                );
+            }
+
+            await module.DisposeAsync();
+        }
+        catch
+        {
+        }
+    }
+}
+
+
+@* @page "/control-center"
 @rendermode InteractiveServer
 
 @attribute [Authorize]
@@ -63,18 +190,28 @@
 
     private bool initialized;
 
-    protected override async Task OnAfterRenderAsync(
-        bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
             return;
 
-        initialized = true;
+        try
+        {
+            await Task.Delay(300);
 
-        await JS.InvokeVoidAsync(
-            "myHomeControlCenter.init",
-            "controlCenterCanvas"
-        );
+            await JS.InvokeVoidAsync(
+                "myHomeControlCenter.init",
+                "controlCenterCanvas"
+            );
+
+            initialized = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"CONTROL CENTER INIT ERROR: {ex.Message}"
+            );
+        }
     }
 
 
@@ -93,7 +230,7 @@
         {
         }
     }
-}
+} *@
 
 
 @* 

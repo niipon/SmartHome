@@ -3495,280 +3495,266 @@ function cleanup() {
    INIT
    ========================= */
 
-window.myHomeControlCenter = {
+/* =========================
+   INIT
+   ========================= */
 
-    init: function (canvasId) {
+export function init(canvasId) {
 
-        console.log(
-            "MY HOME CONTROL CENTER: INIT"
+    console.log(
+        "MY HOME CONTROL CENTER: INIT"
+    );
+
+    cleanup();
+
+    canvas =
+        document.getElementById(
+            canvasId
         );
 
+    if (!canvas) {
 
-        cleanup();
-
-
-        canvas =
-            document.getElementById(
-                canvasId
-            );
-
-
-        if (!canvas) {
-
-            console.error(
-                "CONTROL CENTER: canvas not found"
-            );
-
-            return;
-        }
-
-
-        /* SCENE */
-
-        scene =
-            new THREE.Scene();
-
-        scene.background =
-            new THREE.Color(
-                0x050912
-            );
-
-        scene.fog =
-            new THREE.FogExp2(
-                0x050912,
-                0.012
-            );
-
-
-        /* CAMERA */
-
-        camera =
-            new THREE.OrthographicCamera(
-                -8,
-                8,
-                5,
-                -5,
-                0.1,
-                100
-            );
-
-
-        camera.position.set(
-            0,
-            2.8,
-            12
+        console.error(
+            "CONTROL CENTER: canvas not found"
         );
 
-
-        camera.lookAt(
-            0,
-            0,
-            0
-        );
-
-
-        /* RENDERER */
-
-        renderer =
-            new THREE.WebGLRenderer({
-
-                canvas: canvas,
-
-                antialias: false,
-
-                powerPreference:
-                    "high-performance"
-
-            });
-
-
-        renderer.setPixelRatio(
-            Math.min(
-                window.devicePixelRatio,
-                1.5
-            )
-        );
-
-
-        renderer.outputColorSpace =
-            THREE.SRGBColorSpace;
-
-
-        renderer.toneMapping =
-            THREE.ACESFilmicToneMapping;
-
-
-        renderer.toneMappingExposure =
-            1.15;
-
-
-        renderer.shadowMap.enabled =
-            false;
-
-
-        /* RAYCASTER */
-
-        raycaster =
-            new THREE.Raycaster();
-
-
-        /* CLOCK */
-
-        clock =
-            new THREE.Clock();
-
-
-        /* WORLD */
-
-        createLights();
-
-        createEnvironment();
-
-
-        /* HOUSE */
-
-        house =
-            createHouse();
-
-        scene.add(house);
-
-
-        /* CORE */
-
-        core =
-            createCore();
-
-        core.position.y =
-            0.2;
-
-        scene.add(core);
-
-
-        /* CARDS */
-
-        scene.userData.navigationCards =
-            [];
-
-
-        for (
-            const item
-            of navigationItems
-        ) {
-
-            const card =
-                createNavigationObject(
-                    item
-                );
-
-            scene.add(card);
-
-            scene.userData.navigationCards.push(
-                card
-            );
-        }
-
-
-        console.log(
-            "Navigation cards:",
-            scene.userData.navigationCards
-        );
-
-
-        /* CONTROLS */
-
-        controls =
-            new OrbitControls(
-                camera,
-                canvas
-            );
-
-
-        controls.enableDamping =
-            true;
-
-        controls.dampingFactor =
-            0.06;
-
-        controls.enablePan =
-            false;
-
-        controls.minDistance =
-            7;
-
-        controls.maxDistance =
-            15;
-
-        controls.minPolarAngle =
-            Math.PI * 0.28;
-
-        controls.maxPolarAngle =
-            Math.PI * 0.62;
-
-        controls.target.set(
-            0,
-            0,
-            0
-        );
-
-        controls.autoRotate =
-            false;
-
-
-        /* EVENTS */
-
-        canvas.addEventListener(
-            "pointermove",
-            updatePointer
-        );
-
-        canvas.addEventListener(
-            "click",
-            handleClick
-        );
-
-
-        window.addEventListener(
-            "resize",
-            handleResize
-        );
-
-
-        /* RESIZE OBSERVER */
-
-        resizeObserver =
-            new ResizeObserver(
-                () => {
-                    handleResize();
-                }
-            );
-
-
-        if (canvas.parentElement) {
-
-            resizeObserver.observe(
-                canvas.parentElement
-            );
-        }
-
-
-        /* INITIAL */
-
-        handleResize();
-
-
-        console.log(
-            "MY HOME CONTROL CENTER: READY"
-        );
-
-
-        animate();
-    },
-
-
-    dispose: function () {
-
-        cleanup();
-
+        return;
     }
 
-};
+    /* SCENE */
+
+    scene =
+        new THREE.Scene();
+
+    scene.background =
+        new THREE.Color(
+            0x050912
+        );
+
+    scene.fog =
+        new THREE.FogExp2(
+            0x050912,
+            0.012
+        );
+
+
+    /* CAMERA */
+
+    camera =
+        new THREE.OrthographicCamera(
+            -8,
+            8,
+            5,
+            -5,
+            0.1,
+            100
+        );
+
+    camera.position.set(
+        0,
+        2.8,
+        12
+    );
+
+    camera.lookAt(
+        0,
+        0,
+        0
+    );
+
+
+    /* RENDERER */
+
+    renderer =
+        new THREE.WebGLRenderer({
+
+            canvas: canvas,
+
+            antialias: false,
+
+            powerPreference:
+                "high-performance"
+
+        });
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio,
+            1.5
+        )
+    );
+
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
+    renderer.toneMapping =
+        THREE.ACESFilmicToneMapping;
+
+    renderer.toneMappingExposure =
+        1.15;
+
+    renderer.shadowMap.enabled =
+        false;
+
+
+    /* RAYCASTER */
+
+    raycaster =
+        new THREE.Raycaster();
+
+
+    /* CLOCK */
+
+    clock =
+        new THREE.Clock();
+
+
+    /* WORLD */
+
+    createLights();
+
+    createEnvironment();
+
+
+    /* HOUSE */
+
+    house =
+        createHouse();
+
+    scene.add(house);
+
+
+    /* CORE */
+
+    core =
+        createCore();
+
+    core.position.y =
+        0.2;
+
+    scene.add(core);
+
+
+    /* CARDS */
+
+    scene.userData.navigationCards =
+        [];
+
+    for (
+        const item
+        of navigationItems
+    ) {
+
+        const card =
+            createNavigationObject(
+                item
+            );
+
+        scene.add(card);
+
+        scene.userData.navigationCards.push(
+            card
+        );
+    }
+
+    console.log(
+        "Navigation cards:",
+        scene.userData.navigationCards
+    );
+
+
+    /* CONTROLS */
+
+    controls =
+        new OrbitControls(
+            camera,
+            canvas
+        );
+
+    controls.enableDamping =
+        true;
+
+    controls.dampingFactor =
+        0.06;
+
+    controls.enablePan =
+        false;
+
+    controls.minDistance =
+        7;
+
+    controls.maxDistance =
+        15;
+
+    controls.minPolarAngle =
+        Math.PI * 0.28;
+
+    controls.maxPolarAngle =
+        Math.PI * 0.62;
+
+    controls.target.set(
+        0,
+        0,
+        0
+    );
+
+    controls.autoRotate =
+        false;
+
+
+    /* EVENTS */
+
+    canvas.addEventListener(
+        "pointermove",
+        updatePointer
+    );
+
+    canvas.addEventListener(
+        "click",
+        handleClick
+    );
+
+    window.addEventListener(
+        "resize",
+        handleResize
+    );
+
+
+    /* RESIZE OBSERVER */
+
+    resizeObserver =
+        new ResizeObserver(
+            () => {
+                handleResize();
+            }
+        );
+
+    if (canvas.parentElement) {
+
+        resizeObserver.observe(
+            canvas.parentElement
+        );
+    }
+
+
+    /* INITIAL */
+
+    handleResize();
+
+    console.log(
+        "MY HOME CONTROL CENTER: READY"
+    );
+
+    animate();
+}
+
+
+/* =========================
+   DISPOSE
+   ========================= */
+
+export function dispose() {
+
+    cleanup();
+
+}

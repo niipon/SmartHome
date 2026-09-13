@@ -2784,55 +2784,45 @@ function init(canvasId) {
 
     dispose();
 
-    canvas =
-        document.getElementById(canvasId);
+    canvas = document.getElementById(canvasId);
 
     if (!canvas) {
-
         console.error(
             "MY HOME 3D: canvas not found"
         );
-
         return;
     }
 
-    scene =
-        new THREE.Scene();
+    scene = new THREE.Scene();
 
-    scene.background =
-        new THREE.Color(
-            0x050912
-        );
+    scene.background = new THREE.Color(
+        0x050912
+    );
 
-    scene.fog =
-        new THREE.FogExp2(
-            0x050912,
-            0.018
-        );
+    scene.fog = new THREE.FogExp2(
+        0x050912,
+        0.018
+    );
 
-    clock =
-        new THREE.Clock();
+    clock = new THREE.Clock();
 
-    raycaster =
-        new THREE.Raycaster();
+    raycaster = new THREE.Raycaster();
 
-    mouse =
-        new THREE.Vector2();
+    mouse = new THREE.Vector2();
 
 
     // ========================================================
     // CAMERA
     // ========================================================
 
-    camera =
-        new THREE.OrthographicCamera(
-            -5,
-            5,
-            5,
-            -5,
-            0.1,
-            100
-        );
+    camera = new THREE.OrthographicCamera(
+        -5,
+        5,
+        5,
+        -5,
+        0.1,
+        100
+    );
 
     camera.position.set(
         0,
@@ -2851,18 +2841,17 @@ function init(canvasId) {
     // RENDERER
     // ========================================================
 
-    renderer =
-        new THREE.WebGLRenderer({
+    renderer = new THREE.WebGLRenderer({
 
-            canvas: canvas,
+        canvas: canvas,
 
-            antialias: true,
+        antialias: true,
 
-            alpha: false,
+        alpha: false,
 
-            powerPreference:
-                "high-performance"
-        });
+        powerPreference:
+            "high-performance"
+    });
 
     renderer.setPixelRatio(
         Math.min(
@@ -2914,11 +2903,10 @@ function init(canvasId) {
     // CONTROLS
     // ========================================================
 
-    controls =
-        new OrbitControls(
-            camera,
-            renderer.domElement
-        );
+    controls = new OrbitControls(
+        camera,
+        renderer.domElement
+    );
 
     controls.enableDamping = true;
 
@@ -3096,7 +3084,7 @@ function createBackground() {
     );
 
 
-    // Grid
+    // GRID
 
     const grid =
         new THREE.GridHelper(
@@ -3123,7 +3111,7 @@ function createBackground() {
     );
 
 
-    // Particles
+    // PARTICLES
 
     const geometry =
         new THREE.BufferGeometry();
@@ -3203,7 +3191,7 @@ function createCore() {
         0.05;
 
 
-    // Outer ring
+    // OUTER RING
 
     const ringGeometry =
         new THREE.TorusGeometry(
@@ -3233,7 +3221,7 @@ function createCore() {
     );
 
 
-    // Second ring
+    // SECOND RING
 
     const ring2 =
         new THREE.Mesh(
@@ -3246,6 +3234,7 @@ function createCore() {
             ),
 
             new THREE.MeshBasicMaterial({
+
                 color:
                     0x176fff,
 
@@ -3265,7 +3254,7 @@ function createCore() {
     );
 
 
-    // Inner sphere
+    // INNER SPHERE
 
     const sphere =
         new THREE.Mesh(
@@ -3300,7 +3289,7 @@ function createCore() {
     );
 
 
-    // Inner ring
+    // INNER RING
 
     const innerRing =
         new THREE.Mesh(
@@ -3326,7 +3315,7 @@ function createCore() {
     );
 
 
-    // Glow
+    // GLOW
 
     const glowGeometry =
         new THREE.SphereGeometry(
@@ -3362,7 +3351,7 @@ function createCore() {
     );
 
 
-    // MY HOME text
+    // MY HOME
 
     const title =
         createTextSprite(
@@ -3388,7 +3377,7 @@ function createCore() {
     );
 
 
-    // SYSTEM text
+    // SYSTEM
 
     const system =
         createTextSprite(
@@ -3498,8 +3487,6 @@ function createDataCard(
         1.35;
 
 
-    // Glass
-
     const glass =
         new THREE.Mesh(
 
@@ -3536,8 +3523,6 @@ function createDataCard(
     );
 
 
-    // Border
-
     const border =
         createBorder(
             width,
@@ -3548,8 +3533,6 @@ function createDataCard(
         border
     );
 
-
-    // Title
 
     const titleSprite =
         createTextSprite(
@@ -3575,8 +3558,6 @@ function createDataCard(
     );
 
 
-    // Value
-
     const valueSprite =
         createTextSprite(
             value,
@@ -3600,8 +3581,6 @@ function createDataCard(
         valueSprite
     );
 
-
-    // Subtitle
 
     const subtitleSprite =
         createTextSprite(
@@ -4229,10 +4208,6 @@ function updateState(newState) {
     );
 
 
-    // ========================================================
-    // TEMPERATURE
-    // ========================================================
-
     const temperature =
         getCard("temperature");
 
@@ -4244,10 +4219,6 @@ function updateState(newState) {
         );
     }
 
-
-    // ========================================================
-    // HUMIDITY
-    // ========================================================
 
     const humidity =
         getCard("humidity");
@@ -4261,10 +4232,6 @@ function updateState(newState) {
     }
 
 
-    // ========================================================
-    // OUTDOOR
-    // ========================================================
-
     const outdoor =
         getCard("outdoor");
 
@@ -4276,10 +4243,6 @@ function updateState(newState) {
         );
     }
 
-
-    // ========================================================
-    // GAS
-    // ========================================================
 
     const gas =
         getCard("gas");
@@ -4307,10 +4270,6 @@ function updateState(newState) {
         );
     }
 
-
-    // ========================================================
-    // MOTION
-    // ========================================================
 
     const motion =
         getCard("motion");
@@ -4343,10 +4302,6 @@ function updateState(newState) {
     }
 
 
-    // ========================================================
-    // SECURITY
-    // ========================================================
-
     const security =
         getCard("security");
 
@@ -4373,10 +4328,6 @@ function updateState(newState) {
         );
     }
 
-
-    // ========================================================
-    // STATION
-    // ========================================================
 
     const station =
         getCard("station");
@@ -4555,8 +4506,11 @@ function updateResponsiveLayout() {
 
     if (aspect < 0.62) {
 
+        // БЫЛО 12.5
+        // Меньше область камеры = элементы визуально больше
+
         viewHeight =
-            12.5;
+            10.8;
 
         layoutPhone();
     }
@@ -4899,16 +4853,16 @@ function layoutPhone() {
 
 
     // ========================================================
-    // Верхние карточки
+    // ВЕРХНИЕ КАРТОЧКИ
     // ========================================================
 
     if (temperature)
         setCardPosition(
             temperature,
             -1.55,
-            3.55,
+            3.35,
             4,
-            0.78
+            0.84
         );
 
 
@@ -4916,23 +4870,23 @@ function layoutPhone() {
         setCardPosition(
             humidity,
             1.55,
-            3.55,
+            3.35,
             4,
-            0.78
+            0.84
         );
 
 
     // ========================================================
-    // Нижние карточки
+    // НИЖНИЕ КАРТОЧКИ
     // ========================================================
 
     if (outdoor)
         setCardPosition(
             outdoor,
             -1.55,
-            -2.85,
+            -2.55,
             4,
-            0.78
+            0.84
         );
 
 
@@ -4940,23 +4894,23 @@ function layoutPhone() {
         setCardPosition(
             gas,
             1.55,
-            -2.85,
+            -2.55,
             4,
-            0.78
+            0.84
         );
 
 
     // ========================================================
-    // Статусные карточки
+    // СТАТУСНЫЕ КАРТОЧКИ
     // ========================================================
 
     if (security)
         setCardPosition(
             security,
             -1.45,
-            -3.95,
+            -3.65,
             4.2,
-            0.88
+            0.94
         );
 
 
@@ -4964,46 +4918,46 @@ function layoutPhone() {
         setCardPosition(
             motion,
             1.45,
-            -3.95,
+            -3.65,
             4.2,
-            0.88
+            0.94
         );
 
 
     // ========================================================
-    // Станция
+    // СТАНЦИЯ
     // ========================================================
 
     if (station)
         setCardPosition(
             station,
             0,
-            4.55,
+            4.25,
             4.2,
-            0.88
+            0.94
         );
 
 
     // ========================================================
-    // Уведомления
+    // УВЕДОМЛЕНИЯ
     // ========================================================
 
     if (notificationButton) {
 
         notificationButton.position.set(
             0,
-            -4.85,
+            -4.55,
             4.2
         );
 
         notificationButton.scale.setScalar(
-            0.78
+            0.82
         );
     }
 
 
     // ========================================================
-    // Центральный шар
+    // ЦЕНТРАЛЬНЫЙ ШАР
     // ========================================================
 
     if (core) {
@@ -5014,8 +4968,11 @@ function layoutPhone() {
             0
         );
 
+        // Было 0.67
+        // Совсем немного увеличиваем
+
         core.scale.setScalar(
-            0.67
+            0.73
         );
     }
 }
