@@ -698,9 +698,13 @@
                     GasValue = homeData.GasValue,
                     MotionDetected = homeData.MotionDetected,
                     SecurityEnabled = homeData.SecurityEnabled,
-                    StationOnline = !error
+                    SztationOnline = !error
                 }
             );
+        }
+        catch (TaskCanceledException)
+        {
+            // JS-вызов был отменён при уходе со страницы
         }
         catch (JSDisconnectedException)
         {
