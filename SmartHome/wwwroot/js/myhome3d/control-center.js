@@ -2734,10 +2734,98 @@ function init() {
     animate();
 }
 
-window.controlCenter3D = {
-    init
-};
+//window.controlCenter3D = {
+//    init
+//};
 
-window.myHomeControlCenter = {
-    init
-};
+//window.myHomeControlCenter = {
+//    init
+//};
+
+export function init() {
+    if (scene)
+        return;
+
+    canvas =
+        document.getElementById(
+            "controlCenter3dCanvas"
+        );
+
+    if (!canvas) {
+        console.error(
+            "Control Center: canvas not found"
+        );
+        return;
+    }
+
+    scene =
+        new THREE.Scene();
+
+    scene.background =
+        new THREE.Color(
+            0x05080d
+        );
+
+    camera =
+        new THREE.PerspectiveCamera(
+            40,
+            1,
+            0.1,
+            100
+        );
+
+    renderer =
+        new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true
+        });
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio,
+            2
+        )
+    );
+
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
+    controls =
+        new OrbitControls(
+            camera,
+            renderer.domElement
+        );
+
+    controls.enableDamping = true;
+    controls.enableZoom = false;
+    controls.enablePan = false;
+
+    controls.minPolarAngle =
+        Math.PI / 2;
+
+    controls.maxPolarAngle =
+        Math.PI / 2;
+
+    createHouse();
+
+    items.forEach(item => {
+        createNavigationCard(item);
+    });
+
+    canvas.addEventListener(
+        "pointerup",
+        handleClick
+    );
+
+    window.addEventListener(
+        "resize",
+        resize
+    );
+
+    setupLayout();
+
+    resize();
+
+    animate();
+}

@@ -1,4 +1,4 @@
-﻿@page "/control-center"
+﻿@* @page "/control-center"
 @rendermode InteractiveServer
 
 @attribute [Authorize]
@@ -91,6 +91,91 @@
         }
         catch
         {
+        }
+    }
+} *@
+
+@page "/control-center"
+
+@rendermode InteractiveServer
+
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="control-center-page">
+
+    <div class="control-center-header">
+
+        <div>
+            <div class="eyebrow">
+                MY HOME
+            </div>
+
+            <h1>
+                CONTROL CENTER
+            </h1>
+
+            <p>
+                Центр управления домом
+            </p>
+        </div>
+
+        <div class="system-status">
+            <span></span>
+            SYSTEM ONLINE
+        </div>
+
+    </div>
+
+    <canvas id="controlCenter3dCanvas"></canvas>
+
+    <div class="rotate-hint">
+        Проведите пальцем для вращения
+    </div>
+
+</div>
+
+@code {
+
+    private IJSObjectReference? module;
+
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        try
+        {
+            module =
+                await JS.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "/js/myhome3d/control-center.js"
+                );
+
+            await module.InvokeVoidAsync(
+                "init"
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"CONTROL CENTER 3D ERROR: {ex}"
+            );
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module != null)
+        {
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch
+            {
+            }
         }
     }
 }
