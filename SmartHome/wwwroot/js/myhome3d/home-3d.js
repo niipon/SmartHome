@@ -3491,8 +3491,6 @@ function createDataCard(
         id;
 
 
-    // Размер карточки НЕ МЕНЯЕМ
-
     const width =
         2.55;
 
@@ -3664,8 +3662,6 @@ function createStatusCard(
     group.userData.id =
         id;
 
-
-    // Размер карточки НЕ МЕНЯЕМ
 
     const width =
         2.55;
@@ -3957,9 +3953,6 @@ function createTextSprite(
     color
 ) {
 
-    // Увеличили область текста,
-    // чтобы крупный текст не обрезался
-
     const width =
         1200;
 
@@ -4092,9 +4085,11 @@ function updateText(
         sprite.userData.texture;
 
 
-    if (!canvas ||
+    if (
+        !canvas ||
         !ctx ||
-        !texture)
+        !texture
+    )
         return;
 
 
@@ -4525,9 +4520,11 @@ function getCard(id) {
 
 function updateResponsiveLayout() {
 
-    if (!camera ||
+    if (
+        !camera ||
         !renderer ||
-        !canvas)
+        !canvas
+    )
         return;
 
 
@@ -4538,8 +4535,10 @@ function updateResponsiveLayout() {
         canvas.clientHeight;
 
 
-    if (!width ||
-        !height)
+    if (
+        !width ||
+        !height
+    )
         return;
 
 
@@ -4899,15 +4898,19 @@ function layoutPhone() {
         getCard("station");
 
 
+    // ========================================================
     // Верхние карточки
+    // ========================================================
+
     if (temperature)
         setCardPosition(
             temperature,
             -1.55,
             3.55,
             4,
-            0.68
+            0.78
         );
+
 
     if (humidity)
         setCardPosition(
@@ -4915,19 +4918,23 @@ function layoutPhone() {
             1.55,
             3.55,
             4,
-            0.68
+            0.78
         );
 
 
-    // Нижние большие карточки
+    // ========================================================
+    // Нижние карточки
+    // ========================================================
+
     if (outdoor)
         setCardPosition(
             outdoor,
             -1.55,
             -2.85,
             4,
-            0.68
+            0.78
         );
+
 
     if (gas)
         setCardPosition(
@@ -4935,19 +4942,23 @@ function layoutPhone() {
             1.55,
             -2.85,
             4,
-            0.68
+            0.78
         );
 
 
+    // ========================================================
     // Статусные карточки
+    // ========================================================
+
     if (security)
         setCardPosition(
             security,
             -1.45,
             -3.95,
             4.2,
-            0.78
+            0.88
         );
+
 
     if (motion)
         setCardPosition(
@@ -4955,22 +4966,28 @@ function layoutPhone() {
             1.45,
             -3.95,
             4.2,
-            0.78
+            0.88
         );
 
 
+    // ========================================================
     // Станция
+    // ========================================================
+
     if (station)
         setCardPosition(
             station,
             0,
             4.55,
             4.2,
-            0.78
+            0.88
         );
 
 
+    // ========================================================
     // Уведомления
+    // ========================================================
+
     if (notificationButton) {
 
         notificationButton.position.set(
@@ -4980,12 +4997,15 @@ function layoutPhone() {
         );
 
         notificationButton.scale.setScalar(
-            0.72
+            0.78
         );
     }
 
 
+    // ========================================================
     // Центральный шар
+    // ========================================================
+
     if (core) {
 
         core.position.set(
@@ -5040,8 +5060,10 @@ function setCardPosition(
 
 function onPointerMove(event) {
 
-    if (!canvas ||
-        !camera)
+    if (
+        !canvas ||
+        !camera
+    )
         return;
 
 
@@ -5051,16 +5073,20 @@ function onPointerMove(event) {
 
     mouse.x =
         (
-            (event.clientX -
-                rect.left) /
+            (
+                event.clientX -
+                rect.left
+            ) /
             rect.width
         ) * 2 - 1;
 
 
     mouse.y =
         -(
-            (event.clientY -
-                rect.top) /
+            (
+                event.clientY -
+                rect.top
+            ) /
             rect.height
         ) * 2 + 1;
 
@@ -5117,8 +5143,10 @@ function onPointerMove(event) {
 
 function onPointerDown(event) {
 
-    if (!canvas ||
-        !camera)
+    if (
+        !canvas ||
+        !camera
+    )
         return;
 
 
@@ -5128,16 +5156,20 @@ function onPointerDown(event) {
 
     mouse.x =
         (
-            (event.clientX -
-                rect.left) /
+            (
+                event.clientX -
+                rect.left
+            ) /
             rect.width
         ) * 2 - 1;
 
 
     mouse.y =
         -(
-            (event.clientY -
-                rect.top) /
+            (
+                event.clientY -
+                rect.top
+            ) /
             rect.height
         ) * 2 + 1;
 
@@ -5209,9 +5241,11 @@ function animate() {
         );
 
 
-    if (!scene ||
+    if (
+        !scene ||
         !renderer ||
-        !camera)
+        !camera
+    )
         return;
 
 
@@ -5389,5 +5423,5 @@ window.myHome3D = {
     updateState,
 
     dispose
-};
 
+};
