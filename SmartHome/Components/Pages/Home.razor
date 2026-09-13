@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@* @page "/"
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 
@@ -380,3 +380,371 @@
     }
 }
 
+ *@
+
+
+@page "/"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@using System.Net.Http.Json
+
+@rendermode InteractiveServer
+
+
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject IHttpClientFactory HttpClientFactory
+
+@implements IDisposable
+
+<div class="home-3d-page">
+
+    <canvas id="home3dCanvas"></canvas>
+
+    @if (loading)
+    {
+        <div class="home-loading">
+            <div class="loading-circle"></div>
+
+            <div class="loading-title">
+                MY HOME
+            </div>
+
+            <div class="loading-text">
+                ПОДКЛЮЧЕНИЕ К СИСТЕМЕ
+            </div>
+        </div>
+    }
+
+    @if (error)
+    {
+        <div class="connection-warning">
+            <div class="warning-dot"></div>
+
+            <div>
+                <strong>СТАНЦИЯ ОФЛАЙН</strong>
+                <span>Нет связи с API</span>
+            </div>
+        </div>
+    }
+
+</div>
+
+
+<style>
+
+    .home-3d-page {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #050912;
+    }
+
+
+    #home3dCanvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        outline: none;
+        touch-action: none;
+    }
+
+
+    /* =========================================================
+           LOADING
+           ========================================================= */
+
+    .home-loading {
+        position: absolute;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient( circle at center, rgba(20, 52, 90, .28), rgba(3, 7, 13, .96) );
+        pointer-events: none;
+    }
+
+
+    .loading-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 2px solid rgba(60, 150, 255, .15);
+        border-top-color: #3b9cff;
+        animation: loadingSpin 1s linear infinite;
+        box-shadow: 0 0 30px rgba(50, 145, 255, .4);
+    }
+
+
+    .loading-title {
+        margin-top: 20px;
+        color: #dcefff;
+        font-size: 23px;
+        font-weight: 700;
+        letter-spacing: 7px;
+        text-shadow: 0 0 12px rgba(60, 160, 255, .9), 0 0 35px rgba(60, 160, 255, .4);
+    }
+
+
+    .loading-text {
+        margin-top: 8px;
+        color: #55728f;
+        font-size: 10px;
+        letter-spacing: 3px;
+    }
+
+
+    /* =========================================================
+           CONNECTION
+           ========================================================= */
+
+    .connection-warning {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 18px;
+        border: 1px solid rgba(255, 70, 70, .35);
+        border-radius: 13px;
+        background: rgba(30, 7, 12, .85);
+        backdrop-filter: blur(16px);
+        box-shadow: 0 0 30px rgba(255, 50, 50, .12);
+        pointer-events: none;
+    }
+
+
+        .connection-warning strong {
+            display: block;
+            color: #ff7272;
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+
+        .connection-warning span {
+            display: block;
+            margin-top: 3px;
+            color: #8e6464;
+            font-size: 9px;
+        }
+
+
+    .warning-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ff4d4d;
+        box-shadow: 0 0 12px #ff4d4d;
+        animation: warningPulse 1.3s infinite;
+    }
+
+
+    @@keyframes loadingSpin {
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+
+    @@keyframes warningPulse {
+
+        50% {
+            opacity: .35;
+            transform: scale(.7);
+        }
+    }
+
+
+    @@media (max-width: 600px) {
+
+        .loading-title {
+            font-size: 18px;
+            letter-spacing: 5px;
+        }
+
+        .loading-text {
+            font-size: 9px;
+        }
+
+        .connection-warning {
+            top: 12px;
+        }
+    }
+
+
+
+</style>
+
+
+@code {
+
+    private HomeData? homeData;
+
+    private bool loading = true;
+
+    private bool error = false;
+
+    private System.Threading.Timer? timer;
+
+    private bool home3DReady = false;
+
+    private bool disposed = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadHomeData();
+
+        timer = new System.Threading.Timer(
+            async _ =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    await LoadHomeData();
+
+                    await SendDataTo3D();
+
+                    StateHasChanged();
+                });
+            },
+            null,
+            TimeSpan.FromSeconds(5),
+            TimeSpan.FromSeconds(5)
+        );
+    }
+
+
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+
+        try
+        {
+            await JS.InvokeVoidAsync(
+                "myHome3D.init",
+                "home3dCanvas"
+            );
+
+            home3DReady = true;
+
+            await SendDataTo3D();
+        }
+        catch
+        {
+            home3DReady = false;
+        }
+    }
+
+
+    private async Task LoadHomeData()
+    {
+        try
+        {
+            var client =
+                HttpClientFactory.CreateClient(
+                    "HomeApi"
+                );
+
+
+            homeData =
+                await client.GetFromJsonAsync<HomeData>(
+                    "api/home"
+                );
+
+
+            error =
+                homeData == null;
+        }
+        catch
+        {
+            error = true;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+
+    private async Task SendDataTo3D()
+    {
+        if (disposed || !home3DReady || homeData == null)
+            return;
+
+        try
+        {
+            await JS.InvokeVoidAsync(
+                "myHome3D.updateState",
+                new
+                {
+                    IndoorTemperature = homeData.IndoorTemperature,
+                    OutdoorTemperature = homeData.OutdoorTemperature,
+                    Humidity = homeData.Humidity,
+                    GasDetected = homeData.GasDetected,
+                    GasValue = homeData.GasValue,
+                    MotionDetected = homeData.MotionDetected,
+                    SecurityEnabled = homeData.SecurityEnabled,
+                    StationOnline = !error
+                }
+            );
+        }
+        catch (JSDisconnectedException)
+        {
+            // Пользователь уже ушёл со страницы
+        }
+        catch (JSException)
+        {
+            // JS уже недоступен
+        }
+    }
+
+
+    private void OpenNotifications()
+    {
+        Navigation.NavigateTo(
+            "/notifications"
+        );
+    }
+
+
+    public void Dispose()
+    {
+        disposed = true;
+
+        timer?.Dispose();
+        timer = null;
+    }
+
+
+    public class HomeData
+    {
+        public double IndoorTemperature { get; set; }
+
+        public double OutdoorTemperature { get; set; }
+
+        public int Humidity { get; set; }
+
+        public bool GasDetected { get; set; }
+
+        public int GasValue { get; set; }
+
+        public bool MotionDetected { get; set; }
+
+        public bool SecurityEnabled { get; set; }
+    }
+
+}

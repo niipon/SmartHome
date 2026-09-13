@@ -4587,3 +4587,242 @@ select {
         scroll-behavior: auto !important;
     }
 }
+
+/* =========================================
+   MY HOME — CONTROL CENTER
+   ========================================= */
+
+.control-center-page {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient( circle at 50% 45%, #0b1829 0%, #05090f 42%, #010204 100% );
+    z-index: 1000;
+}
+
+
+/* =========================================
+   CANVAS
+   ========================================= */
+
+#controlCenterCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    outline: none;
+    touch-action: none;
+}
+
+
+/* =========================================
+   VIGNETTE
+   ========================================= */
+
+.control-center-page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient( circle at center, transparent 48%, rgba(0,0,0,.2) 75%, rgba(0,0,0,.72) 100% );
+}
+
+
+/* =========================================
+   OVERLAY
+   ========================================= */
+
+.control-center-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+}
+
+
+/* =========================================
+   BRAND
+   ========================================= */
+
+.control-center-brand {
+    position: absolute;
+    top: clamp(20px, 4vh, 38px);
+    left: clamp(20px, 3vw, 40px);
+}
+
+
+.control-center-eyebrow {
+    color: #5799e8;
+    font-size: clamp(8px, .65vw, 10px);
+    font-weight: 800;
+    letter-spacing: clamp(2px, .3vw, 4px);
+    margin-bottom: 7px;
+}
+
+
+.control-center-title {
+    color: #f4f7fb;
+    font-size: clamp(18px, 1.7vw, 26px);
+    font-weight: 750;
+    letter-spacing: clamp(1.5px, .25vw, 3px);
+    line-height: 1;
+}
+
+
+.control-center-subtitle {
+    margin-top: 8px;
+    color: #667386;
+    font-size: clamp(9px, .75vw, 12px);
+    letter-spacing: .5px;
+}
+
+
+/* =========================================
+   STATUS
+   ========================================= */
+
+.control-center-status {
+    position: absolute;
+    top: clamp(20px, 4vh, 38px);
+    right: clamp(20px, 3vw, 40px);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: clamp(8px, .8vw, 11px) clamp(11px, 1.2vw, 17px);
+    border: 1px solid rgba(92,155,235,.2);
+    border-radius: 999px;
+    background: rgba(7,14,24,.6);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    color: #8290a2;
+    font-size: clamp(8px, .6vw, 10px);
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+
+    .control-center-status .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #39d98b;
+        box-shadow: 0 0 8px #39d98b;
+        margin: 0;
+    }
+
+
+/* =========================================
+   HELP
+   ========================================= */
+
+.control-center-help {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(14px, 3vh, 28px);
+    transform: translateX(-50%);
+    padding: 8px 15px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 999px;
+    background: rgba(5,9,15,.6);
+    backdrop-filter: blur(16px);
+    color: #596678;
+    font-size: clamp(8px, .65vw, 10px);
+    letter-spacing: .6px;
+    white-space: nowrap;
+}
+
+
+.mobile-help {
+    display: none;
+}
+
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 900px) {
+
+    .control-center-brand {
+        top: 22px;
+        left: 22px;
+    }
+
+
+    .control-center-status {
+        top: 22px;
+        right: 22px;
+    }
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    .control-center-brand {
+        top: 18px;
+        left: 18px;
+    }
+
+
+    .control-center-title {
+        font-size: 17px;
+    }
+
+
+    .control-center-subtitle {
+        font-size: 8px;
+    }
+
+
+    .control-center-status {
+        top: 18px;
+        right: 18px;
+        padding: 7px 10px;
+        font-size: 7px;
+    }
+
+
+    .desktop-help {
+        display: none;
+    }
+
+
+    .mobile-help {
+        display: inline;
+    }
+
+
+    .control-center-help {
+        bottom: 15px;
+    }
+}
+
+
+/* =========================================
+   VERY SMALL PHONES
+   ========================================= */
+
+@media (max-width: 380px) {
+
+    .control-center-subtitle {
+        display: none;
+    }
+
+
+    .control-center-status {
+        padding: 6px 8px;
+    }
+
+
+    .control-center-help {
+        font-size: 7px;
+    }
+}
