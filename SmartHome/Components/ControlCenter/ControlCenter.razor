@@ -1,4 +1,4 @@
-﻿@* @page "/control-center"
+﻿@page "/control-center"
 @rendermode InteractiveServer
 
 @attribute [Authorize]
@@ -93,10 +93,10 @@
         {
         }
     }
-} *@
+}
 
 
-
+@* 
 @page "/control-center"
 @rendermode InteractiveServer
 @attribute [Authorize]
@@ -170,12 +170,12 @@
 
 </div> *@
 
-@code {
+@* @code {
 
     private IJSObjectReference? module;
-    private bool initialized;
+    private bool initialized; *@
 
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
+@*     // protected override async Task OnAfterRenderAsync(bool firstRender)
     // {
     //     if (!firstRender)
     //         return;
@@ -244,7 +244,7 @@
         {
         }
     }
-}
+}  *@
 
 
 
