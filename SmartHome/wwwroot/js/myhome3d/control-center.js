@@ -7,26 +7,33 @@ let renderer = null;
 let controls = null;
 let animationFrame = null;
 let canvas = null;
+let raycaster = null;
+let mouse = new THREE.Vector2();
+let clickableCards = [];
 
 const cards = [
     {
         title: "HOME",
         subtitle: "Главная",
+        route: "/",
         position: [-3.4, 1.0, 0]
     },
     {
         title: "SECURITY",
         subtitle: "Охрана",
+        route: "/security",
         position: [3.4, 1.0, 0]
     },
     {
         title: "LIGHTS",
         subtitle: "Освещение",
+        route: "/lights",
         position: [-3.4, -1.2, 0]
     },
     {
         title: "SETTINGS",
         subtitle: "Настройки",
+        route: "/settings",
         position: [3.4, -1.2, 0]
     }
 ];
@@ -219,6 +226,7 @@ function createCard(data) {
 
     group.add(dot);
 
+    group.userData.route = data.route;
 
     return group;
 }
@@ -568,6 +576,56 @@ function animate(time = 0) {
     );
 }
 
+function onPointerDown(event) {
+
+    if (!canvas || !camera)
+        return;
+
+    const rect = canvas.getBoundingClientRect();
+
+    mouse.x =
+        ((event.clientX - rect.left) / rect.width) * 2 - 1;
+
+    mouse.y =
+        -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+    const intersects =
+        raycaster.intersectObjects(
+            clickableCards,
+            true
+        );
+
+    if (intersects.length === 0)
+        return;
+
+    let object =
+        intersects[0].object;
+
+    while (
+        object.parent &&
+        !object.userData.route
+    ) {
+        object = object.parent;
+    }
+
+    const route =
+        object.userData.route;
+
+    if (!route)
+        return;
+
+    console.log(
+        "CONTROL CENTER NAVIGATION:",
+        route
+    );
+
+    window.location.href = route;
+}
 
 export function init(canvasId) {
 
@@ -701,6 +759,7 @@ export function init(canvasId) {
      */
 
     scene.userData.cards = [];
+    clickableCards = [];
 
     for (const item of cards) {
 
@@ -710,6 +769,10 @@ export function init(canvasId) {
         scene.add(card);
 
         scene.userData.cards.push(
+            card
+        );
+
+        clickableCards.push(
             card
         );
     }
@@ -742,6 +805,13 @@ export function init(canvasId) {
         0
     );
 
+    raycaster =
+        new THREE.Raycaster();
+
+    canvas.addEventListener(
+        "pointerdown",
+        onPointerDown
+    );
 
     /*
      * RESIZE
@@ -781,6 +851,13 @@ function cleanup() {
         resize
     );
 
+    if (canvas) {
+
+        canvas.removeEventListener(
+            "pointerdown",
+            onPointerDown
+        );
+    }
 
     if (controls) {
 

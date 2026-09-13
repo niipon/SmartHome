@@ -98,7 +98,7 @@
 
 
 @page "/control-center"
-
+@rendermode InteractiveServer
 @attribute [Authorize]
 
 @using Microsoft.AspNetCore.Authorization
@@ -154,10 +154,54 @@
 
 </div>
 
+@* <div class="control-center-page">
+
+    <div style="
+        position:absolute;
+        inset:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:white;
+        font-size:40px;
+        z-index:9999;">
+        CONTROL CENTER TEST
+    </div>
+
+</div> *@
+
 @code {
 
     private IJSObjectReference? module;
     private bool initialized;
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (!firstRender)
+    //         return;
+
+    //     try
+    //     {
+    //         await JS.InvokeVoidAsync(
+    //             "console.log",
+    //             "CONTROL CENTER JS ЗАПУЩЕН"
+    //         );
+
+    //         await JS.InvokeVoidAsync(
+    //             "document.body.setAttribute",
+    //             "data-control-center",
+    //             "working"
+    //         );
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         await JS.InvokeVoidAsync(
+    //             "console.error",
+    //             "CONTROL CENTER ERROR",
+    //             ex.ToString()
+    //         );
+    //     }
+    // }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
