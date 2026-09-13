@@ -2748,6 +2748,7 @@ let renderer = null;
 let controls = null;
 let canvas = null;
 let clock = null;
+let animationFrame = null;
 
 let core = null;
 let cards = [];
