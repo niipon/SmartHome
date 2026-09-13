@@ -3192,22 +3192,22 @@ function updateResponsiveCamera() {
 
         setCardBaseScale(
             home,
-            0.22
+            0.66
         );
 
         setCardBaseScale(
             security,
-            0.22
+            0.66
         );
 
         setCardBaseScale(
             lights,
-            0.22
+            0.66
         );
 
         setCardBaseScale(
             settings,
-            0.22
+            0.66
         );
     }
 }

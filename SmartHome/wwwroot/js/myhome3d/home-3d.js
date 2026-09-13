@@ -3542,8 +3542,8 @@ function createDataCard(
         );
 
     titleSprite.scale.set(
-        1.28,
-        0.20,
+        1.38,
+        0.27,
         1
     );
 
@@ -3566,8 +3566,8 @@ function createDataCard(
         );
 
     valueSprite.scale.set(
-        1.62,
-        0.38,
+        1.672,
+        0.46,
         1
     );
 
@@ -3590,8 +3590,8 @@ function createDataCard(
         );
 
     subtitleSprite.scale.set(
-        1.08,
-        0.145,
+        1.15,
+        0.19,
         1
     );
 
@@ -3704,8 +3704,8 @@ function createStatusCard(
         );
 
     titleSprite.scale.set(
-        1.08,
-        0.18,
+        1.18,
+        0.24,
         1
     );
 
@@ -3728,8 +3728,8 @@ function createStatusCard(
         );
 
     valueSprite.scale.set(
-        1.08,
-        0.19,
+        1.18,
+        0.25,
         1
     );
 
