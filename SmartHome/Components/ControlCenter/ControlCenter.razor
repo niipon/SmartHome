@@ -95,7 +95,8 @@
     }
 } *@
 
-        ```razor
+
+```razor
 @page "/control-center"
 
 @attribute [Authorize]
@@ -155,6 +156,7 @@
 
 @code {
 
+    private IJSObjectReference? module;
     private bool initialized;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -164,11 +166,13 @@
 
         try
         {
-            // Даём странице и Three.js-модулю загрузиться
-            await Task.Delay(100);
+            module = await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/js/myhome3d/control-center.js"
+            );
 
-            await JS.InvokeVoidAsync(
-                "myHomeControlCenter.init",
+            await module.InvokeVoidAsync(
+                "init",
                 "controlCenterCanvas"
             );
 
@@ -177,26 +181,26 @@
         catch (Exception ex)
         {
             Console.WriteLine(
-                $"CONTROL CENTER INIT ERROR: {ex.Message}"
+                $"CONTROL CENTER ERROR: {ex}"
             );
         }
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (!initialized)
+        if (!initialized || module == null)
             return;
 
         try
         {
-            await JS.InvokeVoidAsync(
-                "myHomeControlCenter.dispose"
-            );
+            await module.InvokeVoidAsync("dispose");
+            await module.DisposeAsync();
         }
         catch
         {
-            // Страница уже могла быть уничтожена
         }
     }
 }
 ```
+
+
