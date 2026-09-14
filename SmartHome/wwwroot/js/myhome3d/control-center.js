@@ -1594,12 +1594,12 @@ function animate(time = 0) {
 
 function cleanup() {
 
+    console.log("CONTROL CENTER: CLEANUP");
+
+
     if (animationFrame) {
 
-        cancelAnimationFrame(
-            animationFrame
-        );
-
+        cancelAnimationFrame(animationFrame);
         animationFrame = null;
     }
 
@@ -1613,7 +1613,6 @@ function cleanup() {
     if (resizeObserver) {
 
         resizeObserver.disconnect();
-
         resizeObserver = null;
     }
 
@@ -1635,16 +1634,23 @@ function cleanup() {
     if (controls) {
 
         controls.dispose();
-
         controls = null;
     }
 
 
     if (renderer) {
 
-        renderer.dispose();
+        try {
+            renderer.dispose();
+        }
+        catch { }
 
-        renderer.forceContextLoss();
+
+        try {
+            renderer.forceContextLoss();
+        }
+        catch { }
+
 
         renderer = null;
     }

@@ -1,711 +1,4 @@
-﻿@* <!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-    <link rel="manifest" href="/manifest.json">
-
-    <meta name="theme-color" content="#111827">
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <base href="/" />
-
-    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/app.css" />
-    <link rel="stylesheet" href="SmartHome.styles.css" />
-
-    <link rel="icon" type="image/png" href="smart-house.png" />
-    <link rel="apple-touch-icon" href="/smart.png" />
-
-    <HeadOutlet />
-
-    <style>
-
-        /* =========================
-                   LAUNCH SCREEN
-                   ========================= */
-
-        .launch-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            background: radial-gradient( circle at 50% 45%, #111820 0%, #07090c 45%, #030405 100% );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            animation: launchAppear 0.8s ease-out forwards;
-        }
-
-        /* Если заставка уже была показана,
-                   полностью скрываем её */
-        body.launch-complete .launch-screen {
-            display: none !important;
-        }
-
-
-        .launch-background {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-        }
-
-
-        .grid-floor {
-            position: absolute;
-            width: 180%;
-            height: 55%;
-            left: -40%;
-            bottom: -25%;
-            background-image: linear-gradient( rgba(255,255,255,.035) 1px, transparent 1px ), linear-gradient( 90deg, rgba(255,255,255,.035) 1px, transparent 1px );
-            background-size: 55px 55px;
-            transform: perspective(500px) rotateX(60deg);
-            transform-origin: center bottom;
-            opacity: 0;
-            animation: gridAppear 2s ease-out 0.7s forwards, gridMove 8s linear infinite;
-        }
-
-
-        .launch-content {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            perspective: 1200px;
-        }
-
-
-        /* =========================
-                   HOUSE
-                   ========================= */
-
-        .house-scene {
-            width: 340px;
-            height: 300px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            perspective: 1000px;
-        }
-
-
-        .house {
-            position: relative;
-            width: 260px;
-            height: 190px;
-            transform-style: preserve-3d;
-            transform: rotateX(4deg) rotateY(-20deg) rotateZ(0deg) translateY(30px) scale(.75);
-            opacity: 0;
-            animation: houseAppear 1.5s cubic-bezier(.2,.8,.2,1) 0.5s forwards, houseFloat 5s ease-in-out 2s infinite;
-        }
-
-
-        .house-base {
-            position: absolute;
-            left: 10px;
-            bottom: 0;
-            width: 250px;
-            height: 12px;
-            background: #151a20;
-            border: 1px solid rgba(255,255,255,.15);
-            transform: translateZ(30px);
-            box-shadow: 0 0 30px rgba(120,180,255,.12);
-        }
-
-
-        .house-front {
-            position: absolute;
-            left: 20px;
-            bottom: 12px;
-            width: 200px;
-            height: 130px;
-            background: linear-gradient( 135deg, #1c242d, #0e1318 );
-            border: 1px solid rgba(255,255,255,.14);
-            transform: translateZ(35px);
-            box-shadow: inset 0 0 30px rgba(255,255,255,.025);
-        }
-
-
-        .house-side {
-            position: absolute;
-            left: 220px;
-            bottom: 12px;
-            width: 55px;
-            height: 130px;
-            background: linear-gradient( 135deg, #11171d, #080b0f );
-            border: 1px solid rgba(255,255,255,.1);
-            transform: skewY(-28deg) translateZ(0);
-        }
-
-
-        /* =========================
-                   ROOF
-                   ========================= */
-
-        .roof {
-            position: absolute;
-            width: 145px;
-            height: 85px;
-            background: linear-gradient( 135deg, #202a35, #0b1015 );
-            border: 1px solid rgba(255,255,255,.18);
-            top: 5px;
-        }
-
-
-        .roof-left {
-            left: 17px;
-            transform: rotate(27deg) skewX(-25deg) translateZ(45px);
-            transform-origin: right bottom;
-        }
-
-
-        .roof-right {
-            left: 130px;
-            transform: rotate(-27deg) skewX(25deg) translateZ(45px);
-            transform-origin: left bottom;
-        }
-
-
-        /* =========================
-                   DOOR
-                   ========================= */
-
-        .house-door {
-            position: absolute;
-            left: 101px;
-            bottom: 12px;
-            width: 42px;
-            height: 82px;
-            background: linear-gradient( 180deg, #151d25, #080c10 );
-            border: 1px solid rgba(255,255,255,.2);
-            transform: translateZ(38px);
-            overflow: hidden;
-        }
-
-
-        .door-light {
-            position: absolute;
-            left: 5px;
-            right: 5px;
-            top: 5px;
-            height: 35px;
-            background: radial-gradient( circle, rgba(180,220,255,.5), rgba(100,160,255,.08), transparent );
-            opacity: 0;
-            animation: lightOn .8s ease-out 3.1s forwards;
-        }
-
-
-        /* =========================
-                   WINDOWS
-                   ========================= */
-
-        .house-window {
-            position: absolute;
-            width: 45px;
-            height: 42px;
-            background: #090d11;
-            border: 1px solid rgba(255,255,255,.2);
-            transform: translateZ(40px);
-            overflow: hidden;
-        }
-
-
-        .window-left {
-            left: 38px;
-            bottom: 73px;
-        }
-
-
-        .window-right {
-            right: 30px;
-            bottom: 73px;
-        }
-
-
-        .window-side {
-            left: 229px;
-            bottom: 72px;
-            transform: skewY(-28deg) translateZ(3px);
-        }
-
-
-        .house-window::before,
-        .house-window::after {
-            content: "";
-            position: absolute;
-            background: rgba(170,210,255,.65);
-            opacity: 0;
-            animation: windowLight .8s ease-out 3.2s forwards;
-        }
-
-
-        .house-window::before {
-            inset: 4px;
-        }
-
-
-        .house-window::after {
-            left: 50%;
-            top: 4px;
-            bottom: 4px;
-            width: 1px;
-            background: rgba(255,255,255,.25);
-        }
-
-
-        .house-window span:first-child {
-            position: absolute;
-            left: 4px;
-            right: 4px;
-            top: 50%;
-            height: 1px;
-            background: rgba(255,255,255,.2);
-            z-index: 2;
-        }
-
-
-        /* =========================
-                   HOUSE GLOW
-                   ========================= */
-
-        .house-glow {
-            position: absolute;
-            width: 230px;
-            height: 80px;
-            left: 20px;
-            bottom: -10px;
-            background: radial-gradient( ellipse, rgba(120,180,255,.22), transparent 70% );
-            filter: blur(20px);
-            opacity: 0;
-            animation: glowAppear 1.5s ease-out 2.8s forwards;
-        }
-
-
-        /* =========================
-                   TITLE
-                   ========================= */
-
-        .launch-title {
-            margin-top: 5px;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: titleAppear 1s ease-out 3.7s forwards;
-        }
-
-
-        .launch-logo {
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: 8px;
-            color: #ffffff;
-            text-shadow: 0 0 15px rgba(150,200,255,.25);
-        }
-
-
-        .launch-status {
-            margin-top: 12px;
-            font-size: 11px;
-            letter-spacing: 4px;
-            color: rgba(255,255,255,.45);
-        }
-
-
-        .status-dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            margin-right: 8px;
-            border-radius: 50%;
-            background: #7ee787;
-            box-shadow: 0 0 10px rgba(126,231,135,.8);
-            animation: statusPulse 1.4s ease-in-out infinite;
-        }
-
-
-        /* =========================
-                   ANIMATIONS
-                   ========================= */
-
-        @@keyframes launchAppear {
-
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-
-        @@keyframes gridAppear {
-
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-
-        @@keyframes gridMove {
-
-            from {
-                background-position: 0 0, 0 0;
-            }
-
-            to {
-                background-position: 0 55px, 55px 0;
-            }
-        }
-
-
-        @@keyframes houseAppear {
-
-            0% {
-                opacity: 0;
-                transform: rotateX(20deg) rotateY(-45deg) translateY(100px) scale(.45);
-            }
-
-            60% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 1;
-                transform: rotateX(4deg) rotateY(-20deg) translateY(30px) scale(.75);
-            }
-        }
-
-
-        @@keyframes houseFloat {
-
-            0%, 100% {
-                transform: rotateX(4deg) rotateY(-20deg) translateY(30px) scale(.75);
-            }
-
-            50% {
-                transform: rotateX(5deg) rotateY(-16deg) translateY(20px) scale(.75);
-            }
-        }
-
-
-        @@keyframes windowLight {
-
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-
-        @@keyframes lightOn {
-
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-
-        @@keyframes glowAppear {
-
-            from {
-                opacity: 0;
-                transform: scale(.5);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-
-        @@keyframes titleAppear {
-
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-
-        @@keyframes statusPulse {
-
-            0%, 100% {
-                opacity: .5;
-                transform: scale(.8);
-            }
-
-            50% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
-        }
-
-
-        /* =========================
-                   EXIT
-                   ========================= */
-
-        .launch-finished {
-            animation: launchExit .7s ease-in forwards;
-        }
-
-
-        @@keyframes launchExit {
-
-            from {
-                opacity: 1;
-            }
-
-            to {
-                opacity: 0;
-                transform: scale(1.04);
-            }
-        }
-
-
-        /* =========================
-                   MOBILE
-                   ========================= */
-
-        @@media (max-width: 600px) {
-
-            .house-scene {
-                transform: scale(.8);
-            }
-
-            .launch-logo {
-                font-size: 26px;
-                letter-spacing: 6px;
-            }
-
-            .launch-status {
-                font-size: 9px;
-                letter-spacing: 3px;
-            }
-        }
-
-        body.launch-complete .launch-screen {
-            display: none !important;
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-    <!-- =========================
-         LAUNCH SCREEN
-         ========================= -->
-
-    <div class="launch-screen" id="launch-screen">
-
-        <div class="launch-background">
-
-            <div class="grid-floor"></div>
-
-        </div>
-
-
-        <div class="launch-content">
-
-            <div class="house-scene">
-
-                <div class="house">
-
-                    <div class="house-base"></div>
-
-                    <div class="house-front"></div>
-
-                    <div class="house-side"></div>
-
-
-                    <div class="roof roof-left"></div>
-
-                    <div class="roof roof-right"></div>
-
-
-                    <div class="house-door">
-
-                        <div class="door-light"></div>
-
-                    </div>
-
-
-                    <div class="house-window window-left">
-
-                        <span></span>
-                        <span></span>
-
-                    </div>
-
-
-                    <div class="house-window window-right">
-
-                        <span></span>
-                        <span></span>
-
-                    </div>
-
-
-                    <div class="house-window window-side">
-
-                        <span></span>
-                        <span></span>
-
-                    </div>
-
-
-                    <div class="house-glow"></div>
-
-                </div>
-
-            </div>
-
-
-            <div class="launch-title">
-
-                <div class="launch-logo">
-                    MY HOME
-                </div>
-
-
-                <div class="launch-status">
-
-                    <span class="status-dot"></span>
-
-                    SYSTEM ONLINE
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         MAIN APPLICATION
-         ========================= -->
-
-    <Routes />
-
-
-    <!-- Blazor -->
-
-    <script src="_framework/blazor.web.js"></script>
-
-
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
-            }
-        }
-    </script>
-
-    <script type="module" src="/js/myhome3d/control-center.js"></script>
-    <script type="module" src="/js/myhome3d/home-3d.js"></script>
-
-
-    
-
-    <script src="push-notifications.js"></script>
-
-
-    <!-- =========================
-         LAUNCH SCRIPT
-         ========================= -->
-
-    <script>
-
-        (() => {
-
-            const STORAGE_KEY = "myhome-launch-shown";
-
-            const launch =
-                document.getElementById("launch-screen");
-
-            // Если Launch уже показывался
-            if (
-                sessionStorage.getItem(STORAGE_KEY) === "true"
-            ) {
-
-                if (launch) {
-                    launch.remove();
-                }
-
-                document.body.classList.add(
-                    "launch-complete"
-                );
-
-                return;
-            }
-
-            // Первый запуск
-            if (!launch)
-                return;
-
-            // Запоминаем, что Launch уже был показан
-            sessionStorage.setItem(
-                STORAGE_KEY,
-                "true"
-            );
-
-            // Ждём окончания заставки
-            setTimeout(() => {
-
-                launch.classList.add(
-                    "launch-finished"
-                );
-
-                setTimeout(() => {
-
-                    document.body.classList.add(
-                        "launch-complete"
-                    );
-
-                    if (launch) {
-                        launch.remove();
-                    }
-
-                }, 700);
-
-            }, 5500);
-
-        })();
-
-    </script>
-
-</body>
-
-</html> *@
+﻿
 
 <!DOCTYPE html>
 <html lang="en">
@@ -1390,14 +683,17 @@
     <script>
         (() => {
 
-            const STORAGE_KEY = "myhome-launch-shown";
+            const STORAGE_KEY = "myhome-launch-completed";
 
             let launchTimer = null;
             let currentPath = window.location.pathname;
 
 
             function getLaunch() {
-                return document.getElementById("launch-screen");
+
+                return document.getElementById(
+                    "launch-screen"
+                );
             }
 
 
@@ -1408,11 +704,27 @@
                 if (!launch)
                     return;
 
+
+                if (launchTimer) {
+
+                    clearTimeout(launchTimer);
+                    launchTimer = null;
+                }
+
+
+                launch.classList.remove(
+                    "launch-finished"
+                );
+
+
                 launch.style.display = "none";
                 launch.style.opacity = "0";
                 launch.style.pointerEvents = "none";
 
-                document.body.classList.add("launch-complete");
+
+                document.body.classList.add(
+                    "launch-complete"
+                );
             }
 
 
@@ -1423,11 +735,21 @@
                 if (!launch)
                     return;
 
+
+                document.body.classList.remove(
+                    "launch-complete"
+                );
+
+
                 launch.style.display = "flex";
                 launch.style.opacity = "1";
                 launch.style.pointerEvents = "auto";
 
-                launch.classList.remove("launch-finished");
+
+                launch.classList.remove(
+                    "launch-finished"
+                );
+
 
                 void launch.offsetWidth;
             }
@@ -1435,87 +757,147 @@
 
             function startLaunch() {
 
-                const path = window.location.pathname.toLowerCase();
+                const path =
+                    window.location.pathname
+                        .toLowerCase();
 
-                // На Login Launch никогда не показываем
-                if (path.startsWith("/login")) {
+
+                /*
+                 * LOGIN
+                 */
+
+                if (
+                    path.startsWith("/login")
+                ) {
+
                     hideLaunch();
                     return;
                 }
 
-                // Launch запускается только на Home
+
+                /*
+                 * LAUNCH НУЖЕН ТОЛЬКО НА /
+                 */
+
                 if (path !== "/") {
+
                     hideLaunch();
                     return;
                 }
 
-                // Уже показывали Launch в этой сессии
-                if (sessionStorage.getItem(STORAGE_KEY) === "true") {
+
+                /*
+                 * LAUNCH УЖЕ ПОЛНОСТЬЮ ЗАВЕРШЁН
+                 */
+
+                if (
+                    sessionStorage.getItem(
+                        STORAGE_KEY
+                    ) === "true"
+                ) {
+
                     hideLaunch();
                     return;
                 }
 
-                // Уже запущен
+
+                /*
+                 * НЕ ЗАПУСКАЕМ ВТОРОЙ РАЗ
+                 */
+
                 if (launchTimer)
                     return;
 
-                const launch = getLaunch();
+
+                const launch =
+                    getLaunch();
+
 
                 if (!launch)
                     return;
 
 
-                console.log("MY HOME: Launch started");
+                console.log(
+                    "MY HOME: Launch started"
+                );
 
-                sessionStorage.setItem(STORAGE_KEY, "true");
 
                 showLaunch();
 
 
-                launchTimer = setTimeout(() => {
-
-                    launchTimer = null;
-
-                    const currentLaunch = getLaunch();
-
-                    if (!currentLaunch)
-                        return;
-
-
-                    console.log("MY HOME: Launch finished");
-
-
-                    currentLaunch.classList.add("launch-finished");
-
-
+                launchTimer =
                     setTimeout(() => {
 
-                        hideLaunch();
+                        launchTimer = null;
+
+
+                        const currentLaunch =
+                            getLaunch();
+
+
+                        if (!currentLaunch)
+                            return;
+
 
                         console.log(
-                            "MY HOME: opening Control Center"
+                            "MY HOME: Launch finished"
                         );
 
 
-                        // Переход именно на Control Center
-                        window.location.href = "/control-center";
+                        /*
+                         * СНАЧАЛА ПОМЕЧАЕМ
+                         * LAUNCH ЗАВЕРШЁННЫМ
+                         */
+
+                        sessionStorage.setItem(
+                            STORAGE_KEY,
+                            "true"
+                        );
 
 
-                    }, 700);
+                        currentLaunch.classList.add(
+                            "launch-finished"
+                        );
 
 
-                }, 5500);
+                        setTimeout(() => {
+
+                            hideLaunch();
+
+
+                            console.log(
+                                "MY HOME: opening Control Center"
+                            );
+
+
+                            /*
+                             * ПОЛНЫЙ ПЕРЕХОД
+                             * НА CONTROL CENTER
+                             */
+
+                            window.location.href =
+                                "/control-center";
+
+
+                        }, 700);
+
+
+                    }, 5500);
             }
 
 
             function checkRoute() {
 
-                const path = window.location.pathname;
+                const path =
+                    window.location.pathname;
+
 
                 if (path === currentPath)
                     return;
 
+
                 currentPath = path;
+
 
                 console.log(
                     "MY HOME: route changed:",
@@ -1523,51 +905,73 @@
                 );
 
 
-                // Login
+                /*
+                 * ПРИ ЛЮБОМ ПЕРЕХОДЕ
+                 * СНАЧАЛА УБИРАЕМ LAUNCH
+                 */
+
+                hideLaunch();
+
+
+                /*
+                 * LOGIN
+                 */
+
                 if (
                     path
                         .toLowerCase()
                         .startsWith("/login")
                 ) {
 
-                    if (launchTimer) {
-                        clearTimeout(launchTimer);
-                        launchTimer = null;
-                    }
-
-                    hideLaunch();
-
                     return;
                 }
 
 
-                // Home
+                /*
+                 * HOME
+                 */
+
                 if (path === "/") {
 
+                    /*
+                     * Если Launch уже проходили —
+                     * НИКОГДА его больше не показываем.
+                     */
+
+                    if (
+                        sessionStorage.getItem(
+                            STORAGE_KEY
+                        ) === "true"
+                    ) {
+
+                        hideLaunch();
+                        return;
+                    }
+
+
                     startLaunch();
-
-                    return;
                 }
-
-
-                // Любая другая страница
-                hideLaunch();
             }
 
 
-            // Первоначальная проверка
+            /*
+             * ПЕРВЫЙ ЗАПУСК
+             */
+
+            const initialPath =
+                window.location.pathname
+                    .toLowerCase();
+
 
             if (
-                window.location.pathname
-                    .toLowerCase()
-                    .startsWith("/login")
+                initialPath.startsWith("/login")
             ) {
 
                 hideLaunch();
 
             }
             else if (
-                window.location.pathname === "/"
+                initialPath === "/"
             ) {
 
                 startLaunch();
@@ -1576,11 +980,12 @@
             else {
 
                 hideLaunch();
-
             }
 
 
-            // Следим за переходами Blazor
+            /*
+             * СЛЕДИМ ЗА NAVIGATION
+             */
 
             setInterval(() => {
 
