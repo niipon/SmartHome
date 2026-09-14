@@ -91,7 +91,7 @@
             module =
                 await JS.InvokeAsync<IJSObjectReference>(
                     "import",
-                    "/js/myhome3d/control-center.js?v=22"
+                    "/js/myhome3d/control-center.js?v=23"
                 );
 
 
@@ -124,16 +124,17 @@
     [JSInvokable]
     public void NavigateFrom3D(string url)
     {
-
         if (string.IsNullOrWhiteSpace(url))
             return;
 
+        Console.WriteLine(
+            $"CONTROL CENTER: FULL NAVIGATION -> {url}"
+        );
 
         Navigation.NavigateTo(
             url,
-            replace: false
+            forceLoad: true
         );
-
     }
 
 
