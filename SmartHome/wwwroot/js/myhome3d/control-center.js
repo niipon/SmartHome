@@ -1,5 +1,4 @@
 ﻿
-
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
@@ -21,6 +20,14 @@ let house = null;
 let core = null;
 
 let resizeObserver = null;
+
+// Ссылка на Blazor для нормальной навигации
+let blazorReference = null;
+
+
+/* =========================
+   NAVIGATION
+   ========================= */
 
 const navigationItems = [
     {
@@ -59,6 +66,7 @@ const navigationItems = [
    ========================= */
 
 function metalMaterial() {
+
     return new THREE.MeshStandardMaterial({
         color: 0x101721,
         metalness: 0.85,
@@ -68,6 +76,7 @@ function metalMaterial() {
 
 
 function blueMaterial() {
+
     return new THREE.MeshStandardMaterial({
         color: 0x1557a5,
         metalness: 0.65,
@@ -79,6 +88,7 @@ function blueMaterial() {
 
 
 function glassMaterial() {
+
     return new THREE.MeshPhysicalMaterial({
         color: 0x102238,
         metalness: 0.3,
@@ -255,7 +265,6 @@ function createCore() {
 
     return group;
 }
-
 
 
 /* =========================
@@ -653,7 +662,7 @@ function createTextSprite(
     );
 
     context.font =
-        `800 ${fontSize}px Arial`;
+        `800 ${ fontSize }px Arial`;
 
     context.textAlign = "center";
     context.textBaseline = "middle";
@@ -965,28 +974,89 @@ function handleClick() {
     if (!hits.length)
         return;
 
-    const navigation =
-        hits[0].object?.userData?.navigation;
+
+    // Ищем navigation не только у объекта,
+    // но и у его родителей
+    let current =
+        hits[0].object;
+
+    let navigation = null;
+
+    while (current) {
+
+        if (
+            current.userData &&
+            current.userData.navigation
+        ) {
+
+            navigation =
+                current.userData.navigation;
+
+            break;
+        }
+
+        current =
+            current.parent;
+    }
+
 
     if (
-        navigation &&
-        navigation.url
-    ) {
-
-        // Передаём переход в Blazor
-        if (window.myHomeNavigation) {
-
-            window.myHomeNavigation(
-                navigation.url
-            );
-
-        } else {
+        !navigation ||
+        !navigation.url
+    )
+        return;
 
 
-            window.location.href =
-                navigation.url;
-        }
+    const url =
+        navigation.url;
+
+
+    console.log(
+        "CONTROL CENTER: navigation →",
+        url
+    );
+
+
+    // =========================================
+    // ПЕРЕХОД ЧЕРЕЗ BLAZOR
+    // =========================================
+
+    if (blazorReference) {
+
+        blazorReference
+            .invokeMethodAsync(
+                "NavigateFrom3D",
+                url
+            )
+            .then(() => {
+
+                console.log(
+                    "CONTROL CENTER: Blazor navigation OK"
+                );
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "CONTROL CENTER: Blazor navigation error",
+                    error
+                );
+
+                // Запасной вариант
+                window.location.href =
+                    url;
+            });
+
+        return;
     }
+
+
+    // =========================================
+    // FALLBACK
+    // =========================================
+
+    window.location.href =
+        url;
 }
 
 
@@ -1288,7 +1358,8 @@ function setCardBaseScale(card, scale) {
     if (!card)
         return;
 
-    card.userData.baseScale = scale;
+    card.userData.baseScale =
+        scale;
 
     const hover =
         card === hoveredObject
@@ -1554,6 +1625,10 @@ function cleanup() {
 
     house = null;
     core = null;
+
+    // Очень важно:
+    // после ухода со страницы удаляем ссылку на Blazor
+    blazorReference = null;
 }
 
 
@@ -1561,22 +1636,35 @@ function cleanup() {
    INIT
    ========================= */
 
-/* =========================
-   INIT
-   ========================= */
-
-export function init(canvasId) {
+export function init(
+    canvasId,
+    dotNetReference
+) {
 
     console.log(
         "MY HOME CONTROL CENTER: INIT"
     );
 
+
+    // Получаем ссылку на Blazor
+    blazorReference =
+        dotNetReference;
+
+
     cleanup();
+
+
+    // cleanup обнуляет ссылку,
+    // поэтому устанавливаем её ещё раз
+    blazorReference =
+        dotNetReference;
+
 
     canvas =
         document.getElementById(
             canvasId
         );
+
 
     if (!canvas) {
 
@@ -1586,6 +1674,7 @@ export function init(canvasId) {
 
         return;
     }
+
 
     /* SCENE */
 
@@ -1643,12 +1732,14 @@ export function init(canvasId) {
 
         });
 
+
     renderer.setPixelRatio(
         Math.min(
             window.devicePixelRatio,
             1.5
         )
     );
+
 
     renderer.outputColorSpace =
         THREE.SRGBColorSpace;
@@ -1706,6 +1797,7 @@ export function init(canvasId) {
     scene.userData.navigationCards =
         [];
 
+
     for (
         const item
         of navigationItems
@@ -1722,6 +1814,7 @@ export function init(canvasId) {
             card
         );
     }
+
 
     console.log(
         "Navigation cards:",
@@ -1780,6 +1873,7 @@ export function init(canvasId) {
         handleClick
     );
 
+
     window.addEventListener(
         "resize",
         handleResize
@@ -1795,6 +1889,7 @@ export function init(canvasId) {
             }
         );
 
+
     if (canvas.parentElement) {
 
         resizeObserver.observe(
@@ -1807,9 +1902,11 @@ export function init(canvasId) {
 
     handleResize();
 
+
     console.log(
         "MY HOME CONTROL CENTER: READY"
     );
+
 
     animate();
 }
@@ -1824,3 +1921,4 @@ export function dispose() {
     cleanup();
 
 }
+
