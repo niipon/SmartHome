@@ -66,336 +66,111 @@
 
 
 @code {
+
     private IJSObjectReference? module;
+
     private DotNetObjectReference<ControlCenter>? dotNetReference;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private bool initialized;
+
+
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
     {
+
         if (!firstRender)
             return;
 
+
         try
         {
+
             await Task.Delay(300);
 
-            module = await JS.InvokeAsync<IJSObjectReference>(
-                "import",
-                "/js/myhome3d/control-center.js?v=20"
-            );
+
+            module =
+                await JS.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "/js/myhome3d/control-center.js?v=15"
+                );
+
 
             dotNetReference =
                 DotNetObjectReference.Create(this);
+
 
             await module.InvokeVoidAsync(
                 "init",
                 "controlCenterCanvas",
                 dotNetReference
             );
+
+
+            initialized = true;
+
         }
         catch (Exception ex)
         {
+
             Console.WriteLine(
                 $"CONTROL CENTER ERROR: {ex}"
             );
+
         }
+
     }
+
 
     [JSInvokable]
     public void NavigateFrom3D(string url)
     {
+
         if (string.IsNullOrWhiteSpace(url))
             return;
+
 
         Navigation.NavigateTo(
             url,
             replace: false
         );
+
     }
+
 
     public async ValueTask DisposeAsync()
     {
+
         if (module != null)
         {
+
             try
             {
-                await module.InvokeVoidAsync("dispose");
+
+                await module.InvokeVoidAsync(
+                    "dispose"
+                );
+
             }
             catch
             {
             }
 
+
             try
             {
+
                 await module.DisposeAsync();
+
             }
             catch
             {
             }
+
         }
+
 
         dotNetReference?.Dispose();
+
     }
+
 }
-
-
-
-@* @page "/control-center"
-@rendermode InteractiveServer
-
-@attribute [Authorize]
-
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.JSInterop
-
-@implements IAsyncDisposable
-
-@inject IJSRuntime JS
-
-<div class="control-center-page">
-
-    <canvas id="controlCenterCanvas"></canvas>
-
-    <div class="control-center-overlay">
-
-        <div class="control-center-brand">
-
-            <div class="control-center-eyebrow">
-                MY HOME
-            </div>
-
-            <div class="control-center-title">
-                CONTROL CENTER
-            </div>
-
-            <div class="control-center-subtitle">
-                Центр управления домом
-            </div>
-
-        </div>
-
-
-        <div class="control-center-status">
-
-            <span class="status-dot"></span>
-
-            SYSTEM ONLINE
-
-        </div>
-
-
-        <div class="control-center-help">
-
-            <span class="desktop-help">
-                Наведите курсор на систему
-            </span>
-
-            <span class="mobile-help">
-                Проведите пальцем для вращения
-            </span>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-@code {
-
-    private bool initialized;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-            return;
-
-        try
-        {
-            await Task.Delay(300);
-
-            await JS.InvokeVoidAsync(
-                "myHomeControlCenter.init",
-                "controlCenterCanvas"
-            );
-
-            initialized = true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(
-                $"CONTROL CENTER INIT ERROR: {ex.Message}"
-            );
-        }
-    }
-
-
-    public async ValueTask DisposeAsync()
-    {
-        if (!initialized)
-            return;
-
-        try
-        {
-            await JS.InvokeVoidAsync(
-                "myHomeControlCenter.dispose"
-            );
-        }
-        catch
-        {
-        }
-    }
-} *@
-
-
-@* 
-@page "/control-center"
-@rendermode InteractiveServer
-@attribute [Authorize]
-
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.JSInterop
-
-@implements IAsyncDisposable
-
-@inject IJSRuntime JS
-
-<div class="control-center-page">
-
-    <canvas id="controlCenterCanvas"></canvas>
-
-    <div class="control-center-overlay">
-
-        <div class="control-center-brand">
-
-            <div class="control-center-eyebrow">
-                MY HOME
-            </div>
-
-            <div class="control-center-title">
-                CONTROL CENTER
-            </div>
-
-            <div class="control-center-subtitle">
-                Центр управления домом
-            </div>
-
-        </div>
-
-        <div class="control-center-status">
-
-            <span class="status-dot"></span>
-
-            SYSTEM ONLINE
-
-        </div>
-
-        <div class="control-center-help">
-
-            <span class="desktop-help">
-                Наведите курсор на систему
-            </span>
-
-            <span class="mobile-help">
-                Проведите пальцем для вращения
-            </span>
-
-        </div>
-
-    </div>
-
-</div>
-
-@* <div class="control-center-page">
-
-    <div style="
-        position:absolute;
-        inset:0;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        color:white;
-        font-size:40px;
-        z-index:9999;">
-        CONTROL CENTER TEST
-    </div>
-
-</div> *@
-
-@* @code {
-
-    private IJSObjectReference? module;
-    private bool initialized; *@
-
-@*     // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (!firstRender)
-    //         return;
-
-    //     try
-    //     {
-    //         await JS.InvokeVoidAsync(
-    //             "console.log",
-    //             "CONTROL CENTER JS ЗАПУЩЕН"
-    //         );
-
-    //         await JS.InvokeVoidAsync(
-    //             "document.body.setAttribute",
-    //             "data-control-center",
-    //             "working"
-    //         );
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         await JS.InvokeVoidAsync(
-    //             "console.error",
-    //             "CONTROL CENTER ERROR",
-    //             ex.ToString()
-    //         );
-    //     }
-    // }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-            return;
-
-        try
-        {
-            module = await JS.InvokeAsync<IJSObjectReference>(
-                "import",
-                "/js/myhome3d/control-center.js"
-            );
-
-            await module.InvokeVoidAsync(
-                "init",
-                "controlCenterCanvas"
-            );
-
-            initialized = true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(
-                $"CONTROL CENTER ERROR: {ex}"
-            );
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (!initialized || module == null)
-            return;
-
-        try
-        {
-            await module.InvokeVoidAsync("dispose");
-            await module.DisposeAsync();
-        }
-        catch
-        {
-        }
-    }
-}  *@
-
-
-
