@@ -257,6 +257,7 @@ function createCore() {
 }
 
 
+
 /* =========================
    CARD GLOW
    ========================= */
@@ -300,8 +301,6 @@ function createNavigationObject(item) {
 
     group.userData.navigation = item;
 
-    // ВАЖНО:
-    // базовый масштаб теперь хранится отдельно
     group.userData.baseScale = 1;
 
 
@@ -974,8 +973,19 @@ function handleClick() {
         navigation.url
     ) {
 
-        window.location.href =
-            navigation.url;
+        // Передаём переход в Blazor
+        if (window.myHomeNavigation) {
+
+            window.myHomeNavigation(
+                navigation.url
+            );
+
+        } else {
+
+
+            window.location.href =
+                navigation.url;
+        }
     }
 }
 

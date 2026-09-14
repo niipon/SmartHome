@@ -10,12 +10,16 @@
 @implements IAsyncDisposable
 
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
+
 
 <div class="control-center-page">
 
     <canvas id="controlCenterCanvas"></canvas>
 
+
     <div class="control-center-overlay">
+
 
         <div class="control-center-brand">
 
@@ -33,6 +37,7 @@
 
         </div>
 
+
         <div class="control-center-status">
 
             <span class="status-dot"></span>
@@ -40,6 +45,7 @@
             SYSTEM ONLINE
 
         </div>
+
 
         <div class="control-center-help">
 
@@ -53,76 +59,122 @@
 
         </div>
 
+
     </div>
 
 </div>
 
+
 @code {
 
     private IJSObjectReference? module;
+
+    private DotNetObjectReference<ControlCenter>? dotNetReference;
+
     private bool initialized;
+
 
     protected override async Task OnAfterRenderAsync(
         bool firstRender)
     {
+
         if (!firstRender)
             return;
 
+
         try
         {
-            Console.WriteLine(
-                "CONTROL CENTER: loading module..."
-            );
 
-            module = await JS.InvokeAsync<IJSObjectReference>(
-                "import",
-                "/js/myhome3d/control-center.js?v=12"
-            );
+            await Task.Delay(300);
 
-            Console.WriteLine(
-                "CONTROL CENTER: module loaded"
-            );
+
+            module =
+                await JS.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "/js/myhome3d/control-center.js?v=15"
+                );
+
+
+            dotNetReference =
+                DotNetObjectReference.Create(this);
+
 
             await module.InvokeVoidAsync(
                 "init",
-                "controlCenterCanvas"
+                "controlCenterCanvas",
+                dotNetReference
             );
+
 
             initialized = true;
 
-            Console.WriteLine(
-                "CONTROL CENTER: initialized"
-            );
         }
         catch (Exception ex)
         {
+
             Console.WriteLine(
-                $"CONTROL CENTER INIT ERROR: {ex}"
+                $"CONTROL CENTER ERROR: {ex}"
             );
+
         }
+
     }
+
+
+    [JSInvokable]
+    public void NavigateFrom3D(string url)
+    {
+
+        if (string.IsNullOrWhiteSpace(url))
+            return;
+
+
+        Navigation.NavigateTo(
+            url,
+            replace: false
+        );
+
+    }
+
 
     public async ValueTask DisposeAsync()
     {
-        if (module == null)
-            return;
 
-        try
+        if (module != null)
         {
-            if (initialized)
+
+            try
             {
+
                 await module.InvokeVoidAsync(
                     "dispose"
                 );
+
+            }
+            catch
+            {
             }
 
-            await module.DisposeAsync();
+
+            try
+            {
+
+                await module.DisposeAsync();
+
+            }
+            catch
+            {
+            }
+
         }
-        catch
-        {
-        }
+
+
+        dotNetReference?.Dispose();
+
     }
+
 }
+
 
 
 @* @page "/control-center"
