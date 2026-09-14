@@ -1,6 +1,4 @@
-﻿
-
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 let scene = null;
@@ -9,847 +7,74 @@ let renderer = null;
 let controls = null;
 let animationFrame = null;
 let canvas = null;
-let clock = null;
 
 let raycaster = null;
 let mouse = new THREE.Vector2();
 
 let interactiveObjects = [];
-let hoveredObject = null;
+let cards = [];
 
-let house = null;
-let core = null;
+let blazorReference = null;
 
-let resizeObserver = null;
+let resizeHandler = null;
+let pointerMoveHandler = null;
+let pointerDownHandler = null;
+let pointerUpHandler = null;
+let clickHandler = null;
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 const navigationItems = [
+
     {
         name: "HOME",
         label: "Главная",
-        description: "Управление домом",
-        position: [-4.0, 0.85, 0.2],
+        description: "Состояние дома",
+        position: [-2.7, 1.0, 0.8],
         url: "/"
     },
+
     {
         name: "SECURITY",
         label: "Охрана",
         description: "Безопасность дома",
-        position: [4.0, 0.85, 0.2],
+        position: [2.7, 1.0, 0.8],
         url: "/security"
     },
+
     {
         name: "LIGHTS",
         label: "Освещение",
         description: "Управление светом",
-        position: [-3.8, -0.65, 0.8],
+        position: [-2.7, -1.0, 0.8],
         url: "/lights"
     },
+
     {
         name: "SETTINGS",
         label: "Настройки",
         description: "Параметры системы",
-        position: [3.8, -0.65, 0.8],
+        position: [2.7, -1.0, 0.8],
         url: "/settings"
+    },
+
+    {
+        name: "NOTIFICATIONS",
+        label: "Уведомления",
+        description: "Центр уведомлений",
+        position: [0, -2.35, 0.8],
+        url: "/notifications"
     }
+
 ];
 
 
-/* =========================
-   MATERIALS
-   ========================= */
-
-function metalMaterial() {
-    return new THREE.MeshStandardMaterial({
-        color: 0x101721,
-        metalness: 0.85,
-        roughness: 0.25
-    });
-}
-
-
-function blueMaterial() {
-    return new THREE.MeshStandardMaterial({
-        color: 0x1557a5,
-        metalness: 0.65,
-        roughness: 0.2,
-        emissive: 0x0d55b8,
-        emissiveIntensity: 1.8
-    });
-}
-
-
-function glassMaterial() {
-    return new THREE.MeshPhysicalMaterial({
-        color: 0x102238,
-        metalness: 0.3,
-        roughness: 0.15,
-        transparent: true,
-        opacity: 0.94,
-        clearcoat: 1
-    });
-}
-
-
-/* =========================
-   HOUSE
-   ========================= */
-
-function createHouse() {
-
-    const group = new THREE.Group();
-
-    const body = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            3.5,
-            2,
-            2.5
-        ),
-        metalMaterial()
-    );
-
-    group.add(body);
-
-
-    const roof = new THREE.Mesh(
-        new THREE.ConeGeometry(
-            2.55,
-            1.4,
-            4
-        ),
-        metalMaterial()
-    );
-
-    roof.rotation.y = Math.PI / 4;
-    roof.position.y = 1.7;
-
-    group.add(roof);
-
-
-    const glass = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            3,
-            1.35,
-            0.08
-        ),
-        glassMaterial()
-    );
-
-    glass.position.set(
-        0,
-        0.15,
-        1.28
-    );
-
-    group.add(glass);
-
-
-    const door = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            0.65,
-            1.25,
-            0.1
-        ),
-        blueMaterial()
-    );
-
-    door.position.set(
-        0,
-        -0.35,
-        1.34
-    );
-
-    group.add(door);
-
-
-    const windowMaterial =
-        new THREE.MeshStandardMaterial({
-            color: 0x318bff,
-            emissive: 0x1467dd,
-            emissiveIntensity: 2,
-            roughness: 0.12
-        });
-
-
-    const positions = [
-        [-1.05, 0.25],
-        [1.05, 0.25],
-        [-1.05, -0.7],
-        [1.05, -0.7]
-    ];
-
-
-    for (const p of positions) {
-
-        const windowMesh =
-            new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.65,
-                    0.45,
-                    0.08
-                ),
-                windowMaterial
-            );
-
-        windowMesh.position.set(
-            p[0],
-            p[1],
-            1.33
-        );
-
-        group.add(windowMesh);
-    }
-
-    return group;
-}
-
-
-/* =========================
-   CORE
-   ========================= */
-
-function createCore() {
-
-    const group =
-        new THREE.Group();
-
-    const sphere =
-        new THREE.Mesh(
-            new THREE.IcosahedronGeometry(
-                0.7,
-                2
-            ),
-            new THREE.MeshStandardMaterial({
-                color: 0x1764c9,
-                metalness: 0.8,
-                roughness: 0.12,
-                emissive: 0x1267e8,
-                emissiveIntensity: 2.5
-            })
-        );
-
-    group.add(sphere);
-
-
-    for (let i = 0; i < 2; i++) {
-
-        const ring =
-            new THREE.Mesh(
-                new THREE.TorusGeometry(
-                    1.05 + i * 0.28,
-                    0.018,
-                    8,
-                    48
-                ),
-                new THREE.MeshBasicMaterial({
-                    color: 0x3d91ff,
-                    transparent: true,
-                    opacity: 0.65
-                })
-            );
-
-        ring.rotation.x =
-            Math.PI / 2;
-
-        group.add(ring);
-    }
-
-    return group;
-}
-
-
-
-/* =========================
-   CARD GLOW
-   ========================= */
-
-function createCardGlow(width, height) {
-
-    const glow =
-        new THREE.Mesh(
-            new THREE.PlaneGeometry(
-                width,
-                height
-            ),
-            new THREE.MeshBasicMaterial({
-                color: 0x087cff,
-                transparent: true,
-                opacity: 0.08,
-                depthWrite: false
-            })
-        );
-
-    glow.position.z = -0.04;
-
-    return glow;
-}
-
-
-/* =========================
-   CARD
-   ========================= */
-
-function createNavigationObject(item) {
-
-    const group =
-        new THREE.Group();
-
-    group.position.set(
-        item.position[0],
-        item.position[1],
-        item.position[2]
-    );
-
-    group.userData.navigation = item;
-
-    group.userData.baseScale = 1;
-
-
-    const glow =
-        createCardGlow(
-            3.0,
-            1.72
-        );
-
-    glow.userData.navigation = item;
-
-    group.add(glow);
-
-
-    const panelMaterial =
-        new THREE.MeshPhysicalMaterial({
-
-            color: 0x0b1726,
-
-            metalness: 0.72,
-            roughness: 0.18,
-
-            transparent: true,
-
-            opacity: 0.94,
-
-            transmission: 0.08,
-
-            clearcoat: 1,
-
-            clearcoatRoughness: 0.12,
-
-            emissive: 0x03172f,
-
-            emissiveIntensity: 0.9
-        });
-
-
-    const panel =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                2.65,
-                1.42,
-                0.18
-            ),
-            panelMaterial
-        );
-
-    panel.userData.navigation = item;
-
-    group.add(panel);
-
-
-    const innerMaterial =
-        new THREE.MeshPhysicalMaterial({
-
-            color: 0x07101c,
-
-            metalness: 0.35,
-
-            roughness: 0.2,
-
-            transparent: true,
-
-            opacity: 0.9,
-
-            transmission: 0.12,
-
-            clearcoat: 1,
-
-            emissive: 0x020b18,
-
-            emissiveIntensity: 0.6
-        });
-
-
-    const inner =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                2.34,
-                1.08,
-                0.045
-            ),
-            innerMaterial
-        );
-
-    inner.position.z = 0.115;
-
-    inner.userData.navigation = item;
-
-    group.add(inner);
-
-
-    const border =
-        new THREE.LineSegments(
-            new THREE.EdgesGeometry(
-                new THREE.BoxGeometry(
-                    2.65,
-                    1.42,
-                    0.18
-                )
-            ),
-            new THREE.LineBasicMaterial({
-                color: 0x238cff,
-                transparent: true,
-                opacity: 0.85
-            })
-        );
-
-    border.position.z = 0.08;
-
-    border.userData.navigation = item;
-
-    group.add(border);
-
-
-    const innerBorder =
-        new THREE.LineSegments(
-            new THREE.EdgesGeometry(
-                new THREE.BoxGeometry(
-                    2.34,
-                    1.08,
-                    0.045
-                )
-            ),
-            new THREE.LineBasicMaterial({
-                color: 0x155da8,
-                transparent: true,
-                opacity: 0.38
-            })
-        );
-
-    innerBorder.position.z = 0.145;
-
-    innerBorder.userData.navigation = item;
-
-    group.add(innerBorder);
-
-
-    const topLine =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                1.9,
-                0.018,
-                0.025
-            ),
-            new THREE.MeshBasicMaterial({
-                color: 0x3d9cff,
-                transparent: true,
-                opacity: 0.85
-            })
-        );
-
-    topLine.position.set(
-        0,
-        0.61,
-        0.17
-    );
-
-    topLine.userData.navigation = item;
-
-    group.add(topLine);
-
-
-    const bottomLine =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                1.2,
-                0.014,
-                0.025
-            ),
-            new THREE.MeshBasicMaterial({
-                color: 0x146fd4,
-                transparent: true,
-                opacity: 0.75
-            })
-        );
-
-    bottomLine.position.set(
-        0,
-        -0.57,
-        0.17
-    );
-
-    bottomLine.userData.navigation = item;
-
-    group.add(bottomLine);
-
-
-    const pointGeometry =
-        new THREE.SphereGeometry(
-            0.035,
-            12,
-            12
-        );
-
-    const pointMaterial =
-        new THREE.MeshBasicMaterial({
-            color: 0x5ab1ff
-        });
-
-
-    const leftPoint =
-        new THREE.Mesh(
-            pointGeometry,
-            pointMaterial
-        );
-
-    leftPoint.position.set(
-        -1.08,
-        0.58,
-        0.18
-    );
-
-    leftPoint.userData.navigation = item;
-
-    group.add(leftPoint);
-
-
-    const rightPoint =
-        new THREE.Mesh(
-            pointGeometry,
-            pointMaterial
-        );
-
-    rightPoint.position.set(
-        1.08,
-        0.58,
-        0.18
-    );
-
-    rightPoint.userData.navigation = item;
-
-    group.add(rightPoint);
-
-
-    const title =
-        createTextSprite(
-            item.name,
-            44,
-            "#ffffff"
-        );
-
-    title.position.set(
-        0,
-        0.20,
-        0.23
-    );
-
-    title.scale.set(
-        2.0,
-        0.48,
-        1
-    );
-
-    title.userData.navigation = item;
-
-    group.add(title);
-
-
-    const description =
-        createTextSprite(
-            item.description,
-            22,
-            "#8db9e9"
-        );
-
-    description.position.set(
-        0,
-        -0.26,
-        0.23
-    );
-
-    description.scale.set(
-        2.15,
-        0.28,
-        1
-    );
-
-    description.userData.navigation = item;
-
-    group.add(description);
-
-
-    const status =
-        new THREE.Mesh(
-            new THREE.SphereGeometry(
-                0.055,
-                16,
-                16
-            ),
-            new THREE.MeshBasicMaterial({
-                color: 0x39a6ff
-            })
-        );
-
-    status.position.set(
-        -0.92,
-        -0.47,
-        0.22
-    );
-
-    status.userData.navigation = item;
-
-    group.add(status);
-
-
-    interactiveObjects.push(panel);
-    interactiveObjects.push(inner);
-    interactiveObjects.push(border);
-    interactiveObjects.push(innerBorder);
-    interactiveObjects.push(topLine);
-    interactiveObjects.push(bottomLine);
-    interactiveObjects.push(leftPoint);
-    interactiveObjects.push(rightPoint);
-    interactiveObjects.push(title);
-    interactiveObjects.push(description);
-    interactiveObjects.push(status);
-    interactiveObjects.push(glow);
-
-
-    return group;
-}
-
-
-/* =========================
-   TEXT
-   ========================= */
-
-function createTextSprite(
-    text,
-    fontSize,
-    color
-) {
-
-    const textCanvas =
-        document.createElement("canvas");
-
-    textCanvas.width = 512;
-    textCanvas.height = 128;
-
-    const context =
-        textCanvas.getContext("2d");
-
-    context.clearRect(
-        0,
-        0,
-        textCanvas.width,
-        textCanvas.height
-    );
-
-    context.font =
-        `800 ${fontSize}px Arial`;
-
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-
-    context.fillStyle = color;
-
-    context.shadowColor = "#1685ff";
-    context.shadowBlur = 8;
-
-    context.fillText(
-        text,
-        textCanvas.width / 2,
-        textCanvas.height / 2
-    );
-
-
-    const texture =
-        new THREE.CanvasTexture(
-            textCanvas
-        );
-
-    texture.colorSpace =
-        THREE.SRGBColorSpace;
-
-    texture.minFilter =
-        THREE.LinearFilter;
-
-    texture.magFilter =
-        THREE.LinearFilter;
-
-
-    const material =
-        new THREE.SpriteMaterial({
-            map: texture,
-            transparent: true,
-            depthWrite: false
-        });
-
-
-    return new THREE.Sprite(material);
-}
-
-
-/* =========================
-   LIGHTS
-   ========================= */
-
-function createLights() {
-
-    scene.add(
-        new THREE.HemisphereLight(
-            0x4d82bd,
-            0x080b10,
-            2.8
-        )
-    );
-
-
-    const directional =
-        new THREE.DirectionalLight(
-            0xffffff,
-            3.5
-        );
-
-    directional.position.set(
-        5,
-        8,
-        7
-    );
-
-    scene.add(directional);
-
-
-    const blue =
-        new THREE.PointLight(
-            0x1474ff,
-            25,
-            20
-        );
-
-    blue.position.set(
-        -5,
-        3,
-        4
-    );
-
-    scene.add(blue);
-
-
-    const blue2 =
-        new THREE.PointLight(
-            0x168cff,
-            18,
-            18
-        );
-
-    blue2.position.set(
-        5,
-        2,
-        -3
-    );
-
-    scene.add(blue2);
-}
-
-
-/* =========================
-   ENVIRONMENT
-   ========================= */
-
-function createEnvironment() {
-
-    const floor =
-        new THREE.Mesh(
-            new THREE.CircleGeometry(
-                18,
-                64
-            ),
-            new THREE.MeshStandardMaterial({
-                color: 0x020407,
-                metalness: 0.8,
-                roughness: 0.3
-            })
-        );
-
-    floor.rotation.x =
-        -Math.PI / 2;
-
-    floor.position.y =
-        -1.5;
-
-    scene.add(floor);
-
-
-    const grid =
-        new THREE.GridHelper(
-            30,
-            30,
-            0x174c8d,
-            0x07101c
-        );
-
-    grid.position.y =
-        -1.48;
-
-    grid.material.transparent = true;
-    grid.material.opacity = 0.16;
-
-    scene.add(grid);
-
-
-    const platform =
-        new THREE.Mesh(
-            new THREE.CylinderGeometry(
-                3.3,
-                3.5,
-                0.3,
-                64
-            ),
-            metalMaterial()
-        );
-
-    platform.position.y =
-        -1.25;
-
-    scene.add(platform);
-
-
-    const ring =
-        new THREE.Mesh(
-            new THREE.TorusGeometry(
-                3.35,
-                0.025,
-                8,
-                64
-            ),
-            new THREE.MeshBasicMaterial({
-                color: 0x2585ff,
-                transparent: true,
-                opacity: 0.7
-            })
-        );
-
-    ring.rotation.x =
-        Math.PI / 2;
-
-    ring.position.y =
-        -1.08;
-
-    scene.add(ring);
-}
-
-
-/* =========================
-   POINTER
-   ========================= */
+/* =========================================================
+   HELPERS
+========================================================= */
 
 function updatePointer(event) {
 
@@ -858,9 +83,6 @@ function updatePointer(event) {
 
     const rect =
         canvas.getBoundingClientRect();
-
-    if (!rect.width || !rect.height)
-        return;
 
     mouse.x =
         ((event.clientX - rect.left) /
@@ -872,84 +94,36 @@ function updatePointer(event) {
 }
 
 
-/* =========================
-   HOVER
-   ========================= */
+function getNavigationFromObject(object) {
 
-function checkHover() {
+    let current = object;
 
-    if (!raycaster || !camera)
-        return;
+    while (current) {
 
-    raycaster.setFromCamera(
-        mouse,
-        camera
-    );
-
-    const hits =
-        raycaster.intersectObjects(
-            interactiveObjects,
-            false
-        );
-
-    const object =
-        hits.length
-            ? hits[0].object
-            : null;
-
-    let newHoveredCard = null;
-
-    if (object) {
-
-        let current = object;
-
-        while (current) {
-
-            if (
-                current.userData &&
-                current.userData.navigation
-            ) {
-
-                newHoveredCard =
-                    current;
-
-                break;
-            }
-
-            current =
-                current.parent;
+        if (
+            current.userData &&
+            current.userData.navigation
+        ) {
+            return current.userData.navigation;
         }
+
+        current = current.parent;
     }
 
-
-    if (
-        newHoveredCard !==
-        hoveredObject
-    ) {
-
-        hoveredObject =
-            newHoveredCard;
-    }
-
-
-    if (canvas) {
-
-        canvas.style.cursor =
-            hoveredObject
-                ? "pointer"
-                : "default";
-    }
+    return null;
 }
 
 
-/* =========================
+/* =========================================================
    CLICK
-   ========================= */
+========================================================= */
 
-function handleClick() {
+async function handleClick(event) {
 
     if (!raycaster || !camera)
         return;
+
+    updatePointer(event);
 
     raycaster.setFromCamera(
         mouse,
@@ -959,351 +133,526 @@ function handleClick() {
     const hits =
         raycaster.intersectObjects(
             interactiveObjects,
-            false
+            true
         );
 
     if (!hits.length)
         return;
 
     const navigation =
-        hits[0].object?.userData?.navigation;
+        getNavigationFromObject(
+            hits[0].object
+        );
 
     if (
-        navigation &&
-        navigation.url
+        !navigation ||
+        !navigation.url
     ) {
+        return;
+    }
 
-        // Передаём переход в Blazor
-        if (window.myHomeNavigation) {
+    console.log(
+        "CONTROL CENTER CLICK:",
+        navigation.name,
+        navigation.url
+    );
 
-            window.myHomeNavigation(
+
+    /* -----------------------------------------
+       Blazor navigation
+    ----------------------------------------- */
+
+    if (blazorReference) {
+
+        try {
+
+            await blazorReference.invokeMethodAsync(
+                "NavigateFrom3D",
                 navigation.url
             );
 
-        } else {
+            return;
 
+        }
+        catch (error) {
 
-            window.location.href =
-                navigation.url;
+            console.error(
+                "Blazor navigation error:",
+                error
+            );
+
         }
     }
+
+
+    /* -----------------------------------------
+       Fallback
+    ----------------------------------------- */
+
+    window.location.href =
+        navigation.url;
 }
 
 
-/* =========================
-   RESPONSIVE CAMERA
-   ========================= */
+/* =========================================================
+   HOVER
+========================================================= */
 
-function updateResponsiveCamera() {
+function handlePointerMove(event) {
 
-    if (!camera || !canvas)
+    if (!raycaster || !camera)
         return;
 
-    const width =
-        canvas.clientWidth;
+    updatePointer(event);
 
-    const height =
-        canvas.clientHeight;
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
 
-    if (!width || !height)
-        return;
+    const hits =
+        raycaster.intersectObjects(
+            interactiveObjects,
+            true
+        );
 
-    const aspect =
-        width / height;
+    if (hits.length) {
 
-    let viewHeight;
-
-
-    if (aspect >= 1.5) {
-
-        viewHeight = 9.2;
-
-    }
-    else if (aspect >= 1.0) {
-
-        viewHeight = 9.7;
-
-    }
-    else if (aspect >= 0.7) {
-
-        viewHeight = 10.8;
+        canvas.style.cursor =
+            "pointer";
 
     }
     else {
 
-        viewHeight = 11.8;
+        canvas.style.cursor =
+            "default";
+
     }
+}
 
 
-    const viewWidth =
-        viewHeight * aspect;
+/* =========================================================
+   CARD CREATION
+========================================================= */
 
-    camera.left =
-        -viewWidth / 2;
+function createCard(item) {
 
-    camera.right =
-        viewWidth / 2;
+    const group =
+        new THREE.Group();
 
-    camera.top =
-        viewHeight / 2;
-
-    camera.bottom =
-        -viewHeight / 2;
-
-    camera.updateProjectionMatrix();
+    group.position.set(
+        item.position[0],
+        item.position[1],
+        item.position[2]
+    );
 
 
-    const cards =
-        scene?.userData?.navigationCards;
+    /* -----------------------------------------
+       Main card
+    ----------------------------------------- */
+
+    const geometry =
+        new THREE.BoxGeometry(
+            2.15,
+            1.15,
+            0.12
+        );
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color: 0x0b1524,
+            metalness: 0.75,
+            roughness: 0.28,
+            transparent: true,
+            opacity: 0.96
+        });
+
+    const card =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+    group.add(card);
+
+
+    /* -----------------------------------------
+       Border
+    ----------------------------------------- */
+
+    const borderGeometry =
+        new THREE.EdgesGeometry(
+            geometry
+        );
+
+    const borderMaterial =
+        new THREE.LineBasicMaterial({
+            color: 0x238cff,
+            transparent: true,
+            opacity: 0.9
+        });
+
+    const border =
+        new THREE.LineSegments(
+            borderGeometry,
+            borderMaterial
+        );
+
+    group.add(border);
+
+
+    /* -----------------------------------------
+       Navigation data
+    ----------------------------------------- */
+
+    group.userData.navigation =
+        item;
+
+    card.userData.navigation =
+        item;
+
+    border.userData.navigation =
+        item;
+
+
+    /* -----------------------------------------
+       Text
+    ----------------------------------------- */
+
+    const textCanvas =
+        document.createElement("canvas");
+
+    textCanvas.width = 1024;
+    textCanvas.height = 512;
+
+    const ctx =
+        textCanvas.getContext("2d");
+
+    ctx.clearRect(
+        0,
+        0,
+        textCanvas.width,
+        textCanvas.height
+    );
+
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+
+    /* Title */
+
+    ctx.font =
+        "bold 72px Arial";
+
+    ctx.fillStyle =
+        "#ffffff";
+
+    ctx.fillText(
+        item.name,
+        512,
+        190
+    );
+
+
+    /* Description */
+
+    ctx.font =
+        "32px Arial";
+
+    ctx.fillStyle =
+        "#8fa8c7";
+
+    ctx.fillText(
+        item.description,
+        512,
+        280
+    );
+
+
+    const texture =
+        new THREE.CanvasTexture(
+            textCanvas
+        );
+
+    texture.colorSpace =
+        THREE.SRGBColorSpace;
+
+
+    const textMaterial =
+        new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true
+        });
+
+
+    const textGeometry =
+        new THREE.PlaneGeometry(
+            1.85,
+            0.9
+        );
+
+
+    const text =
+        new THREE.Mesh(
+            textGeometry,
+            textMaterial
+        );
+
+    text.position.z =
+        0.075;
+
+    text.userData.navigation =
+        item;
+
+    group.add(text);
+
+
+    /* -----------------------------------------
+       Glow
+    ----------------------------------------- */
+
+    const glowGeometry =
+        new THREE.PlaneGeometry(
+            2.35,
+            1.35
+        );
+
+    const glowMaterial =
+        new THREE.MeshBasicMaterial({
+            color: 0x087cff,
+            transparent: true,
+            opacity: 0.045,
+            side: THREE.DoubleSide
+        });
+
+    const glow =
+        new THREE.Mesh(
+            glowGeometry,
+            glowMaterial
+        );
+
+    glow.position.z =
+        -0.08;
+
+    glow.userData.navigation =
+        item;
+
+    group.add(glow);
+
+
+    /* -----------------------------------------
+       Store
+    ----------------------------------------- */
+
+    interactiveObjects.push(
+        group
+    );
+
+    cards.push(
+        group
+    );
+
+    scene.add(
+        group
+    );
+
+
+    return group;
+}
+
+
+/* =========================================================
+   RESPONSIVE CAMERA
+========================================================= */
+
+function updateResponsiveCamera() {
 
     if (
+        !camera ||
+        !renderer ||
         !cards ||
-        cards.length < 4
+        cards.length < 5
     ) {
         return;
     }
 
-
-    const home = cards[0];
-    const security = cards[1];
-    const lights = cards[2];
-    const settings = cards[3];
+    const width =
+        window.innerWidth;
 
 
-    /* =========================
-       WIDE
-       ========================= */
+    /* -----------------------------------------
+       Desktop
+    ----------------------------------------- */
 
-    if (aspect >= 1.5) {
+    if (width > 1200) {
 
-        home.position.set(
-            -3.55,
-            0.9,
-            0.3
+        camera.position.set(
+            0,
+            0.5,
+            8.8
         );
 
-        security.position.set(
-            3.55,
-            0.9,
-            0.3
-        );
+        camera.fov = 48;
 
-        lights.position.set(
-            -3.4,
-            -0.05,
+        cards[0].position.set(
+            -2.7,
+            1.0,
             0.8
         );
 
-        settings.position.set(
-            3.4,
-            -0.05,
+        cards[1].position.set(
+            2.7,
+            1.0,
             0.8
         );
 
-        setCardBaseScale(
-            home,
-            0.82
+        cards[2].position.set(
+            -2.7,
+            -1.0,
+            0.8
         );
 
-        setCardBaseScale(
-            security,
-            0.82
+        cards[3].position.set(
+            2.7,
+            -1.0,
+            0.8
         );
 
-        setCardBaseScale(
-            lights,
-            0.82
+        cards[4].position.set(
+            0,
+            -2.35,
+            0.8
         );
 
-        setCardBaseScale(
-            settings,
-            0.82
-        );
+        cards.forEach(card => {
+            card.scale.set(
+                1,
+                1,
+                1
+            );
+        });
+
     }
 
 
-    /* =========================
-       MEDIUM
-       ========================= */
+    /* -----------------------------------------
+       Tablet
+    ----------------------------------------- */
 
-    else if (aspect >= 1.0) {
+    else if (width > 700) {
 
-        home.position.set(
-            -2.75,
-            0.9,
-            0.3
+        camera.position.set(
+            0,
+            0.4,
+            9.8
         );
 
-        security.position.set(
-            2.75,
-            0.9,
-            0.3
-        );
+        camera.fov = 52;
 
-        lights.position.set(
-            -2.6,
-            -0.4,
-            0.8
-        );
-
-        settings.position.set(
-            2.6,
-            -0.4,
-            0.8
-        );
-
-        setCardBaseScale(
-            home,
-            0.76
-        );
-
-        setCardBaseScale(
-            security,
-            0.76
-        );
-
-        setCardBaseScale(
-            lights,
-            0.76
-        );
-
-        setCardBaseScale(
-            settings,
-            0.76
-        );
-    }
-
-
-    /* =========================
-       TABLET
-       ========================= */
-
-    else if (aspect >= 0.7) {
-
-        home.position.set(
-            -2.15,
+        cards[0].position.set(
+            -2.35,
             1.05,
-            0.3
+            0.8
         );
 
-        security.position.set(
-            2.15,
+        cards[1].position.set(
+            2.35,
             1.05,
-            0.3
-        );
-
-        lights.position.set(
-            -2.15,
-            -0.8,
             0.8
         );
 
-        settings.position.set(
-            2.15,
-            -0.8,
+        cards[2].position.set(
+            -2.35,
+            -0.85,
             0.8
         );
 
-        setCardBaseScale(
-            home,
-            0.66
+        cards[3].position.set(
+            2.35,
+            -0.85,
+            0.8
         );
 
-        setCardBaseScale(
-            security,
-            0.66
+        cards[4].position.set(
+            0,
+            -2.05,
+            0.8
         );
 
-        setCardBaseScale(
-            lights,
-            0.66
-        );
+        cards.forEach(card => {
+            card.scale.set(
+                0.9,
+                0.9,
+                0.9
+            );
+        });
 
-        setCardBaseScale(
-            settings,
-            0.66
-        );
     }
 
 
-    /* =========================
-       PHONE
-       ========================= */
+    /* -----------------------------------------
+       Phone
+    ----------------------------------------- */
 
     else {
 
-        home.position.set(
-            -1.8,
-            2.1,
-            -0.5
+        camera.position.set(
+            0,
+            0.2,
+            10.8
         );
 
-        security.position.set(
-            1.8,
-            2.1,
-            -0.5
+        camera.fov = 55;
+
+        cards[0].position.set(
+            -1.45,
+            2.45,
+            0.8
         );
 
-        lights.position.set(
-            -1.8,
-            -2.1,
-            -0.5
+        cards[1].position.set(
+            1.45,
+            2.45,
+            0.8
         );
 
-        settings.position.set(
-            1.8,
-            -2.1,
-            -0.5
+        cards[2].position.set(
+            -1.45,
+            0.65,
+            0.8
         );
 
-        setCardBaseScale(
-            home,
-            0.66
+        cards[3].position.set(
+            1.45,
+            0.65,
+            0.8
         );
 
-        setCardBaseScale(
-            security,
-            0.66
+        cards[4].position.set(
+            0,
+            -1.25,
+            0.8
         );
 
-        setCardBaseScale(
-            lights,
-            0.66
-        );
+        cards.forEach(card => {
+            card.scale.set(
+                0.68,
+                0.68,
+                0.68
+            );
+        });
 
-        setCardBaseScale(
-            settings,
-            0.66
-        );
     }
+
+
+    camera.updateProjectionMatrix();
 }
 
 
-/* =========================
-   CARD SCALE
-   ========================= */
-
-function setCardBaseScale(card, scale) {
-
-    if (!card)
-        return;
-
-    card.userData.baseScale = scale;
-
-    const hover =
-        card === hoveredObject
-            ? 1.055
-            : 1;
-
-    card.scale.setScalar(
-        scale * hover
-    );
-}
-
-
-/* =========================
+/* =========================================================
    RESIZE
-   ========================= */
+========================================================= */
 
 function handleResize() {
 
@@ -1311,17 +660,24 @@ function handleResize() {
         !camera ||
         !renderer ||
         !canvas
-    )
+    ) {
         return;
+    }
 
     const width =
-        canvas.clientWidth;
+        canvas.clientWidth ||
+        window.innerWidth;
 
     const height =
-        canvas.clientHeight;
+        canvas.clientHeight ||
+        window.innerHeight;
 
-    if (!width || !height)
-        return;
+
+    camera.aspect =
+        width / height;
+
+    camera.updateProjectionMatrix();
+
 
     renderer.setSize(
         width,
@@ -1329,17 +685,27 @@ function handleResize() {
         false
     );
 
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio,
+            2
+        )
+    );
+
+
     updateResponsiveCamera();
 }
 
 
-/* =========================
+/* =========================================================
    ANIMATION
-   ========================= */
+========================================================= */
 
-let lastFrameTime = 0;
+function animate() {
 
-function animate(time = 0) {
+    if (!renderer || !scene || !camera)
+        return;
 
     animationFrame =
         requestAnimationFrame(
@@ -1347,141 +713,306 @@ function animate(time = 0) {
         );
 
 
-    if (
-        time -
-        lastFrameTime <
-        33
-    ) {
-        return;
-    }
+    /* -----------------------------------------
+       Subtle card animation
+    ----------------------------------------- */
 
-    lastFrameTime = time;
+    const time =
+        performance.now() * 0.001;
 
 
-    if (!clock)
-        return;
+    cards.forEach(
+        (card, index) => {
 
-    const elapsed =
-        clock.getElapsedTime();
+            const baseY =
+                card.userData.baseY ??
+                card.position.y;
+
+            if (
+                card.userData.baseY ===
+                undefined
+            ) {
+                card.userData.baseY =
+                    baseY;
+            }
+
+            card.position.y =
+                baseY +
+                Math.sin(
+                    time * 0.8 +
+                    index * 0.7
+                ) * 0.025;
+
+        }
+    );
 
 
     if (controls)
         controls.update();
 
 
-    /* HOUSE */
-
-    if (house) {
-
-        house.rotation.y =
-            Math.sin(
-                elapsed * 0.25
-            ) * 0.025;
-    }
-
-
-    /* CORE */
-
-    if (core) {
-
-        core.rotation.y =
-            elapsed * 0.2;
-
-        core.position.y =
-            0.2 +
-            Math.sin(elapsed) *
-            0.04;
-    }
-
-
-    /* CARDS */
-
-    if (
-        scene &&
-        scene.userData &&
-        scene.userData.navigationCards
-    ) {
-
-        for (
-            const card
-            of scene.userData.navigationCards
-        ) {
-
-            if (!card)
-                continue;
-
-
-            const baseScale =
-                card.userData.baseScale ??
-                1;
-
-
-            const hoverScale =
-                card === hoveredObject
-                    ? 1.055
-                    : 1;
-
-
-            const targetScale =
-                baseScale *
-                hoverScale;
-
-
-            const current =
-                card.scale.x;
-
-
-            const next =
-                THREE.MathUtils.lerp(
-                    current,
-                    targetScale,
-                    0.12
-                );
-
-
-            card.scale.setScalar(
-                next
-            );
-
-
-            const baseY =
-                card.userData.baseY ??
-                card.position.y;
-
-            card.userData.baseY =
-                baseY;
-
-
-            card.position.y =
-                baseY +
-                Math.sin(
-                    elapsed * 1.2 +
-                    card.position.x
-                ) * 0.008;
-        }
-    }
-
-
-    checkHover();
-
-
-    if (
-        renderer &&
-        scene &&
+    renderer.render(
+        scene,
         camera
-    ) {
-
-        renderer.render(
-            scene,
-            camera
-        );
-    }
+    );
 }
 
 
-/* =========================
+/* =========================================================
+   INIT
+========================================================= */
+
+export function init(
+    canvasId,
+    dotNetReference
+) {
+
+    console.log(
+        "MY HOME CONTROL CENTER: INIT"
+    );
+
+
+    cleanup();
+
+
+    blazorReference =
+        dotNetReference;
+
+
+    canvas =
+        document.getElementById(
+            canvasId
+        );
+
+
+    if (!canvas) {
+
+        console.error(
+            "CONTROL CENTER: canvas not found"
+        );
+
+        return;
+    }
+
+
+    /* -----------------------------------------
+       Scene
+    ----------------------------------------- */
+
+    scene =
+        new THREE.Scene();
+
+    scene.background =
+        new THREE.Color(
+            0x050912
+        );
+
+
+    /* -----------------------------------------
+       Camera
+    ----------------------------------------- */
+
+    camera =
+        new THREE.PerspectiveCamera(
+            48,
+            window.innerWidth /
+            window.innerHeight,
+            0.1,
+            100
+        );
+
+    camera.position.set(
+        0,
+        0.5,
+        8.8
+    );
+
+
+    /* -----------------------------------------
+       Renderer
+    ----------------------------------------- */
+
+    renderer =
+        new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true
+        });
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio,
+            2
+        )
+    );
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
+
+    /* -----------------------------------------
+       Lights
+    ----------------------------------------- */
+
+    const ambientLight =
+        new THREE.AmbientLight(
+            0x8dbdff,
+            1.8
+        );
+
+    scene.add(
+        ambientLight
+    );
+
+
+    const mainLight =
+        new THREE.DirectionalLight(
+            0xffffff,
+            2.5
+        );
+
+    mainLight.position.set(
+        3,
+        5,
+        6
+    );
+
+    scene.add(
+        mainLight
+    );
+
+
+    const blueLight =
+        new THREE.PointLight(
+            0x087cff,
+            5,
+            15
+        );
+
+    blueLight.position.set(
+        0,
+        0,
+        4
+    );
+
+    scene.add(
+        blueLight
+    );
+
+
+    /* -----------------------------------------
+       Controls
+    ----------------------------------------- */
+
+    controls =
+        new OrbitControls(
+            camera,
+            canvas
+        );
+
+    controls.enableDamping =
+        true;
+
+    controls.enablePan =
+        false;
+
+    controls.enableZoom =
+        false;
+
+    controls.minPolarAngle =
+        Math.PI * 0.38;
+
+    controls.maxPolarAngle =
+        Math.PI * 0.62;
+
+
+    /* -----------------------------------------
+       Raycaster
+    ----------------------------------------- */
+
+    raycaster =
+        new THREE.Raycaster();
+
+
+    /* -----------------------------------------
+       Cards
+    ----------------------------------------- */
+
+    interactiveObjects = [];
+    cards = [];
+
+
+    navigationItems.forEach(
+        item => {
+
+            createCard(
+                item
+            );
+
+        }
+    );
+
+
+    /* -----------------------------------------
+       Responsive
+    ----------------------------------------- */
+
+    updateResponsiveCamera();
+
+
+    /* -----------------------------------------
+       Events
+    ----------------------------------------- */
+
+    resizeHandler =
+        handleResize;
+
+    pointerMoveHandler =
+        handlePointerMove;
+
+    clickHandler =
+        handleClick;
+
+
+    window.addEventListener(
+        "resize",
+        resizeHandler
+    );
+
+
+    canvas.addEventListener(
+        "pointermove",
+        pointerMoveHandler
+    );
+
+
+    canvas.addEventListener(
+        "click",
+        clickHandler
+    );
+
+
+    /* -----------------------------------------
+       Start
+    ----------------------------------------- */
+
+    animate();
+
+
+    console.log(
+        "MY HOME CONTROL CENTER: READY"
+    );
+}
+
+
+/* =========================================================
    CLEANUP
-   ========================= */
+========================================================= */
 
 function cleanup() {
 
@@ -1495,30 +1026,35 @@ function cleanup() {
     }
 
 
-    window.removeEventListener(
-        "resize",
-        handleResize
-    );
-
-
-    if (resizeObserver) {
-
-        resizeObserver.disconnect();
-
-        resizeObserver = null;
-    }
-
-
-    if (canvas) {
+    if (
+        canvas &&
+        pointerMoveHandler
+    ) {
 
         canvas.removeEventListener(
             "pointermove",
-            updatePointer
+            pointerMoveHandler
         );
+    }
+
+
+    if (
+        canvas &&
+        clickHandler
+    ) {
 
         canvas.removeEventListener(
             "click",
-            handleClick
+            clickHandler
+        );
+    }
+
+
+    if (resizeHandler) {
+
+        window.removeEventListener(
+            "resize",
+            resizeHandler
         );
     }
 
@@ -1526,7 +1062,6 @@ function cleanup() {
     if (controls) {
 
         controls.dispose();
-
         controls = null;
     }
 
@@ -1534,293 +1069,72 @@ function cleanup() {
     if (renderer) {
 
         renderer.dispose();
-
-        renderer.forceContextLoss();
-
         renderer = null;
     }
 
 
-    scene = null;
-    camera = null;
-    canvas = null;
-    raycaster = null;
+    if (scene) {
 
-    interactiveObjects = [];
+        scene.traverse(
+            object => {
 
-    hoveredObject = null;
+                if (
+                    object.geometry
+                ) {
+                    object.geometry.dispose();
+                }
 
-    clock = null;
+                if (
+                    object.material
+                ) {
 
-    house = null;
-    core = null;
-}
+                    if (
+                        Array.isArray(
+                            object.material
+                        )
+                    ) {
 
+                        object.material.forEach(
+                            material =>
+                                material.dispose()
+                        );
 
-/* =========================
-   INIT
-   ========================= */
+                    }
+                    else {
 
-/* =========================
-   INIT
-   ========================= */
+                        object.material.dispose();
 
-export function init(canvasId) {
+                    }
+                }
 
-    console.log(
-        "MY HOME CONTROL CENTER: INIT"
-    );
-
-    cleanup();
-
-    canvas =
-        document.getElementById(
-            canvasId
-        );
-
-    if (!canvas) {
-
-        console.error(
-            "CONTROL CENTER: canvas not found"
-        );
-
-        return;
-    }
-
-    /* SCENE */
-
-    scene =
-        new THREE.Scene();
-
-    scene.background =
-        new THREE.Color(
-            0x050912
-        );
-
-    scene.fog =
-        new THREE.FogExp2(
-            0x050912,
-            0.012
-        );
-
-
-    /* CAMERA */
-
-    camera =
-        new THREE.OrthographicCamera(
-            -8,
-            8,
-            5,
-            -5,
-            0.1,
-            100
-        );
-
-    camera.position.set(
-        0,
-        2.8,
-        12
-    );
-
-    camera.lookAt(
-        0,
-        0,
-        0
-    );
-
-
-    /* RENDERER */
-
-    renderer =
-        new THREE.WebGLRenderer({
-
-            canvas: canvas,
-
-            antialias: false,
-
-            powerPreference:
-                "high-performance"
-
-        });
-
-    renderer.setPixelRatio(
-        Math.min(
-            window.devicePixelRatio,
-            1.5
-        )
-    );
-
-    renderer.outputColorSpace =
-        THREE.SRGBColorSpace;
-
-    renderer.toneMapping =
-        THREE.ACESFilmicToneMapping;
-
-    renderer.toneMappingExposure =
-        1.15;
-
-    renderer.shadowMap.enabled =
-        false;
-
-
-    /* RAYCASTER */
-
-    raycaster =
-        new THREE.Raycaster();
-
-
-    /* CLOCK */
-
-    clock =
-        new THREE.Clock();
-
-
-    /* WORLD */
-
-    createLights();
-
-    createEnvironment();
-
-
-    /* HOUSE */
-
-    house =
-        createHouse();
-
-    scene.add(house);
-
-
-    /* CORE */
-
-    core =
-        createCore();
-
-    core.position.y =
-        0.2;
-
-    scene.add(core);
-
-
-    /* CARDS */
-
-    scene.userData.navigationCards =
-        [];
-
-    for (
-        const item
-        of navigationItems
-    ) {
-
-        const card =
-            createNavigationObject(
-                item
-            );
-
-        scene.add(card);
-
-        scene.userData.navigationCards.push(
-            card
-        );
-    }
-
-    console.log(
-        "Navigation cards:",
-        scene.userData.navigationCards
-    );
-
-
-    /* CONTROLS */
-
-    controls =
-        new OrbitControls(
-            camera,
-            canvas
-        );
-
-    controls.enableDamping =
-        true;
-
-    controls.dampingFactor =
-        0.06;
-
-    controls.enablePan =
-        false;
-
-    controls.minDistance =
-        7;
-
-    controls.maxDistance =
-        15;
-
-    controls.minPolarAngle =
-        Math.PI * 0.28;
-
-    controls.maxPolarAngle =
-        Math.PI * 0.62;
-
-    controls.target.set(
-        0,
-        0,
-        0
-    );
-
-    controls.autoRotate =
-        false;
-
-
-    /* EVENTS */
-
-    canvas.addEventListener(
-        "pointermove",
-        updatePointer
-    );
-
-    canvas.addEventListener(
-        "click",
-        handleClick
-    );
-
-    window.addEventListener(
-        "resize",
-        handleResize
-    );
-
-
-    /* RESIZE OBSERVER */
-
-    resizeObserver =
-        new ResizeObserver(
-            () => {
-                handleResize();
             }
         );
 
-    if (canvas.parentElement) {
-
-        resizeObserver.observe(
-            canvas.parentElement
-        );
+        scene.clear();
+        scene = null;
     }
 
 
-    /* INITIAL */
+    interactiveObjects = [];
+    cards = [];
 
-    handleResize();
+    raycaster = null;
+    camera = null;
+    canvas = null;
 
-    console.log(
-        "MY HOME CONTROL CENTER: READY"
-    );
-
-    animate();
+    blazorReference = null;
 }
 
 
-/* =========================
+/* =========================================================
    DISPOSE
-   ========================= */
+========================================================= */
 
 export function dispose() {
 
-    cleanup();
+    console.log(
+        "MY HOME CONTROL CENTER: DISPOSE"
+    );
 
+    cleanup();
 }
