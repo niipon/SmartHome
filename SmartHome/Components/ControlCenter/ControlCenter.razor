@@ -66,113 +66,75 @@
 
 
 @code {
-
     private IJSObjectReference? module;
-
     private DotNetObjectReference<ControlCenter>? dotNetReference;
 
-    private bool initialized;
-
-
-    protected override async Task OnAfterRenderAsync(
-        bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
         if (!firstRender)
             return;
 
-
         try
         {
-
             await Task.Delay(300);
 
-
-            module =
-                await JS.InvokeAsync<IJSObjectReference>(
-                    "import",
-                    "/js/myhome3d/control-center.js?v=15"
-                );
-
+            module = await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/js/myhome3d/control-center.js?v=20"
+            );
 
             dotNetReference =
                 DotNetObjectReference.Create(this);
-
 
             await module.InvokeVoidAsync(
                 "init",
                 "controlCenterCanvas",
                 dotNetReference
             );
-
-
-            initialized = true;
-
         }
         catch (Exception ex)
         {
-
             Console.WriteLine(
                 $"CONTROL CENTER ERROR: {ex}"
             );
-
         }
-
     }
-
 
     [JSInvokable]
     public void NavigateFrom3D(string url)
     {
-
         if (string.IsNullOrWhiteSpace(url))
             return;
-
 
         Navigation.NavigateTo(
             url,
             replace: false
         );
-
     }
-
 
     public async ValueTask DisposeAsync()
     {
-
         if (module != null)
         {
-
             try
             {
-
-                await module.InvokeVoidAsync(
-                    "dispose"
-                );
-
+                await module.InvokeVoidAsync("dispose");
             }
             catch
             {
             }
 
-
             try
             {
-
                 await module.DisposeAsync();
-
             }
             catch
             {
             }
-
         }
 
-
         dotNetReference?.Dispose();
-
     }
-
 }
 
 
