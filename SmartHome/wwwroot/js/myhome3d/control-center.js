@@ -1,5 +1,4 @@
 ﻿
-
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
@@ -20,9 +19,15 @@ let hoveredObject = null;
 let house = null;
 let core = null;
 
-
-
 let resizeObserver = null;
+
+// Ссылка на Blazor
+let blazorReference = null;
+
+
+/* =========================
+   NAVIGATION
+   ========================= */
 
 const navigationItems = [
     {
@@ -61,6 +66,7 @@ const navigationItems = [
    ========================= */
 
 function metalMaterial() {
+
     return new THREE.MeshStandardMaterial({
         color: 0x101721,
         metalness: 0.85,
@@ -70,6 +76,7 @@ function metalMaterial() {
 
 
 function blueMaterial() {
+
     return new THREE.MeshStandardMaterial({
         color: 0x1557a5,
         metalness: 0.65,
@@ -81,6 +88,7 @@ function blueMaterial() {
 
 
 function glassMaterial() {
+
     return new THREE.MeshPhysicalMaterial({
         color: 0x102238,
         metalness: 0.3,
@@ -257,7 +265,6 @@ function createCore() {
 
     return group;
 }
-
 
 
 /* =========================
@@ -655,7 +662,7 @@ function createTextSprite(
     );
 
     context.font =
-        `800 ${fontSize}px Arial`;
+        `800 ${ fontSize }px Arial`;
 
     context.textAlign = "center";
     context.textBaseline = "middle";
@@ -875,6 +882,32 @@ function updatePointer(event) {
 
 
 /* =========================
+   FIND NAVIGATION
+   ========================= */
+
+function findNavigation(object) {
+
+    let current = object;
+
+    while (current) {
+
+        if (
+            current.userData &&
+            current.userData.navigation
+        ) {
+
+            return current.userData.navigation;
+        }
+
+        current =
+            current.parent;
+    }
+
+    return null;
+}
+
+
+/* =========================
    HOVER
    ========================= */
 
@@ -891,7 +924,7 @@ function checkHover() {
     const hits =
         raycaster.intersectObjects(
             interactiveObjects,
-            false
+            true
         );
 
     const object =
@@ -899,27 +932,28 @@ function checkHover() {
             ? hits[0].object
             : null;
 
+
+    const navigation =
+        object
+            ? findNavigation(object)
+            : null;
+
+
     let newHoveredCard = null;
 
-    if (object) {
 
-        let current = object;
+    if (navigation && object) {
 
-        while (current) {
+        newHoveredCard =
+            object;
 
-            if (
-                current.userData &&
-                current.userData.navigation
-            ) {
+        while (
+            newHoveredCard.parent &&
+            !newHoveredCard.userData?.baseScale
+        ) {
 
-                newHoveredCard =
-                    current;
-
-                break;
-            }
-
-            current =
-                current.parent;
+            newHoveredCard =
+                newHoveredCard.parent;
         }
     }
 
@@ -937,7 +971,7 @@ function checkHover() {
     if (canvas) {
 
         canvas.style.cursor =
-            hoveredObject
+            navigation
                 ? "pointer"
                 : "default";
     }
@@ -945,50 +979,119 @@ function checkHover() {
 
 
 /* =========================
-   CLICK
+   CLICK / TOUCH
    ========================= */
 
-function handleClick() {
+function handleClick(event) {
 
-    if (!raycaster || !camera)
+    if (
+        !raycaster ||
+        !camera ||
+        !canvas
+    ) {
         return;
+    }
+
+
+    // На iPhone координаты нужно
+    // обновлять непосредственно при касании
+    updatePointer(event);
+
 
     raycaster.setFromCamera(
         mouse,
         camera
     );
 
+
     const hits =
         raycaster.intersectObjects(
             interactiveObjects,
-            false
+            true
         );
 
-    if (!hits.length)
+
+    if (!hits.length) {
+
+        console.log(
+            "CONTROL CENTER: nothing clicked"
+        );
+
         return;
+    }
+
 
     const navigation =
-        hits[0].object?.userData?.navigation;
+        findNavigation(
+            hits[0].object
+        );
+
 
     if (
-        navigation &&
-        navigation.url
+        !navigation ||
+        !navigation.url
     ) {
 
-        // Передаём переход в Blazor
-        if (window.myHomeNavigation) {
+        console.log(
+            "CONTROL CENTER: navigation not found"
+        );
 
-            window.myHomeNavigation(
-                navigation.url
-            );
-
-        } else {
-
-
-            window.location.href =
-                navigation.url;
-        }
+        return;
     }
+
+
+    const url =
+        navigation.url;
+
+
+    console.log(
+        "CONTROL CENTER: OPEN",
+        url
+    );
+
+
+    // =========================================
+    // BLAZOR NAVIGATION
+    // =========================================
+
+    if (blazorReference) {
+
+        blazorReference
+            .invokeMethodAsync(
+                "NavigateFrom3D",
+                url
+            )
+            .then(() => {
+
+                console.log(
+                    "CONTROL CENTER: Blazor navigation complete"
+                );
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "CONTROL CENTER: Blazor navigation failed",
+                    error
+                );
+
+                // Запасной вариант
+                window.location.assign(
+                    url
+                );
+            });
+
+        return;
+    }
+
+
+    // =========================================
+    // FALLBACK
+    // =========================================
+
+    window.location.assign(
+        url
+    );
 }
 
 
@@ -1057,6 +1160,7 @@ function updateResponsiveCamera() {
 
     const cards =
         scene?.userData?.navigationCards;
+
 
     if (
         !cards ||
@@ -1290,7 +1394,8 @@ function setCardBaseScale(card, scale) {
     if (!card)
         return;
 
-    card.userData.baseScale = scale;
+    card.userData.baseScale =
+        scale;
 
     const hover =
         card === hoveredObject
@@ -1362,6 +1467,7 @@ function animate(time = 0) {
 
     if (!clock)
         return;
+
 
     const elapsed =
         clock.getElapsedTime();
@@ -1450,6 +1556,7 @@ function animate(time = 0) {
                 card.userData.baseY ??
                 card.position.y;
 
+
             card.userData.baseY =
                 baseY;
 
@@ -1519,7 +1626,7 @@ function cleanup() {
         );
 
         canvas.removeEventListener(
-            "click",
+            "pointerup",
             handleClick
         );
     }
@@ -1556,6 +1663,8 @@ function cleanup() {
 
     house = null;
     core = null;
+
+    blazorReference = null;
 }
 
 
@@ -1563,22 +1672,29 @@ function cleanup() {
    INIT
    ========================= */
 
-/* =========================
-   INIT
-   ========================= */
-
-export function init(canvasId) {
+export function init(
+    canvasId,
+    dotNetReference
+) {
 
     console.log(
         "MY HOME CONTROL CENTER: INIT"
     );
 
+
     cleanup();
+
+
+    // Сохраняем ссылку на Blazor
+    blazorReference =
+        dotNetReference;
+
 
     canvas =
         document.getElementById(
             canvasId
         );
+
 
     if (!canvas) {
 
@@ -1588,6 +1704,7 @@ export function init(canvasId) {
 
         return;
     }
+
 
     /* SCENE */
 
@@ -1645,12 +1762,14 @@ export function init(canvasId) {
 
         });
 
+
     renderer.setPixelRatio(
         Math.min(
             window.devicePixelRatio,
             1.5
         )
     );
+
 
     renderer.outputColorSpace =
         THREE.SRGBColorSpace;
@@ -1708,6 +1827,7 @@ export function init(canvasId) {
     scene.userData.navigationCards =
         [];
 
+
     for (
         const item
         of navigationItems
@@ -1724,6 +1844,7 @@ export function init(canvasId) {
             card
         );
     }
+
 
     console.log(
         "Navigation cards:",
@@ -1777,10 +1898,12 @@ export function init(canvasId) {
         updatePointer
     );
 
+    // Работает и на мыши, и на iPhone
     canvas.addEventListener(
-        "click",
+        "pointerup",
         handleClick
     );
+
 
     window.addEventListener(
         "resize",
@@ -1797,6 +1920,7 @@ export function init(canvasId) {
             }
         );
 
+
     if (canvas.parentElement) {
 
         resizeObserver.observe(
@@ -1809,9 +1933,11 @@ export function init(canvasId) {
 
     handleResize();
 
+
     console.log(
         "MY HOME CONTROL CENTER: READY"
     );
+
 
     animate();
 }
@@ -1824,6 +1950,5 @@ export function init(canvasId) {
 export function dispose() {
 
     cleanup();
-
 }
 
