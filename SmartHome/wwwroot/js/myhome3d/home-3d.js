@@ -2247,19 +2247,50 @@ function onPointerMove(event) {
     );
 
 
+    const objectsToCheck =
+        notificationButton
+            ? [
+                ...dataObjects,
+                notificationButton
+            ]
+            : dataObjects;
+
+
     const hits =
         raycaster.intersectObjects(
-            dataObjects,
+            objectsToCheck,
             true
         );
 
 
     if (hits.length) {
 
+        const notificationHit =
+            notificationButton &&
+            (
+                hits[0].object ===
+                notificationButton ||
+                notificationButton
+                    .getObjectById(
+                        hits[0].object.id
+                    )
+            );
+
+
+        if (notificationHit) {
+
+            canvas.style.cursor =
+                "pointer";
+
+            return;
+        }
+
+
         const card =
             findCardFromHit(
                 hits[0].object
             );
+
 
         canvas.style.cursor =
             card
@@ -2278,7 +2309,6 @@ function onPointerMove(event) {
 // ============================================================
 // CLICK / TAP
 // ============================================================
-
 function onPointerDown(event) {
 
     if (
@@ -2298,6 +2328,39 @@ function onPointerDown(event) {
         camera
     );
 
+
+    // ========================================================
+    // ПРОВЕРЯЕМ УВЕДОМЛЕНИЯ
+    // ========================================================
+
+    if (notificationButton) {
+
+        const notificationHits =
+            raycaster.intersectObject(
+                notificationButton,
+                true
+            );
+
+
+        if (notificationHits.length) {
+
+            console.log(
+                "MY HOME: открываем уведомления"
+            );
+
+
+            window.location.href =
+                "/notifications";
+
+
+            return;
+        }
+    }
+
+
+    // ========================================================
+    // ПРОВЕРЯЕМ ОСТАЛЬНЫЕ КАРТОЧКИ
+    // ========================================================
 
     const hits =
         raycaster.intersectObjects(
@@ -2343,7 +2406,7 @@ function onPointerDown(event) {
 
 
     // ========================================================
-    // ОТКРЫВАЕМ ЛЮБУЮ КАРТОЧКУ
+    // ОТКРЫВАЕМ КАРТОЧКУ
     // ========================================================
 
     selectedCard =
