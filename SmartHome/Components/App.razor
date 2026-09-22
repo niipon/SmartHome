@@ -25,6 +25,12 @@
     <link rel="stylesheet"
           href="SmartHome.styles.css" />
 
+    <link href="css/setting.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="css/security.css">
+
+    <link rel="stylesheet" href="css/light.css">
+
     <link rel="icon"
           type="image/png"
           href="smart-house.png" />
@@ -642,13 +648,6 @@
          BLAZOR
          ========================= -->
 
-    <script src="_framework/blazor.web.js"></script>
-
-
-    <!-- =========================
-         THREE.JS IMPORT MAP
-         ========================= -->
-
     <script type="importmap">
         {
             "imports": {
@@ -658,15 +657,18 @@
         }
     </script>
 
-
-    <!-- =========================
-         MY HOME 3D
-         ========================= -->
-
     <script type="module"
             src="/js/myhome3d/home-3d.js?v=4"></script>
 
-  
+    <script type="module"
+            src="/js/settingsDna.js"></script>
+
+    <script type="module" src="/js/security3d.js"></script>
+
+    <script type="module" src="/js/lights3d.js"></script>
+
+    <script src="_framework/blazor.web.js"></script>
+    
 
 
     <!-- =========================

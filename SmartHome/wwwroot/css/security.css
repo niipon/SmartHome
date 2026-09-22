@@ -1,0 +1,351 @@
+﻿.security-page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    background: radial-gradient( circle at 50% 45%, rgba(0, 180, 220, .14), transparent 42% ), #050b10;
+    color: white;
+}
+
+
+/* TOP */
+
+.security-top {
+    position: absolute;
+    top: 32px;
+    left: 42px;
+    right: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.security-eyebrow {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #43dff5;
+    margin-bottom: 7px;
+}
+
+.security-top h1 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.security-top p {
+    margin: 7px 0 0;
+    color: #687b85;
+    font-size: 14px;
+}
+
+
+/* ONLINE */
+
+.security-online {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border: 1px solid rgba(0, 220, 255, .22);
+    border-radius: 30px;
+    background: rgba(0, 180, 220, .06);
+    color: #5de5f7;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+    .security-online span {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #00eaff;
+        box-shadow: 0 0 8px #00eaff, 0 0 18px #00eaff;
+        animation: securityStatusPulse 1.5s infinite;
+    }
+
+@keyframes securityStatusPulse {
+    0%, 100% {
+        opacity: .4;
+        transform: scale(.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+
+/* 3D */
+
+.security-3d-wrapper {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+#security3d {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+}
+
+    #security3d:active {
+        cursor: grabbing;
+    }
+
+    #security3d canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+
+/* CONTROL */
+
+.security-control {
+    position: absolute;
+    left: 50%;
+    bottom: 42px;
+    transform: translateX(-50%);
+    z-index: 20;
+    width: min(430px, calc(100% - 40px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+
+/* STATUS */
+
+.security-state {
+    text-align: center;
+}
+
+.security-state-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: rgba(120, 180, 195, .5);
+    margin-bottom: 5px;
+}
+
+.security-state-value {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+    .security-state-value.active {
+        color: #50e8f7;
+        text-shadow: 0 0 12px rgba(0, 220, 255, .55);
+    }
+
+    .security-state-value.inactive {
+        color: #66747b;
+    }
+
+
+/* BUTTON */
+
+.security-button {
+    border: 1px solid rgba(0, 225, 255, .35);
+    border-radius: 30px;
+    background: rgba(0, 190, 220, .08);
+    color: #70ebf7;
+    padding: 12px 25px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    transition: background .2s, transform .2s, border-color .2s;
+}
+
+    .security-button:active {
+        transform: scale(.96);
+    }
+
+    .security-button:hover {
+        background: rgba(0, 200, 230, .15);
+        border-color: rgba(0, 230, 255, .65);
+    }
+
+
+/* MOTION */
+
+.security-motion {
+    text-align: center;
+}
+
+.security-motion-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: rgba(120, 180, 195, .4);
+    margin-bottom: 4px;
+}
+
+.security-motion-value {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #65747b;
+}
+
+    .security-motion-value.motion {
+        color: #ff668c;
+        text-shadow: 0 0 12px rgba(255, 80, 130, .55);
+        animation: motionPulse .7s infinite alternate;
+    }
+
+@keyframes motionPulse {
+    from {
+        opacity: .55;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .security-top {
+        top: 18px;
+        left: 18px;
+        right: 18px;
+        align-items: flex-start;
+    }
+
+    .security-eyebrow {
+        font-size: 8px;
+        letter-spacing: 3px;
+    }
+
+    .security-top h1 {
+        font-size: 26px;
+    }
+
+    .security-top p {
+        margin-top: 5px;
+        font-size: 11px;
+    }
+
+    .security-online {
+        padding: 7px 9px;
+        font-size: 7px;
+        letter-spacing: 1px;
+    }
+
+        .security-online span {
+            width: 5px;
+            height: 5px;
+        }
+
+    .security-control {
+        bottom: 24px;
+        width: calc(100% - 28px);
+        gap: 9px;
+    }
+
+    .security-state-label {
+        font-size: 7px;
+    }
+
+    .security-state-value {
+        font-size: 12px;
+        letter-spacing: 1.5px;
+    }
+
+    .security-button {
+        padding: 10px 19px;
+        font-size: 8px;
+    }
+
+    .security-motion-label {
+        font-size: 7px;
+    }
+
+    .security-motion-value {
+        font-size: 8px;
+    }
+}
+
+
+/* VERY SMALL PHONES */
+
+@media (max-width: 390px) {
+
+    .security-top {
+        top: 14px;
+    }
+
+        .security-top h1 {
+            font-size: 23px;
+        }
+
+        .security-top p {
+            font-size: 10px;
+        }
+
+    .security-online {
+        padding: 6px 8px;
+    }
+
+    .security-control {
+        bottom: 18px;
+    }
+
+    .security-state-value {
+        font-size: 11px;
+    }
+
+    .security-button {
+        padding: 9px 16px;
+    }
+}
+
+
+/* LANDSCAPE PHONE */
+
+@media (max-height: 550px) {
+
+    .security-top {
+        top: 12px;
+    }
+
+        .security-top h1 {
+            font-size: 22px;
+        }
+
+        .security-top p {
+            display: none;
+        }
+
+    .security-control {
+        bottom: 12px;
+        gap: 5px;
+    }
+
+    .security-state-label {
+        display: none;
+    }
+
+    .security-button {
+        padding: 8px 17px;
+    }
+
+    .security-motion-label {
+        display: none;
+    }
+}

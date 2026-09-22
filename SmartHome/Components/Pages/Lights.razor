@@ -1,157 +1,191 @@
 ﻿@page "/lights"
+@rendermode InteractiveServer
 
-<div class="page">
+@inject IJSRuntime JS
 
-    <header class="page-header">
+<div class="lights-page">
+
+    <!-- HEADER -->
+    <div class="lights-header">
 
         <div>
-            <p class="eyebrow">УПРАВЛЕНИЕ</p>
+            <div class="lights-eyebrow">MY HOME</div>
+
             <h1>Освещение</h1>
-            <p class="subtitle">
+
+            <p>
                 Управление светом в комнатах
             </p>
         </div>
 
-        <div class="page-title-icon">
-            ☼
+        <div class="lights-status">
+            <span></span>
+            SYSTEM ONLINE
         </div>
 
-    </header>
+    </div>
 
 
-    <section class="light-overview">
+    <!-- 3D ЛАМПОЧКА -->
+    <div class="lamp-wrapper">
 
-        <div>
-            <span>Включено</span>
-            <strong>2</strong>
+        <div id="lights3d"></div>
+
+        <div class="lamp-hint">
+            DRAG TO ROTATE
         </div>
 
-        <div>
-            <span>Всего</span>
-            <strong>4</strong>
-        </div>
-
-    </section>
+    </div>
 
 
-    <section class="section">
+    <!-- ПАНЕЛЬ УПРАВЛЕНИЯ -->
+    <div class="lights-control">
 
-        <div class="section-header">
+        <div class="lights-control-top">
 
             <div>
-                <p class="eyebrow">КОМНАТЫ</p>
-                <h2>Освещение</h2>
+                <span class="control-label">
+                    ОСВЕЩЕНИЕ
+                </span>
+
+                <div class="control-title">
+                    Комнаты
+                </div>
+            </div>
+
+            <div class="lights-counter">
+                <strong>
+                    @lights.Count(x => x.Enabled)
+                </strong>
+
+                <span>
+                    / @lights.Count
+                </span>
             </div>
 
         </div>
 
 
-        <div class="lights-grid">
+        <div class="lights-buttons">
 
+            @foreach (var light in lights)
+            {
+                <button class="light-button @(light.Enabled ? "active" : "")"
+                        @onclick="() => ToggleLight(light)">
 
-            <div class="light-card">
-
-                <div class="light-card-top">
-
-                    <div class="room-icon">
-                        ???
+                    <div class="light-button-icon">
+                        @light.Icon
                     </div>
 
-                    <button class="switch active">
-                        <span></span>
-                    </button>
+                    <div class="light-button-info">
 
-                </div>
+                        <span class="light-button-name">
+                            @light.Name
+                        </span>
 
-                <h3>Комната</h3>
+                        <span class="light-button-state">
+                            @(light.Enabled ? "Включён" : "Выключен")
+                        </span>
 
-                <p>Основной свет</p>
-
-                <span class="light-status on">
-                    Включён
-                </span>
-
-            </div>
-
-
-            <div class="light-card">
-
-                <div class="light-card-top">
-
-                    <div class="room-icon">
-                        ??
                     </div>
 
-                    <button class="switch">
-                        <span></span>
-                    </button>
+                    <div class="light-dot"></div>
 
-                </div>
-
-                <h3>Кухня</h3>
-
-                <p>Основной свет</p>
-
-                <span class="light-status">
-                    Выключен
-                </span>
-
-            </div>
-
-
-            <div class="light-card">
-
-                <div class="light-card-top">
-
-                    <div class="room-icon">
-                        ??
-                    </div>
-
-                    <button class="switch active">
-                        <span></span>
-                    </button>
-
-                </div>
-
-                <h3>Прихожая</h3>
-
-                <p>Основной свет</p>
-
-                <span class="light-status on">
-                    Включён
-                </span>
-
-            </div>
-
-
-            <div class="light-card">
-
-                <div class="light-card-top">
-
-                    <div class="room-icon">
-                        ??
-                    </div>
-
-                    <button class="switch">
-                        <span></span>
-                    </button>
-
-                </div>
-
-                <h3>Ванная</h3>
-
-                <p>Основной свет</p>
-
-                <span class="light-status">
-                    Выключен
-                </span>
-
-            </div>
-
+                </button>
+            }
 
         </div>
 
-    </section>
+    </div>
 
 </div>
 
+
+@code
+{
+    private List<LightItem> lights = new()
+    {
+        new LightItem
+        {
+            Name = "Комната",
+            Icon = "◉",
+            Enabled = true
+        },
+
+        new LightItem
+        {
+            Name = "Кухня",
+            Icon = "◇",
+            Enabled = false
+        },
+
+        new LightItem
+        {
+            Name = "Прихожая",
+            Icon = "△",
+            Enabled = true
+        },
+
+        new LightItem
+        {
+            Name = "Ванная",
+            Icon = "○",
+            Enabled = false
+        }
+    };
+
+
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        try
+        {
+            await JS.InvokeVoidAsync(
+                "myHomeLights3d.init"
+            );
+
+            await UpdateLamp();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                "MY HOME LIGHTS 3D ERROR: "
+                + ex.Message
+            );
+        }
+    }
+
+
+    private async Task ToggleLight(
+        LightItem light)
+    {
+        light.Enabled = !light.Enabled;
+
+        await UpdateLamp();
+    }
+
+
+    private async Task UpdateLamp()
+    {
+        int enabledCount =
+            lights.Count(x => x.Enabled);
+
+        await JS.InvokeVoidAsync(
+            "myHomeLights3d.setState",
+            enabledCount
+        );
+    }
+
+
+    public class LightItem
+    {
+        public string Name { get; set; } = "";
+
+        public string Icon { get; set; } = "";
+
+        public bool Enabled { get; set; }
+    }
+}

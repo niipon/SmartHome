@@ -1,5 +1,4 @@
-﻿@page "/security"
-
+﻿@* @page "/security"
 
 @rendermode InteractiveServer
 
@@ -7,120 +6,550 @@
 
 @inject IHttpClientFactory HttpClientFactory
 
-<div class="page">
+<div class="security-page">
 
-    <header class="page-header">
+    <header class="security-header">
 
         <div>
             <p class="eyebrow">БЕЗОПАСНОСТЬ</p>
+
             <h1>Охрана</h1>
+
             <p class="subtitle">
                 Управление системой безопасности
-
             </p>
         </div>
 
-        <div class="page-title-icon">
+        <div class="header-icon">
             🛡️
         </div>
 
     </header>
 
 
-    <section class="security-status">
+    <!-- 3D SECURITY CORE -->
 
-        <div class="security-shield">
-            🛡️
+    <section class="security-core">
+
+        <div class="scene">
+
+            <div class="shield-3d @(securityEnabled ? "active" : "")">
+
+                <div class="shield-glow"></div>
+
+                <div class="shield-face">
+
+                    <div class="shield-symbol">
+                        🛡️
+                    </div>
+
+                    <div class="security-label">
+                        @(securityEnabled ? "ОХРАНА" : "ОХРАНА")
+                    </div>
+
+                    <div class="security-state">
+                        @(securityEnabled ? "АКТИВНА" : "ВЫКЛЮЧЕНА")
+                    </div>
+
+                    <button class="security-button"
+                            @onclick="ToggleSecurity">
+
+                        <span class="button-light"></span>
+
+                        @(securityEnabled ? "ВЫКЛЮЧИТЬ" : "ВКЛЮЧИТЬ")
+
+                    </button>
+
+                </div>
+
+            </div>
+
         </div>
-
-        <div class="security-info">
-
-            <p class="eyebrow">СОСТОЯНИЕ СИСТЕМЫ</p>
-
-            <h2>Охрана активна</h2>
-
-            <p>
-                Все основные датчики работают нормально.
-            </p>
-
-        </div>
-        
-
-        <button class="danger-button" @onclick="ToggleSecurity">
-            @(securityEnabled ? "Выключить охрану" : "Включить охрану")
-        </button>
 
     </section>
 
 
-    <section class="section">
+    <!-- STATUS -->
 
-        <div class="section-header">
+    <section class="status-panel">
+
+        <div class="status-left">
+
+            <div class="status-dot @(securityEnabled ? "online" : "")"></div>
 
             <div>
-                <p class="eyebrow">СИСТЕМА БЕЗОПАСНОСТИ</p>
-                <h2>Датчики</h2>
-            </div>
 
-        </div>
+                <p class="eyebrow">
+                    СОСТОЯНИЕ СИСТЕМЫ
+                </p>
 
+                <h2>
+                    @(securityEnabled
+                                        ? "Охрана активна"
+                                        : "Охрана выключена")
+                </h2>
 
-        <div class="device-grid">
-
-
-
-
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    👀
-                </div>
-
-                <div>
-
-                    <p>Движение</p>
-
-                    @if (homeData!.MotionDetected)
-                    {
-                        <h2>
-                            Обнаружено
-                        </h2>
-                    }
-                    else
-                    {
-                        <h2>
-                            Нет
-                        </h2>
-                    }
-
-                </div>
+                <p>
+                    @(securityEnabled
+                                        ? "Система контролирует датчики."
+                                        : "Система безопасности отключена.")
+                </p>
 
             </div>
-
-          
-
 
         </div>
 
     </section>
 
 
+    <!-- SENSORS -->
+
+    <section class="sensors-section">
+
+        <div class="section-title">
+
+            <p class="eyebrow">
+                СИСТЕМА БЕЗОПАСНОСТИ
+            </p>
+
+            <h2>Датчики</h2>
+
+        </div>
+
+
+        <div class="sensor-card">
+
+            <div class="sensor-icon">
+                👀
+            </div>
+
+            <div class="sensor-info">
+
+                <p>Движение</p>
+
+                @if (homeData.MotionDetected)
+                {
+                    <h2 class="detected">
+                        Обнаружено
+                    </h2>
+                }
+                else
+                {
+                    <h2>
+                        Нет
+                    </h2>
+                }
+
+            </div>
+
+            <div class="sensor-indicator
+                        @(homeData.MotionDetected ? "motion" : "")">
+            </div>
+
+        </div>
+
+    </section>
 
 </div>
 
 
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+
+    .security-page {
+        min-height: 100vh;
+        padding: 32px;
+        color: #ffffff;
+        background: radial-gradient( circle at 50% 25%, rgba(30, 90, 150, .13), transparent 35% ), #0b0d10;
+    }
+
+
+    /* HEADER */
+
+    .security-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1100px;
+        margin: 0 auto 20px;
+    }
+
+
+    .eyebrow {
+        margin: 0 0 7px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: #657080;
+    }
+
+
+    h1 {
+        margin: 0;
+        font-size: 34px;
+        font-weight: 700;
+    }
+
+
+    .subtitle {
+        margin-top: 7px;
+        color: #737d8c;
+    }
+
+
+    .header-icon {
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: #11151b;
+        border: 1px solid #202833;
+        font-size: 25px;
+    }
+
+
+    /* 3D AREA */
+
+    .security-core {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+
+    .scene {
+        height: 390px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        perspective: 900px;
+    }
+
+
+    .shield-3d {
+        position: relative;
+        width: 250px;
+        height: 285px;
+        transform: rotateX(8deg) rotateY(-8deg);
+        transform-style: preserve-3d;
+        transition: transform .35s ease, filter .35s ease;
+    }
+
+
+        .shield-3d:hover {
+            transform: rotateX(5deg) rotateY(-14deg) translateY(-5px);
+        }
+
+
+    /* GLOW */
+
+    .shield-glow {
+        position: absolute;
+        inset: 20px;
+        border-radius: 45% 45% 50% 50%;
+        background: rgba(30, 130, 220, .08);
+        filter: blur(30px);
+        transform: translateZ(-35px);
+        transition: .4s;
+    }
+
+
+    .shield-3d.active .shield-glow {
+        background: rgba(40, 150, 255, .25);
+        filter: blur(35px);
+    }
+
+
+    /* SHIELD */
+
+    .shield-face {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 42px;
+        background: linear-gradient( 145deg, #1a222d, #0c1015 55%, #080b0f );
+        clip-path: polygon( 50% 0%, 91% 15%, 84% 67%, 70% 86%, 50% 100%, 30% 86%, 16% 67%, 9% 15% );
+        border: 1px solid #27313d;
+        box-shadow: inset 0 0 30px rgba(70, 130, 180, .08), 0 25px 50px rgba(0,0,0,.55);
+        transform: translateZ(25px);
+    }
+
+
+        /* EXTRA 3D LAYERS */
+
+        .shield-face::before {
+            content: "";
+            position: absolute;
+            inset: 9px;
+            clip-path: polygon( 50% 0%, 91% 15%, 84% 67%, 70% 86%, 50% 100%, 30% 86%, 16% 67%, 9% 15% );
+            border: 1px solid rgba(90, 140, 180, .18);
+            pointer-events: none;
+        }
+
+
+        .shield-face::after {
+            content: "";
+            position: absolute;
+            left: 10px;
+            right: -12px;
+            top: 12px;
+            bottom: -15px;
+            clip-path: inherit;
+            background: #06090d;
+            transform: translateZ(-18px);
+            z-index: -1;
+        }
+
+
+    /* ICON */
+
+    .shield-symbol {
+        font-size: 45px;
+        filter: drop-shadow( 0 0 12px rgba(50,150,255,.2) );
+        margin-bottom: 8px;
+    }
+
+
+    .security-label {
+        font-size: 12px;
+        letter-spacing: 3px;
+        font-weight: 700;
+        color: #8c98a8;
+    }
+
+
+    .security-state {
+        margin-top: 7px;
+        font-size: 17px;
+        font-weight: 700;
+        color: #dbe4ef;
+    }
+
+
+    .shield-3d.active .security-state {
+        color: #55b9ff;
+        text-shadow: 0 0 12px rgba(50,170,255,.4);
+    }
+
+
+    /* BUTTON */
+
+    .security-button {
+        position: relative;
+        margin-top: 27px;
+        width: 145px;
+        height: 40px;
+        border: 1px solid #293441;
+        border-radius: 12px;
+        background: linear-gradient( 180deg, #18202a, #0d1218 );
+        color: #dce6f0;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        cursor: pointer;
+        transition: .2s;
+        box-shadow: 0 7px 15px rgba(0,0,0,.35);
+    }
+
+
+        .security-button:hover {
+            transform: translateY(-2px);
+            border-color: #3d86b5;
+            background: #16212c;
+        }
+
+
+        .security-button:active {
+            transform: translateY(1px);
+        }
+
+
+    .button-light {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-right: 7px;
+        border-radius: 50%;
+        background: #56616d;
+    }
+
+
+    .active .button-light {
+        background: #45b5ff;
+        box-shadow: 0 0 9px #45b5ff;
+    }
+
+
+    /* STATUS */
+
+    .status-panel {
+        max-width: 1100px;
+        margin: 0 auto 28px;
+        padding: 22px 25px;
+        border: 1px solid #1d252e;
+        border-radius: 18px;
+        background: #101419;
+    }
+
+
+    .status-left {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+    }
+
+
+    .status-dot {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #4c5560;
+    }
+
+
+        .status-dot.online {
+            background: #42b6ff;
+            box-shadow: 0 0 13px rgba(66,182,255,.65);
+        }
+
+
+    .status-panel h2 {
+        margin: 0;
+        font-size: 20px;
+    }
+
+
+    .status-panel p:last-child {
+        margin: 6px 0 0;
+        color: #697482;
+    }
+
+
+    /* SENSORS */
+
+    .sensors-section {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+
+    .section-title {
+        margin-bottom: 15px;
+    }
+
+
+        .section-title h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+
+    .sensor-card {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border: 1px solid #1d252e;
+        border-radius: 18px;
+        background: #101419;
+    }
+
+
+    .sensor-icon {
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        background: #161c23;
+        font-size: 24px;
+        margin-right: 17px;
+    }
+
+
+    .sensor-info p {
+        margin: 0 0 5px;
+        color: #7b8795;
+    }
+
+
+    .sensor-info h2 {
+        margin: 0;
+        font-size: 19px;
+    }
+
+
+    .sensor-info .detected {
+        color: #ffb45c;
+    }
+
+
+    .sensor-indicator {
+        width: 9px;
+        height: 9px;
+        margin-left: auto;
+        border-radius: 50%;
+        background: #414a54;
+    }
+
+
+        .sensor-indicator.motion {
+            background: #ffb45c;
+            box-shadow: 0 0 12px rgba(255,180,92,.7);
+        }
+
+
+    /* MOBILE */
+
+    @@media (max-width: 700px) {
+        .security-page
+
+    {
+        padding: 20px;
+    }
+
+    .security-header h1 {
+        font-size: 28px;
+    }
+
+    .scene {
+        height: 350px;
+    }
+
+    .shield-3d {
+        transform: scale(.85) rotateX(8deg) rotateY(-8deg);
+    }
+
+        .shield-3d:hover {
+            transform: scale(.85) rotateX(5deg) rotateY(-10deg);
+        }
+
+    }
+</style>
+
+
 @code {
+
     private HomeData homeData = new HomeData();
+
     private bool securityEnabled;
 
     private System.Threading.Timer? timer;
+
 
     private async Task ToggleSecurity()
     {
         securityEnabled = !securityEnabled;
 
-        var client = HttpClientFactory.CreateClient("HomeApi");
+        var client =
+            HttpClientFactory.CreateClient("HomeApi");
 
         await client.PostAsJsonAsync(
             "api/home/security",
@@ -132,6 +561,7 @@
         StateHasChanged();
     }
 
+
     protected override async Task OnInitializedAsync()
     {
         await LoadHomeData();
@@ -142,6 +572,7 @@
                 await InvokeAsync(async () =>
                 {
                     await LoadHomeData();
+
                     StateHasChanged();
                 });
             },
@@ -151,31 +582,266 @@
         );
     }
 
+
     private async Task LoadHomeData()
     {
         try
         {
-            var client = HttpClientFactory.CreateClient("HomeApi");
+            var client =
+                HttpClientFactory.CreateClient("HomeApi");
 
-            homeData = await client.GetFromJsonAsync<HomeData>("api/home")
-                        ?? new HomeData();
+            homeData =
+                await client.GetFromJsonAsync<HomeData>(
+                    "api/home"
+                ) ?? new HomeData();
 
-            securityEnabled = homeData.SecurityEnabled;
+            securityEnabled =
+                homeData.SecurityEnabled;
         }
         catch
         {
-            // Если API временно недоступен — оставляем последние данные
+            // API временно недоступен
         }
     }
+
 
     public void Dispose()
     {
         timer?.Dispose();
     }
 
+
     public class HomeData
     {
         public bool SecurityEnabled { get; set; }
-		public bool MotionDetected { get; set; }
+
+        public bool MotionDetected { get; set; }
     }
+
+} *@
+
+
+
+
+
+@page "/security"
+@rendermode InteractiveServer
+
+@using System.Net.Http.Json
+@using Microsoft.JSInterop
+
+@inject IHttpClientFactory HttpClientFactory
+@inject IJSRuntime JS
+
+@implements IDisposable
+
+<div class="security-page">
+
+    <!-- Верхняя часть -->
+    <div class="security-top">
+
+        <div>
+            <div class="security-eyebrow">
+                MY HOME
+            </div>
+
+            <h1>Security</h1>
+
+            <p>Система безопасности дома</p>
+        </div>
+
+        <div class="security-online">
+            <span></span>
+            SYSTEM ONLINE
+        </div>
+
+    </div>
+
+
+    <!-- 3D -->
+    <div class="security-3d-wrapper">
+
+        <div id="security3d"></div>
+
+        <div class="security-drag-hint">
+            DRAG TO ROTATE
+        </div>
+
+    </div>
+
+
+    <!-- Центральная информация -->
+    <div class="security-control">
+
+        <div class="security-state">
+
+            <div class="security-state-label">
+                STATUS
+            </div>
+
+            <div class="security-state-value @(securityEnabled ? "active" : "inactive")">
+
+                @(securityEnabled
+                                ? "ОХРАНА АКТИВНА"
+                                : "ОХРАНА ВЫКЛЮЧЕНА")
+
+            </div>
+
+        </div>
+
+
+        <button class="security-button"
+                @onclick="ToggleSecurity">
+
+            @(securityEnabled
+                        ? "ВЫКЛЮЧИТЬ ОХРАНУ"
+                        : "ВКЛЮЧИТЬ ОХРАНУ")
+
+        </button>
+
+
+        <div class="security-motion">
+
+            <div class="security-motion-label">
+                MOTION SENSOR
+            </div>
+
+            <div class="security-motion-value @(homeData.MotionDetected ? "motion" : "")">
+
+                @(homeData.MotionDetected
+                                ? "ДВИЖЕНИЕ ОБНАРУЖЕНО"
+                                : "ДВИЖЕНИЯ НЕТ")
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+
+    private HomeData homeData = new HomeData();
+
+    private bool securityEnabled;
+
+    private System.Threading.Timer? timer;
+
+    private bool security3dInitialized;
+
+
+    private async Task ToggleSecurity()
+    {
+        securityEnabled = !securityEnabled;
+
+        var client =
+            HttpClientFactory.CreateClient("HomeApi");
+
+        await client.PostAsJsonAsync(
+            "api/home/security",
+            securityEnabled
+        );
+
+        await LoadHomeData();
+
+        StateHasChanged();
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadHomeData();
+
+        timer = new System.Threading.Timer(
+            async _ =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    await LoadHomeData();
+
+                    StateHasChanged();
+                });
+            },
+            null,
+            TimeSpan.FromSeconds(5),
+            TimeSpan.FromSeconds(5)
+        );
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JS.InvokeVoidAsync(
+                    "myHomeSecurity3d.init"
+                );
+
+                security3dInitialized = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    "MY HOME SECURITY 3D ERROR: " + ex.Message
+                );
+            }
+        }
+
+        if (security3dInitialized)
+        {
+            try
+            {
+                await JS.InvokeVoidAsync(
+                    "myHomeSecurity3d.setState",
+                    securityEnabled,
+                    homeData.MotionDetected
+                );
+            }
+            catch
+            {
+                // JS может быть недоступен во время перехода страницы
+            }
+        }
+    }
+
+
+    private async Task LoadHomeData()
+    {
+        try
+        {
+            var client =
+                HttpClientFactory.CreateClient("HomeApi");
+
+            homeData =
+                await client.GetFromJsonAsync<HomeData>(
+                    "api/home"
+                ) ?? new HomeData();
+
+            securityEnabled =
+                homeData.SecurityEnabled;
+        }
+        catch
+        {
+            // API временно недоступен
+        }
+    }
+
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+
+
+    public class HomeData
+    {
+        public bool SecurityEnabled { get; set; }
+
+        public bool MotionDetected { get; set; }
+    }
+
 }

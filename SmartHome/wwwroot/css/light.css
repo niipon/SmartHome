@@ -1,0 +1,484 @@
+﻿/* =========================================
+   MY HOME — LIGHTS
+========================================= */
+
+.lights-page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    color: white;
+    background: radial-gradient( circle at 50% 38%, rgba(255, 174, 50, .16), transparent 34% ), radial-gradient( circle at 50% 70%, rgba(80, 55, 20, .12), transparent 40% ), #0d0b06;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.lights-header {
+    position: absolute;
+    top: 32px;
+    left: 42px;
+    right: 42px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.lights-eyebrow {
+    margin-bottom: 7px;
+    color: #ffb52e;
+    font-size: 10px;
+    letter-spacing: 4px;
+}
+
+.lights-header h1 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.lights-header p {
+    margin: 7px 0 0;
+    color: #817866;
+    font-size: 13px;
+}
+
+
+/* STATUS */
+
+.lights-status {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 15px;
+    border: 1px solid rgba(255,181,46,.22);
+    border-radius: 30px;
+    background: rgba(255,181,46,.045);
+    color: #ffbf55;
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+    .lights-status span {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #ffb52e;
+        box-shadow: 0 0 8px #ffb52e, 0 0 18px #ffb52e;
+        animation: lightStatusPulse 1.5s infinite;
+    }
+
+@keyframes lightStatusPulse {
+
+    0%, 100% {
+        opacity: .45;
+        transform: scale(.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
+}
+
+
+/* =========================================
+   3D AREA
+========================================= */
+
+.lamp-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 72vh;
+    overflow: hidden;
+}
+
+#lights3d {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+}
+
+    #lights3d:active {
+        cursor: grabbing;
+    }
+
+    #lights3d canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+
+/* HINT */
+
+.lamp-hint {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(220,175,95,.38);
+    font-size: 8px;
+    letter-spacing: 4px;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   CONTROL PANEL
+========================================= */
+
+.lights-control {
+    position: absolute;
+    left: 50%;
+    bottom: 25px;
+    transform: translateX(-50%);
+    width: min(720px, calc(100% - 50px));
+    padding: 18px;
+    z-index: 30;
+    border: 1px solid rgba(255,181,46,.13);
+    border-radius: 22px;
+    background: rgba(17,14,8,.76);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 15px 50px rgba(0,0,0,.3);
+}
+
+
+/* =========================================
+   PANEL TOP
+========================================= */
+
+.lights-control-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding: 0 4px;
+}
+
+.control-label {
+    display: block;
+    color: #746c5d;
+    font-size: 8px;
+    letter-spacing: 3px;
+}
+
+.control-title {
+    margin-top: 3px;
+    color: #eee;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.lights-counter {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+}
+
+    .lights-counter strong {
+        color: #ffb52e;
+        font-size: 23px;
+    }
+
+    .lights-counter span {
+        color: #686052;
+        font-size: 12px;
+    }
+
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.lights-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
+}
+
+
+/* =========================================
+   LIGHT BUTTON
+========================================= */
+
+.light-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 11px;
+    border: 1px solid rgba(255,255,255,.055);
+    border-radius: 14px;
+    background: rgba(255,255,255,.025);
+    color: white;
+    cursor: pointer;
+    text-align: left;
+    transition: background .22s ease, border .22s ease, transform .15s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+
+/* HOVER */
+
+@media (hover: hover) {
+
+    .light-button:hover {
+        background: rgba(255,181,46,.055);
+        border-color: rgba(255,181,46,.18);
+    }
+}
+
+
+/* PRESS */
+
+.light-button:active {
+    transform: scale(.96);
+}
+
+
+/* ACTIVE */
+
+.light-button.active {
+    background: rgba(255,174,40,.075);
+    border-color: rgba(255,181,46,.28);
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.light-button-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(255,255,255,.04);
+    color: #777;
+    font-size: 16px;
+    transition: .25s;
+}
+
+.light-button.active
+.light-button-icon {
+    background: rgba(255,181,46,.12);
+    color: #ffb52e;
+    box-shadow: 0 0 15px rgba(255,181,46,.08);
+}
+
+
+/* =========================================
+   TEXT
+========================================= */
+
+.light-button-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.light-button-name {
+    overflow: hidden;
+    color: #ddd;
+    font-size: 11px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.light-button-state {
+    color: #625c51;
+    font-size: 8px;
+}
+
+.light-button.active
+.light-button-state {
+    color: #c08c37;
+}
+
+
+/* =========================================
+   DOT
+========================================= */
+
+.light-dot {
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    margin-left: auto;
+    border-radius: 50%;
+    background: #3d392f;
+}
+
+.light-button.active .light-dot {
+    background: #ffb52e;
+    box-shadow: 0 0 7px #ffb52e, 0 0 14px rgba(255,181,46,.5);
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 850px) {
+
+    .lights-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* =========================================
+   PHONE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .lights-header {
+        top: 20px;
+        left: 20px;
+        right: 20px;
+    }
+
+        .lights-header h1 {
+            font-size: 27px;
+        }
+
+        .lights-header p {
+            font-size: 11px;
+        }
+
+    .lights-status {
+        padding: 7px 10px;
+        font-size: 7px;
+        letter-spacing: 1.5px;
+    }
+
+
+    /*
+       3D ЛАМПОЧКА
+    */
+
+    .lamp-wrapper {
+        height: 68vh;
+    }
+
+
+    /*
+       ПАНЕЛЬ
+    */
+
+    .lights-control {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        transform: none;
+        width: auto;
+        padding: 13px;
+        border-radius: 18px;
+    }
+
+
+    .lights-control-top {
+        margin-bottom: 10px;
+    }
+
+    .control-title {
+        font-size: 15px;
+    }
+
+    .lights-counter strong {
+        font-size: 20px;
+    }
+
+
+    /*
+       2 × 2
+    */
+
+    .lights-buttons {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 7px;
+    }
+
+
+    /*
+       КНОПКИ БОЛЬШЕ
+    */
+
+    .light-button {
+        min-height: 54px;
+        padding: 9px;
+        border-radius: 13px;
+        gap: 8px;
+    }
+
+    .light-button-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 15px;
+    }
+
+    .light-button-name {
+        font-size: 10px;
+    }
+
+    .light-button-state {
+        font-size: 7px;
+    }
+}
+
+
+/* =========================================
+   VERY SMALL PHONE
+========================================= */
+
+@media (max-width: 380px) {
+
+    .lights-header h1 {
+        font-size: 24px;
+    }
+
+    .lights-header p {
+        display: none;
+    }
+
+    .lights-status {
+        display: none;
+    }
+
+    .lamp-wrapper {
+        height: 66vh;
+    }
+
+    .lights-control {
+        padding: 10px;
+    }
+
+    .light-button {
+        min-height: 51px;
+    }
+
+    .light-button-icon {
+        width: 29px;
+        height: 29px;
+    }
+}

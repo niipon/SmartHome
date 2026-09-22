@@ -46,6 +46,8 @@ using SmartHome.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<CurrentUserService>();
 builder.Services.AddSingleton<PushNotificationService>();
+builder.Services.AddSingleton<AdbService>();
+builder.Services.AddSingleton<TvRemoteService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

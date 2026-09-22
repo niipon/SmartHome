@@ -1,200 +1,48 @@
-﻿
+﻿```razor
 @page "/settings"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
 
-<div class="page">
+<div class="settings-page">
 
-    <!-- HEADER -->
-    <div class="page-header">
-
+    <div class="settings-top">
         <div>
-            <p class="eyebrow">MY HOME</p>
+            <div class="settings-eyebrow">MY HOME</div>
             <h1>Settings</h1>
-            <p class="subtitle">
-                Управление системой умного дома
-            </p>
+            <p>Система управления домом</p>
         </div>
 
-        <div class="page-title-icon">
-            ⚙
+        <div class="settings-status">
+            <span></span>
+            SYSTEM ONLINE
         </div>
-
     </div>
 
+    <div class="dna-wrapper">
+        <div id="settingsDna"></div>
 
-    
-
-
-    <!-- MANAGEMENT -->
-    <div class="settings-section">
-
-        <p class="eyebrow">MANAGEMENT</p>
-
-        <div class="settings-group">
-
-
-            <!-- USERS -->
-            <div class="setting-item">
-
-                <a href="/users" class="setting-link">
-
-                    <div class="setting-icon blue">
-                        👥
-                    </div>
-
-                    <div class="setting-content">
-
-                        <h3>Users</h3>
-
-                        <p>
-                            Управление пользователями дома
-                        </p>
-
-                    </div>
-
-                    <span class="arrow">›</span>
-
-                </a>
-
-            </div>
-
-
-            
-
-
-            <!-- SECURITY -->
-            <div class="setting-item">
-
-                <a href="/security" class="setting-link">
-
-                    <div class="setting-icon red">
-                        🛡
-                    </div>
-
-                    <div class="setting-content">
-
-                        <h3>Security</h3>
-
-                        <p>
-                            Настройки безопасности дома
-                        </p>
-
-                    </div>
-
-                    <span class="arrow">›</span>
-
-                </a>
-
-            </div>
-
-
+        <div class="dna-hint">
+            DRAG TO ROTATE
         </div>
-
-    </div>
-
-
-    <!-- SYSTEM -->
-    <div class="settings-section">
-
-        <p class="eyebrow">SYSTEM</p>
-
-        <div class="settings-group">
-
-
-            
-
-
-            <!-- HOME -->
-            <div class="setting-item">
-
-                <a href="/" class="setting-link">
-
-                    <div class="setting-icon blue">
-                        🏠
-                    </div>
-
-                    <div class="setting-content">
-
-                        <h3>Home</h3>
-
-                        <p>
-                            Основной дом
-                        </p>
-
-                    </div>
-
-                    <span class="arrow">›</span>
-
-                </a>
-
-            </div>
-
-
-
-
-            
-
-    </div>
-
-
-    
-
-
-    <!-- ABOUT -->
-    <div class="settings-section">
-
-        <p class="eyebrow">ABOUT</p>
-
-        <div class="settings-group">
-
-
-            <!-- APP VERSION -->
-            <div class="setting-item">
-
-                <div class="setting-link">
-
-                    <div class="setting-icon">
-                        ℹ
-                    </div>
-
-                    <div class="setting-content">
-
-                        <h3>MY HOME</h3>
-
-                        <p>
-                            Smart Home System
-                        </p>
-
-                    </div>
-
-                    <span class="setting-value">
-                        v1.0.0
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            
-
-
-        </div>
-
-    </div>
-
-
-    
-</div>
-
-    <!-- FOOTER -->
-    <div class="settings-footer">
-
-        <strong>MY HOME</strong>
-
-        <span>
-            Smart Home System • Version 1.0.0
-        </span>
-
     </div>
 
 </div>
+
+@code
+{
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        try
+        {
+            await JS.InvokeVoidAsync("myHomeSettingsDna.init");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("MY HOME SETTINGS DNA ERROR: " + ex.Message);
+        }
+    }
+}
+```

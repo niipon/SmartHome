@@ -1,0 +1,667 @@
+﻿@page "/remote"
+@using System.Diagnostics;
+@using SmartHome.Services
+@rendermode InteractiveServer
+@inject TvRemoteService TvRemote
+@inject AdbService Adb
+
+<div class="remote-page">
+
+    <div class="remote-wrapper">
+
+        <div class="remote">
+
+            <!-- POWER -->
+            <button class="power-button" @onclick="Power">
+                <span class="power-symbol">⏻</span>
+            </button>
+
+            <!-- GOOGLE ASSISTANT -->
+            <button class="assistant-button" @onclick="Assistant">
+                <span class="google-dot blue"></span>
+                <span class="google-dot red"></span>
+                <span class="google-dot yellow"></span>
+                <span class="google-dot green"></span>
+            </button>
+
+            <!-- NAVIGATION -->
+            <div class="navigation">
+
+                <button class="nav-up" @onclick="Up">
+                    <span>⌃</span>
+                </button>
+
+                <button class="nav-left" @onclick="Left">
+                    <span>‹</span>
+                </button>
+
+                <button class="nav-ok" @onclick="Ok">
+                    <span>OK</span>
+                </button>
+
+                <button class="nav-right" @onclick="Right">
+                    <span>›</span>
+                </button>
+
+                <button class="nav-down" @onclick="Down">
+                    <span>⌄</span>
+                </button>
+
+            </div>
+
+            <!-- THREE BUTTONS -->
+            <div class="three-buttons">
+
+                <!-- APPS -->
+                <button class="small-button apps-button"
+                        @onclick="Apps"
+                        aria-label="Приложения">
+
+                    <span class="apps-grid">
+                        <i></i><i></i><i></i>
+                        <i></i><i></i><i></i>
+                        <i></i><i></i><i></i>
+                    </span>
+
+                </button>
+
+                <!-- BACK -->
+                <button class="small-button back-button"
+                        @onclick="Back"
+                        aria-label="Назад">
+
+                    <span class="back-icon">‹</span>
+
+                </button>
+
+                <!-- HOME -->
+                <button class="small-button home-button"
+                        @onclick="Home"
+                        aria-label="Главный экран">
+
+                    <span class="home-icon">○</span>
+
+                </button>
+
+            </div>
+
+            <!-- NETFLIX / PRIME -->
+            <div class="service-buttons">
+
+                <button class="service netflix"
+                        @onclick="Netflix">
+                    NETFLIX
+                </button>
+
+                <button class="service prime"
+                        @onclick="Prime">
+
+                    <span class="prime-small">prime</span>
+                    <span class="video-small">video</span>
+
+                </button>
+
+            </div>
+
+            <!-- VOLUME -->
+            <div class="volume-control">
+
+                <button class="volume-button volume-up"
+                        @onclick="VolumeUp"
+                        aria-label="Увеличить громкость">
+
+                    <span>+</span>
+
+                </button>
+
+                <div class="volume-divider"></div>
+
+                <button class="volume-button volume-down"
+                        @onclick="VolumeDown"
+                        aria-label="Уменьшить громкость">
+
+                    <span>−</span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await TvRemote.ConnectAsync();
+    }
+
+    // POWER
+    private void Power()
+    {
+        string powerPath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = powerPath,
+            Arguments = "-s 192.168.8.8:5555 shell input keyevent 26"
+        });
+    }
+
+
+    // GOOGLE ASSISTANT
+
+    private void Assistant()
+    {
+    }
+
+
+    // NAVIGATION
+
+    private void Up()
+    {
+        Adb.SendKey(19);
+
+
+    }
+
+    private void Down()
+    {
+        string downPath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+            {
+                FileName = downPath,
+                Arguments = "-s 192.168.8.8:5555 shell input keyevent 20"
+            });
+    }
+
+    private void Left()
+    {
+        string leftPath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+            {
+                FileName = leftPath,
+                Arguments = "- s 192.168.8.8:5555 shell input keyevent 21"
+            });
+    }
+
+    private void Right()
+    {
+        string rightPath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+            {
+                FileName = rightPath,
+                Arguments = "-s 192.168.8.8:5555 shell input keyevent 22"
+            });
+    }
+
+    private void Ok()
+    {
+        string okPath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+            {
+                FileName = okPath,
+                Arguments = "-s 192.168.8.8:5555 shell input keyevent 23"
+            });        
+    }
+
+
+    // MENU / APPS
+
+    private void Apps()
+    {
+        string appsPath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = appsPath,
+            Arguments = "-s 192.168.8.8:5555 shell input keyevent 187"
+        });
+    }
+
+
+    // BACK
+
+    private void Back()
+    {
+        string backPath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = backPath,
+            Arguments = "-s 192.168.8.8:5555 shell input keyevent 4"
+        });
+    }
+
+
+    // HOME
+
+    private void Home()
+    {
+        string homePath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = homePath,
+            Arguments = "-s 192.168.8.8:5555 shell input keyevent 3"
+        });
+    }
+
+
+    // STREAMING SERVICES
+
+    private void Netflix()
+    {
+    }
+
+    private void Prime()
+    {
+    }
+
+
+    // VOLUME
+
+    private void VolumeUp()
+    {
+        string volupPath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = volupPath,
+            Arguments = "-s 192.168.8.8:5555 shell input keyevent 24"
+        });
+    }
+
+    private void VolumeDown()
+    {
+        string voldownPath = @"C:\Users\Админ\Desktop\platform-tools-latest-windows\platform-tools\adb.exe";
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = voldownPath,
+            Arguments = "-s 192.168.8.8:5555 shell input keyevent 25"
+        });
+    }
+
+}
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .remote-page {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: radial-gradient( circle at center, #1a1d22 0%, #0d0f12 55%, #08090b 100% );
+        padding: 30px 20px;
+        overflow: hidden;
+    }
+
+    .remote-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* REMOTE BODY */
+
+    .remote {
+        position: relative;
+        width: 220px;
+        height: 590px;
+        border-radius: 38px;
+        background: linear-gradient( 145deg, #24272a 0%, #101214 35%, #08090a 75%, #17191b 100% );
+        box-shadow: inset 1px 1px 2px rgba(255,255,255,.10), inset -2px -3px 5px rgba(0,0,0,.8), 0 25px 60px rgba(0,0,0,.55);
+        border: 1px solid #303337;
+        padding-top: 22px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+
+    /* POWER */
+
+    .power-button {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: 1px solid #111;
+        background: #090a0b;
+        box-shadow: inset 0 2px 4px rgba(255,255,255,.04), 0 2px 4px rgba(0,0,0,.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: .12s;
+    }
+
+        .power-button:active {
+            transform: scale(.93);
+        }
+
+    .power-symbol {
+        color: #ff812e;
+        font-size: 27px;
+        line-height: 1;
+        font-weight: 300;
+    }
+
+
+    /* ASSISTANT */
+
+    .assistant-button {
+        margin-top: 12px;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #090a0b;
+        border: 1px solid #15171a;
+        box-shadow: inset 0 2px 4px rgba(255,255,255,.03), 0 2px 5px rgba(0,0,0,.8);
+        position: relative;
+        cursor: pointer;
+    }
+
+    .google-dot {
+        position: absolute;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+    }
+
+    .blue {
+        background: #4285f4;
+        left: 13px;
+        top: 15px;
+    }
+
+    .red {
+        background: #ea4335;
+        right: 10px;
+        top: 17px;
+    }
+
+    .yellow {
+        background: #fbbc05;
+        left: 17px;
+        bottom: 10px;
+    }
+
+    .green {
+        background: #34a853;
+        right: 13px;
+        bottom: 11px;
+    }
+
+
+    /* NAVIGATION */
+
+    .navigation {
+        position: relative;
+        width: 155px;
+        height: 155px;
+        margin-top: 12px;
+        border-radius: 50%;
+        background: radial-gradient( circle at 50% 45%, #202326 0%, #141618 55%, #0a0b0c 100% );
+        box-shadow: inset 0 2px 5px rgba(255,255,255,.04), inset 0 -5px 10px rgba(0,0,0,.75), 0 3px 6px rgba(0,0,0,.6);
+    }
+
+        .navigation button {
+            position: absolute;
+            border: 0;
+            background: transparent;
+            color: #85888b;
+            cursor: pointer;
+            transition: .12s;
+        }
+
+            .navigation button:active {
+                transform: scale(.88);
+                color: white;
+            }
+
+    .nav-up {
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .nav-down {
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .nav-left {
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .nav-right {
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .nav-up span,
+    .nav-down span {
+        font-size: 27px;
+        font-weight: 300;
+    }
+
+    .nav-left span,
+    .nav-right span {
+        font-size: 32px;
+        font-weight: 200;
+    }
+
+    .nav-ok {
+        width: 67px;
+        height: 67px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50% !important;
+        background: radial-gradient( circle, #202326, #111315 ) !important;
+        box-shadow: inset 0 1px 2px rgba(255,255,255,.04), 0 2px 5px rgba(0,0,0,.6);
+    }
+
+        .nav-ok:active {
+            transform: translate(-50%, -50%) scale(.92) !important;
+        }
+
+        .nav-ok span {
+            font-size: 11px;
+            color: #777b7f;
+            letter-spacing: 1px;
+        }
+
+
+    /* THREE BUTTONS */
+
+    .three-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 165px;
+        margin-top: 20px;
+    }
+
+    .small-button {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: radial-gradient( circle at 40% 35%, #25282a, #111315 );
+        border: 1px solid #0b0c0d;
+        box-shadow: inset 0 1px 2px rgba(255,255,255,.04), 0 2px 4px rgba(0,0,0,.7);
+        color: #888;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .small-button:active {
+            transform: scale(.9);
+        }
+
+
+    /* APPS */
+
+    .apps-grid {
+        width: 17px;
+        height: 17px;
+        display: grid;
+        grid-template-columns: repeat(3, 4px);
+        grid-template-rows: repeat(3, 4px);
+        gap: 2px;
+    }
+
+        .apps-grid i {
+            background: #8c8f92;
+            border-radius: 1px;
+        }
+
+
+    /* BACK */
+
+    .back-icon {
+        font-size: 31px;
+        font-weight: 200;
+        transform: translateY(-1px);
+    }
+
+
+    /* HOME */
+
+    .home-icon {
+        font-size: 27px;
+        font-weight: 200;
+    }
+
+
+    /* SERVICES */
+
+    .service-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .service {
+        height: 32px;
+        border-radius: 18px;
+        border: 1px solid #111;
+        cursor: pointer;
+        box-shadow: inset 0 1px 1px rgba(255,255,255,.08), 0 2px 4px rgba(0,0,0,.65);
+        transition: .12s;
+    }
+
+        .service:active {
+            transform: scale(.94);
+        }
+
+    .netflix {
+        width: 72px;
+        background: linear-gradient( 180deg, #272727, #101010 );
+        color: #ef463c;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .2px;
+    }
+
+    .prime {
+        width: 82px;
+        background: linear-gradient( 180deg, #292929, #111111 );
+        color: #63c9ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        font-weight: 700;
+    }
+
+    .prime-small {
+        font-size: 10px;
+    }
+
+    .video-small {
+        font-size: 9px;
+    }
+
+
+    /* VOLUME */
+
+    .volume-control {
+        width: 45px;
+        height: 76px;
+        margin-top: 14px;
+        border-radius: 20px;
+        background: linear-gradient( 145deg, #25282a, #0e1011 );
+        border: 1px solid #0a0b0c;
+        box-shadow: inset 1px 1px 2px rgba(255,255,255,.03), 0 2px 5px rgba(0,0,0,.75);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .volume-button {
+        width: 100%;
+        height: 50%;
+        border: 0;
+        background: transparent;
+        color: #777b7f;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: .12s;
+    }
+
+        .volume-button span {
+            font-size: 22px;
+            font-weight: 300;
+        }
+
+        .volume-button:active {
+            background: rgba(255,255,255,.06);
+            color: white;
+            transform: scale(.94);
+        }
+
+    .volume-divider {
+        width: 18px;
+        height: 1px;
+        margin: 0 auto;
+        background: #292c2f;
+    }
+
+
+    /* PHONE */
+
+    @@media (max-width: 480px) {
+        .remote-page
+
+    {
+        padding: 20px 10px;
+    }
+
+    .remote {
+        transform: scale(.9);
+    }
+
+    }
+</style>
