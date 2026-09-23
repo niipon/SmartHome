@@ -1,40 +1,4 @@
-//using SmartHome.Components;
 
-//var builder = WebApplication.CreateBuilder(args);
-
-
-//// Add services to the container.
-//builder.Services.AddRazorComponents()
-//    .AddInteractiveServerComponents();
-
-//builder.Services.AddControllers();
-
-//builder.Services.AddHttpClient("HomeApi", client =>
-//{
-//    client.BaseAddress = new Uri("http://localhost:5284/");
-//});
-
-//var app = builder.Build();
-
-//// Configure the HTTP request pipeline.
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-//    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-//    app.UseHsts();
-//}
-
-////app.UseHttpsRedirection();
-
-//app.UseStaticFiles();
-//app.UseAntiforgery();
-
-//app.MapRazorComponents<App>()
-//    .AddInteractiveServerRenderMode();
-
-//app.MapControllers();
-
-//app.Run();
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -72,7 +36,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddHttpClient("HomeApi", client =>
 {
-    client.BaseAddress = new Uri("https://192.168.8.38:8080/");
+    client.BaseAddress = new Uri("http://192.168.8.38:8080/");
 });
 
 var app = builder.Build();
