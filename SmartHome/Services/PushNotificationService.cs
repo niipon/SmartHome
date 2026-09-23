@@ -25,7 +25,7 @@ public class PushNotificationService
             privateKey
         )
         {
-            Subject = "https://smarthome-r4vs.onrender.com"
+            Subject = "http://192.168.8.38:8080/"
         };
     }
 
