@@ -36,7 +36,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddHttpClient("HomeApi", client =>
 {
-    client.BaseAddress = new Uri("http://192.168.8.38:8080/");
+    client.BaseAddress = new Uri("http://localhost:8080/");
 });
 
 var app = builder.Build();
