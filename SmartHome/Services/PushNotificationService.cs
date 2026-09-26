@@ -25,7 +25,7 @@ public class PushNotificationService
             privateKey
         )
         {
-            Subject = "http://192.168.8.38:8080/"
+            Subject = "https://myhome-server.taila61dc2.ts.net/"
         };
     }
 
